@@ -35,7 +35,10 @@ parser said on the day the file was written.
 2. Set `RAILS_MASTER_KEY` from `config/master.key`. Without it the app cannot read
    credentials and will not boot.
 3. Set anything from `.env.example` the phase you are on needs. Nothing there is required
-   to boot.
+   to boot. From Phase 2 that means `LLM_API_KEY` and `LLM_VERIFIER_API_KEY`; everything
+   else about a provider has a default in `app/models/llm/provider.rb`. Check with
+   `railway run bin/rails llm:status`, which prints the model each role resolved to and
+   names any key that is missing.
 4. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 230.
 
 At this point the app runs and has its taxonomy, and no guidelines.
@@ -81,6 +84,28 @@ railway run bin/rails gpc:link
 pinned to one thread in `config/queue.yml`. Leave it that way. The Internet Archive answers
 429 and 503 freely and will need more than one attempt.
 
+## Moving generated questions into production
+
+**Not built yet — this is a Phase 2 deliverable, and the rule above is a policy with no
+tool behind it so far.** `gpc:export` carries guidelines and section text only. The
+`clinical_cases`, `questions` and `answer_options` tables do not exist until Phase 2
+creates them, so there is nothing to export today.
+
+When they do exist, questions need the opposite treatment from the corpus. Guideline text
+is cheap to move and its derivatives are rebuilt on arrival; a generated question is the
+one thing here that costs money and **cannot be reproduced** — the same prompt against the
+same model returns different wording, different distractors, and a different quality draw.
+So:
+
+- Generate **once**, locally, against the local corpus.
+- Export the result to a file, import it into production, and keep that file. It is the
+  backup, and it is worth more than the database it came from.
+- Turn on Railway's Postgres backups before the run, not after.
+- Never point the generator at production "just to fill it in". That is how you pay twice.
+
+Until the exporter exists, do not start a paid generation run against a database you are
+not backing up.
+
 ## Keeping it fresh
 
 `Gpc::RefreshCatalogJob` runs quarterly on its own (03:00 on 1 Jan/Apr/Jul/Oct, from
@@ -107,6 +132,7 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | `gpc:retitle` | Re-derive archived titles from stored text. Same idea, for the PDF title heuristic. |
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
 | `taxonomy:seed` | Rebuild the topic tree after editing `db/seeds/taxonomy.yml`. Runs automatically on deploy. |
+| `llm:status` | Show which model each role resolved to and whether its key is set. Run it before any paid generation. |
 
 ## Before the first paying subscriber
 
