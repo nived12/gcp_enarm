@@ -4,7 +4,8 @@ An ENARM simulator built on Mexico's public Guías de Práctica Clínica. Clinic
 generated from graded GPC recommendations, and every answer cites the recommendation it
 came from. Free for a granted-premium list, paid for everyone else.
 
-The full build plan lives outside the repo at
+The full build plan lives outside the repo at `../initial_plan.md`
+(`/Users/nived/enarm_simulador/initial_plan.md`), mirrored to
 `~/.claude/plans/i-want-to-create-crispy-stardust.md`.
 
 ## Non-negotiables
