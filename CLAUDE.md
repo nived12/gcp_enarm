@@ -141,13 +141,15 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   `GuidelineSection#graded?` sections are read for recommendations.
 - **Sample before writing a parser, then check the whole corpus after.** Three sections
   per guideline said 1.5% of strips were unparseable; all 3,076 said 22%.
-- **`deepseek-flash` is a reasoning model, and its thinking is billed as output.**
-  Verified live 2026-09-20: a one-word answer spent 10 reasoning tokens against 2 of
-  content, returned in a `reasoning_content` field beside `content`, and counted under
-  `completion_tokens_details.reasoning_tokens`. Two consequences. A `max_tokens` budgeted
-  for the answer alone comes back with **empty `content` and no error** — the reasoning
-  consumed the budget. And DeepSeek's real output cost is a multiple of the visible
-  answer, so the plan's price comparison flatters it; the bake-off must compare *measured*
-  token counts, not list prices.
+- **`deepseek-flash` thinks before answering, and the thinking is billed as output.**
+  Measured live 2026-09-20 on a real generation prompt: 5,682 output tokens, of which
+  **4,638 were reasoning** and 1,044 were the answer. With `max_tokens: 4000` it spent the
+  entire budget thinking and returned an **empty string with `finish_reason: "length"`
+  and no error** — the failure mode to fear, because it looks like success.
+  Pass `thinking: {type: "disabled"}` or `reasoning_effort: "none"` and it drops to zero
+  reasoning tokens and still returns valid JSON — 4.4x cheaper output. Verified against
+  the API, not just the docs: `reasoning_effort: "minimal"` is silently mapped to `"low"`
+  and still thinks, so it is not a way to turn this off. Gemini Flash-Lite reports zero
+  reasoning tokens on the same prompt and needs none of this.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.
