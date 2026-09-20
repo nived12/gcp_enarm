@@ -1,0 +1,617 @@
+# The filter axis and the study plan's backbone.
+#
+# Shape follows Dr. Re's temario — specialty, branch, named topic — because that is
+# what a student recognises, but the content is ours: the four troncales and three
+# transversal contexts the ENARM convocatoria names, filled from the GPC catalog and
+# the exam blueprint rather than copied from anyone's curated list.
+#
+# Names are Spanish because they are data a student reads, not identifiers. Slugs are
+# derived, not written. Aliases exist so Gpc::TopicLinker can match a guideline titled
+# "cetoacidosis diabética" to the topic a student calls "complicaciones agudas".
+---
+- name: Medicina Interna
+  kind: core
+  color_token: indigo
+  branches:
+    - name: Cardiología
+      topics:
+        - name: Infarto agudo de miocardio
+          aliases: [IAM, síndrome coronario agudo, SICA, elevación del segmento ST, infarto del miocardio]
+        - name: Cardiopatía isquémica crónica
+          aliases: [angina estable, insuficiencia coronaria]
+        - name: Insuficiencia cardiaca
+          aliases: [falla cardiaca, insuficiencia cardiaca aguda, insuficiencia cardiaca crónica]
+        - name: Arritmias y fibrilación auricular
+          aliases: [fibrilación auricular, taquiarritmia, bradiarritmia]
+        - name: Hipertensión arterial sistémica
+          aliases: [HAS, hipertensión arterial]
+        - name: Valvulopatías
+          aliases: [estenosis aórtica, insuficiencia mitral]
+        - name: Endocarditis y pericarditis
+          aliases: [endocarditis infecciosa, derrame pericárdico]
+        - name: Rehabilitación cardiovascular
+          aliases: [rehabilitación cardiaca]
+    - name: Neumología
+      topics:
+        - name: Enfermedad pulmonar obstructiva crónica
+          aliases: [EPOC, enfisema, bronquitis crónica]
+        - name: Asma
+          aliases: [exacerbación de asma, crisis asmática]
+        - name: Neumonía adquirida en la comunidad
+          aliases: [NAC, neumonía bacteriana]
+        - name: Neumonía asociada a la atención de la salud
+          aliases: [neumonía nosocomial, neumonía asociada a ventilación mecánica]
+        - name: Tuberculosis
+          aliases: [TB pulmonar, tuberculosis pulmonar]
+        - name: Tromboembolia pulmonar
+          aliases: [TEP, embolia pulmonar]
+        - name: Derrame pleural
+          aliases: [empiema]
+        - name: Cáncer de pulmón
+          aliases: [cáncer pulmonar, carcinoma broncogénico]
+        - name: Apnea obstructiva del sueño
+          aliases: [SAOS, apnea del sueño]
+    - name: Gastroenterología
+      topics:
+        - name: Enfermedad por reflujo y úlcera péptica
+          aliases: [ERGE, reflujo gastroesofágico, úlcera gástrica, Helicobacter pylori]
+        - name: Hemorragia de tubo digestivo
+          aliases: [sangrado de tubo digestivo, hemorragia digestiva]
+        - name: Hepatitis virales
+          aliases: [hepatitis B, hepatitis C, virus de la hepatitis]
+        - name: Cirrosis y sus complicaciones
+          aliases: [hipertensión portal, ascitis, encefalopatía hepática]
+        - name: Pancreatitis
+          aliases: [pancreatitis aguda, pancreatitis crónica]
+        - name: Enfermedad inflamatoria intestinal
+          aliases: [colitis ulcerativa, enfermedad de Crohn]
+        - name: Diarrea aguda y crónica
+          aliases: [síndrome diarreico, enfermedad diarreica]
+    - name: Nefrología
+      topics:
+        - name: Lesión renal aguda
+          aliases: [insuficiencia renal aguda, falla renal aguda]
+        - name: Enfermedad renal crónica
+          aliases: [ERC, insuficiencia renal crónica]
+        - name: Terapia de reemplazo renal
+          aliases: [diálisis, hemodiálisis, diálisis peritoneal]
+        - name: Síndrome nefrótico y nefrítico
+          aliases: [glomerulonefritis, proteinuria]
+        - name: Trastornos hidroelectrolíticos
+          aliases: [hiponatremia, hiperkalemia, hipokalemia]
+        - name: Trastornos ácido-base
+          aliases: [acidosis metabólica, alcalosis]
+    - name: Endocrinología
+      topics:
+        - name: Diabetes mellitus tipo 2
+          aliases: [diabetes mellitus, DM2, control glucémico]
+        - name: Complicaciones agudas de la diabetes
+          aliases: [cetoacidosis diabética, estado hiperglucémico hiperosmolar, hipoglucemia]
+        - name: Complicaciones crónicas de la diabetes
+          aliases: [nefropatía diabética, retinopatía diabética, neuropatía diabética, pie diabético]
+        - name: Dislipidemias
+          aliases: [hipercolesterolemia, hipertrigliceridemia, colesterol]
+        - name: Enfermedad tiroidea
+          aliases: [hipotiroidismo, hipertiroidismo, nódulo tiroideo, tiroides]
+        - name: Obesidad y síndrome metabólico
+          aliases: [sobrepeso, obesidad exógena]
+        - name: Patología suprarrenal
+          aliases: [insuficiencia suprarrenal, síndrome de Cushing]
+    - name: Infectología
+      topics:
+        - name: Infección de vías urinarias
+          aliases: [IVU, cistitis, pielonefritis, infección del tracto urinario]
+        - name: Infecciones de piel y tejidos blandos
+          aliases: [celulitis, erisipela, absceso]
+        - name: VIH y sida
+          aliases: [VIH, infección por VIH, antirretroviral]
+        - name: Arbovirosis
+          aliases: [dengue, Zika, chikungunya]
+        - name: Rickettsiosis
+          aliases: [fiebre manchada, Rickettsia rickettsii]
+        - name: Herpes zóster
+          aliases: [varicela zóster, neuralgia posherpética]
+        - name: Sepsis y choque séptico
+          aliases: [sepsis, choque séptico]
+        - name: Infecciones asociadas a la atención de la salud
+          aliases: [infección nosocomial, infección asociada a catéter, catéter central]
+    - name: Hematología
+      topics:
+        - name: Anemias
+          aliases: [anemia ferropénica, anemia megaloblástica, anemia hemolítica]
+        - name: Leucemias
+          aliases: [leucemia aguda, leucemia linfoblástica, leucemia mieloide]
+        - name: Linfomas
+          aliases: [linfoma de Hodgkin, linfoma no Hodgkin]
+        - name: Trastornos de la coagulación
+          aliases: [hemofilia, trombocitopenia, coagulación intravascular diseminada]
+        - name: Enfermedad tromboembólica venosa
+          aliases: [trombosis venosa profunda, TVP, anticoagulación]
+    - name: Reumatología
+      topics:
+        - name: Artritis reumatoide
+          aliases: [AR, artritis]
+        - name: Lupus eritematoso sistémico
+          aliases: [LES, lupus]
+        - name: Osteoartritis
+          aliases: [artrosis, gonartrosis, coxartrosis]
+        - name: Gota e hiperuricemia
+          aliases: [gota, ácido úrico]
+        - name: Osteoporosis
+          aliases: [densidad mineral ósea, fractura por fragilidad]
+    - name: Neurología
+      topics:
+        - name: Enfermedad vascular cerebral
+          aliases: [EVC, evento vascular cerebral, infarto cerebral, ictus]
+        - name: Epilepsia y crisis convulsivas
+          aliases: [epilepsia, crisis epiléptica, estado epiléptico]
+        - name: Cefaleas
+          aliases: [migraña, cefalea tensional]
+        - name: Demencias
+          aliases: [enfermedad de Alzheimer, deterioro cognitivo, demencia]
+        - name: Enfermedad de Parkinson
+          aliases: [parkinsonismo]
+        - name: Neuropatías periféricas
+          aliases: [polineuropatía, síndrome de Guillain-Barré]
+    - name: Dermatología
+      topics:
+        - name: Dermatitis
+          aliases: [dermatitis atópica, dermatitis por contacto, eccema]
+        - name: Infecciones cutáneas
+          aliases: [tiña, escabiasis, impétigo, micosis superficial]
+        - name: Psoriasis
+          aliases: [psoriasis en placas]
+        - name: Cáncer de piel
+          aliases: [melanoma, carcinoma basocelular]
+    - name: Oncología
+      topics:
+        - name: Cáncer de mama
+          aliases: [tumor mamario, carcinoma de mama]
+        - name: Cáncer de próstata
+          aliases: [antígeno prostático, adenocarcinoma de próstata]
+        - name: Cáncer colorrectal
+          aliases: [cáncer de colon, cáncer de recto]
+        - name: Cáncer gástrico
+          aliases: [cáncer de estómago]
+        - name: Cáncer de testículo
+          aliases: [tumor testicular]
+        - name: Cuidados paliativos
+          aliases: [dolor oncológico, final de la vida]
+    - name: Geriatría
+      topics:
+        - name: Valoración geriátrica integral
+          aliases: [valoración del adulto mayor, persona adulta mayor]
+        - name: Síndromes geriátricos
+          aliases: [caídas, fragilidad, delirium, incontinencia]
+        - name: Polifarmacia y prescripción razonada
+          aliases: [prescripción razonada, polifarmacia, deprescripción]
+        - name: Nutrición del adulto mayor
+          aliases: [desnutrición del adulto mayor, evaluación nutricional]
+        - name: Fractura de cadera
+          aliases: [fractura de cadera en el adulto mayor]
+    - name: Psiquiatría
+      topics:
+        - name: Trastorno depresivo mayor
+          aliases: [depresión, trastorno depresivo]
+        - name: Trastornos de ansiedad
+          aliases: [ansiedad, trastorno de pánico]
+        - name: Trastornos por consumo de sustancias
+          aliases: [adicciones, sustancias psicoactivas, consumo de sustancias]
+        - name: Trastornos del sueño
+          aliases: [insomnio, trastorno del sueño]
+        - name: Intoxicación etílica y abstinencia alcohólica
+          aliases: [alcoholismo, síndrome de abstinencia alcohólica, intoxicación etílica]
+
+- name: Pediatría
+  kind: core
+  color_token: green
+  branches:
+    - name: Neonatología
+      topics:
+        - name: Recién nacido sano
+          aliases: [recién nacido de término, egreso hospitalario del recién nacido, tamiz neonatal]
+        - name: Reanimación neonatal
+          aliases: [asfixia perinatal, reanimación del recién nacido]
+        - name: Síndrome de dificultad respiratoria del recién nacido
+          aliases: [SDR, enfermedad de membrana hialina, dificultad respiratoria neonatal]
+        - name: Ictericia neonatal
+          aliases: [hiperbilirrubinemia neonatal, ictericia del recién nacido]
+        - name: Sepsis neonatal
+          aliases: [infección neonatal]
+        - name: Prematurez
+          aliases: [recién nacido prematuro, pretérmino]
+    - name: Crecimiento y desarrollo
+      topics:
+        - name: Vigilancia del crecimiento
+          aliases: [somatometría, percentiles, curvas de crecimiento]
+        - name: Desarrollo psicomotor
+          aliases: [hitos del desarrollo, retraso del desarrollo]
+        - name: Alimentación y lactancia
+          aliases: [lactancia materna, ablactación, alimentación complementaria]
+        - name: Esquema de vacunación
+          aliases: [inmunizaciones, cartilla de vacunación]
+    - name: Infectología pediátrica
+      topics:
+        - name: Otitis media aguda
+          aliases: [otitis media, otitis]
+        - name: Faringoamigdalitis
+          aliases: [faringitis estreptocócica, amigdalitis]
+        - name: Neumonía en pediatría
+          aliases: [neumonía adquirida en la comunidad en pediatría, neumonía infantil]
+        - name: Infección de vías urinarias en pediatría
+          aliases: [IVU pediátrica, infección urinaria en niños]
+        - name: Exantemas de la infancia
+          aliases: [sarampión, rubéola, escarlatina, exantema súbito]
+        - name: Gastroenteritis y deshidratación
+          aliases: [enfermedad diarreica aguda, deshidratación, plan de hidratación]
+    - name: Neumología pediátrica
+      topics:
+        - name: Asma en pediatría
+          aliases: [asma infantil, sibilancias recurrentes]
+        - name: Bronquiolitis
+          aliases: [virus sincicial respiratorio]
+        - name: Laringotraqueítis
+          aliases: [crup, croup]
+    - name: Cardiología pediátrica
+      topics:
+        - name: Cardiopatías congénitas
+          aliases: [comunicación interventricular, persistencia del conducto arterioso, cardiopatía congénita]
+        - name: Fiebre reumática
+          aliases: [cardiopatía reumática]
+        - name: Enfermedad de Kawasaki
+          aliases: [síndrome de Kawasaki]
+    - name: Gastroenterología y nutrición pediátrica
+      topics:
+        - name: Reflujo gastroesofágico del lactante
+          aliases: [reflujo del lactante]
+        - name: Estreñimiento en pediatría
+          aliases: [constipación infantil]
+        - name: Desnutrición infantil
+          aliases: [desnutrición, marasmo, kwashiorkor]
+        - name: Sobrepeso y obesidad en pediatría
+          aliases: [obesidad infantil, sobrepeso infantil]
+    - name: Nefrología pediátrica
+      topics:
+        - name: Lesión renal aguda en pediatría
+          aliases: [insuficiencia renal aguda pediátrica]
+        - name: Enfermedad renal crónica en pediatría
+          aliases: [ERC pediátrica]
+        - name: Síndrome nefrótico pediátrico
+          aliases: [síndrome nefrótico en niños]
+    - name: Endocrinología pediátrica
+      topics:
+        - name: Diabetes mellitus tipo 1
+          aliases: [DM1, diabetes en el paciente pediátrico]
+        - name: Talla baja
+          aliases: [retraso del crecimiento, hormona de crecimiento]
+        - name: Pubertad precoz y retrasada
+          aliases: [pubertad precoz]
+    - name: Neurodesarrollo y salud mental
+      topics:
+        - name: Trastorno por déficit de atención e hiperactividad
+          aliases: [TDAH, déficit de atención]
+        - name: Trastorno del espectro autista
+          aliases: [autismo, TEA]
+        - name: Crisis convulsivas febriles
+          aliases: [convulsión febril]
+    - name: Urgencias pediátricas
+      topics:
+        - name: Cuerpo extraño en vía aérea y digestiva
+          aliases: [inhalación de cuerpo extraño, ingestión de cuerpo extraño, broncoaspiración]
+        - name: Intoxicaciones en pediatría
+          aliases: [intoxicación infantil]
+        - name: Maltrato infantil
+          aliases: [abuso físico, abuso infantil, violencia contra niñas y niños]
+    - name: Genética y errores del metabolismo
+      topics:
+        - name: Tamiz metabólico neonatal
+          aliases: [tamiz neonatal ampliado]
+        - name: Errores innatos del metabolismo
+          aliases: [mucopolisacaridosis, enfermedad de Pompe, enfermedad lisosomal]
+        - name: Síndrome de Down
+          aliases: [trisomía 21]
+
+- name: Gineco-Obstetricia
+  kind: core
+  color_token: magenta
+  branches:
+    - name: Obstetricia
+      topics:
+        - name: Control prenatal
+          aliases: [atención prenatal, cuidados en el embarazo, vigilancia del embarazo]
+        - name: Trabajo de parto y parto
+          aliases: [atención del parto, parto eutócico]
+        - name: Puerperio
+          aliases: [puerperio fisiológico, atención del puerperio]
+        - name: Inducción del trabajo de parto y cesárea
+          aliases: [cesárea, inducción del parto]
+    - name: Complicaciones del embarazo
+      topics:
+        - name: Preeclampsia y eclampsia
+          aliases: [enfermedad hipertensiva del embarazo, preeclampsia, síndrome HELLP]
+        - name: Diabetes gestacional
+          aliases: [diabetes en el embarazo]
+        - name: Hemorragia obstétrica
+          aliases: [hemorragia postparto, atonía uterina, placenta previa]
+        - name: Amenaza de parto pretérmino
+          aliases: [parto pretérmino, trabajo de parto pretérmino]
+        - name: Ruptura prematura de membranas
+          aliases: [RPM]
+        - name: Infección urinaria y bacteriuria en el embarazo
+          aliases: [bacteriuria asintomática, infección de vías urinarias en el embarazo]
+        - name: Aborto y embarazo ectópico
+          aliases: [aborto espontáneo, embarazo ectópico]
+        - name: Depresión prenatal y posparto
+          aliases: [depresión perinatal, depresión posparto]
+    - name: Ginecología
+      topics:
+        - name: Sangrado uterino anormal
+          aliases: [hemorragia uterina disfuncional, metrorragia]
+        - name: Endometriosis
+          aliases: [dolor pélvico crónico]
+        - name: Miomatosis uterina
+          aliases: [miomas, leiomioma uterino]
+        - name: Enfermedad pélvica inflamatoria
+          aliases: [EPI, salpingitis]
+        - name: Tumores anexiales
+          aliases: [quiste de ovario, tumor anexial benigno]
+        - name: Infertilidad
+          aliases: [esterilidad, reproducción asistida]
+    - name: Oncología ginecológica
+      topics:
+        - name: Cáncer cervicouterino
+          aliases: [lesiones precursoras de cáncer de cuello uterino, virus del papiloma humano, displasia cervical]
+        - name: Cáncer de ovario
+          aliases: [tumor maligno de ovario]
+        - name: Cáncer de endometrio
+          aliases: [hiperplasia endometrial]
+    - name: Planificación familiar
+      topics:
+        - name: Métodos anticonceptivos
+          aliases: [anticoncepción, dispositivo intrauterino, anticonceptivos hormonales]
+        - name: Anticoncepción de emergencia
+          aliases: [pastilla del día siguiente]
+    - name: Climaterio
+      topics:
+        - name: Climaterio y menopausia
+          aliases: [menopausia, terapia hormonal de reemplazo]
+
+- name: Cirugía General
+  kind: core
+  color_token: amber
+  branches:
+    - name: Cirugía gastrointestinal
+      topics:
+        - name: Apendicitis aguda
+          aliases: [apendicectomía, abdomen agudo apendicular]
+        - name: Colecistitis y colelitiasis
+          aliases: [colecistectomía, litiasis vesicular, coledocolitiasis]
+        - name: Obstrucción intestinal
+          aliases: [oclusión intestinal, íleo]
+        - name: Enfermedad diverticular
+          aliases: [diverticulitis]
+        - name: Perforación de víscera hueca
+          aliases: [peritonitis, abdomen agudo perforativo]
+        - name: Patología anorrectal
+          aliases: [hemorroides, fisura anal, fístula anal, absceso perianal]
+    - name: Pared abdominal
+      topics:
+        - name: Hernia inguinal
+          aliases: [hernioplastía inguinal, hernia crural]
+        - name: Hernia umbilical e incisional
+          aliases: [eventración, hernia ventral]
+    - name: Trauma
+      topics:
+        - name: Atención inicial al politraumatizado
+          aliases: [politraumatizado, ATLS, trauma múltiple]
+        - name: Trauma abdominal
+          aliases: [trauma abdominal cerrado, trauma abdominal penetrante]
+        - name: Trauma torácico
+          aliases: [neumotórax, hemotórax, tórax inestable]
+        - name: Traumatismo craneoencefálico
+          aliases: [TCE, trauma craneal]
+        - name: Quemaduras
+          aliases: [paciente quemado, superficie corporal quemada]
+    - name: Cirugía vascular
+      topics:
+        - name: Insuficiencia venosa crónica
+          aliases: [várices, úlcera venosa]
+        - name: Enfermedad arterial periférica
+          aliases: [isquemia arterial, claudicación intermitente]
+        - name: Pie diabético
+          aliases: [úlcera de pie diabético, amputación de extremidad inferior]
+        - name: Aneurisma de aorta abdominal
+          aliases: [aneurisma aórtico]
+    - name: Urología
+      topics:
+        - name: Litiasis urinaria
+          aliases: [urolitiasis, cólico renoureteral, cálculo renal]
+        - name: Hiperplasia prostática benigna
+          aliases: [crecimiento prostático, HPB]
+        - name: Escroto agudo
+          aliases: [torsión testicular, epididimitis]
+        - name: Retención aguda de orina
+          aliases: [retención urinaria, sondaje vesical]
+    - name: Ortopedia y traumatología
+      topics:
+        - name: Fracturas frecuentes
+          aliases: [fractura de radio distal, fractura de tobillo, fractura expuesta]
+        - name: Luxaciones
+          aliases: [luxación de hombro, luxación de cadera]
+        - name: Lumbalgia y patología de columna
+          aliases: [lumbalgia, hernia de disco, ciática]
+        - name: Síndrome compartimental
+          aliases: [compartimental agudo]
+        - name: Osteomielitis y artritis séptica
+          aliases: [osteomielitis, artritis séptica]
+    - name: Otorrinolaringología
+      topics:
+        - name: Vértigo
+          aliases: [vértigo postural paroxístico benigno, síndrome vertiginoso]
+        - name: Hipoacusia
+          aliases: [sordera, pérdida auditiva, tamiz auditivo]
+        - name: Rinosinusitis
+          aliases: [sinusitis, rinitis alérgica]
+        - name: Epistaxis
+          aliases: [sangrado nasal]
+    - name: Oftalmología
+      topics:
+        - name: Ojo rojo
+          aliases: [conjuntivitis, queratitis, uveítis]
+        - name: Glaucoma
+          aliases: [presión intraocular]
+        - name: Catarata
+          aliases: [cirugía de catarata]
+        - name: Retinopatía diabética e hipertensiva
+          aliases: [retinopatía diabética, fondo de ojo]
+    - name: Neurocirugía
+      topics:
+        - name: Hipertensión intracraneal
+          aliases: [edema cerebral, presión intracraneal]
+        - name: Hematomas intracraneales
+          aliases: [hematoma epidural, hematoma subdural, hemorragia subaracnoidea]
+    - name: Anestesia y cuidados perioperatorios
+      topics:
+        - name: Valoración preoperatoria
+          aliases: [riesgo quirúrgico, evaluación preanestésica]
+        - name: Manejo del dolor postoperatorio
+          aliases: [analgesia postoperatoria, dolor agudo]
+        - name: Profilaxis antibiótica quirúrgica
+          aliases: [infección del sitio quirúrgico, antibiótico profiláctico]
+        - name: Tromboprofilaxis perioperatoria
+          aliases: [profilaxis de trombosis, heparina profiláctica]
+    - name: Cirugía de mama y endocrina
+      topics:
+        - name: Nódulo mamario
+          aliases: [tumor de mama, patología mamaria benigna]
+        - name: Tratamiento quirúrgico del cáncer de mama
+          aliases: [mastectomía, ganglio centinela]
+        - name: Patología tiroidea quirúrgica
+          aliases: [tiroidectomía, bocio]
+    - name: Cirugía pediátrica
+      topics:
+        - name: Estenosis hipertrófica del píloro
+          aliases: [piloromiotomía]
+        - name: Invaginación intestinal
+          aliases: [intususcepción]
+        - name: Criptorquidia e hidrocele
+          aliases: [testículo no descendido, hidrocele]
+
+- name: Salud Pública
+  kind: cross_cutting
+  color_token: teal
+  branches:
+    - name: Epidemiología
+      topics:
+        - name: Medidas de frecuencia
+          aliases: [incidencia, prevalencia, tasa]
+        - name: Medidas de asociación
+          aliases: [riesgo relativo, razón de momios, odds ratio]
+        - name: Diseños de estudio
+          aliases: [cohorte, casos y controles, ensayo clínico]
+        - name: Tamizaje y pruebas diagnósticas
+          aliases: [sensibilidad, especificidad, valor predictivo, detección oportuna]
+    - name: Bioestadística
+      topics:
+        - name: Pruebas de hipótesis
+          aliases: [valor de p, intervalo de confianza]
+        - name: Sesgos y confusión
+          aliases: [sesgo de selección, variable confusora]
+    - name: Vigilancia y prevención
+      topics:
+        - name: Vigilancia epidemiológica
+          aliases: [notificación epidemiológica, enfermedad de notificación obligatoria]
+        - name: Estudio de brotes
+          aliases: [brote epidémico, investigación de brote]
+        - name: Vacunación poblacional
+          aliases: [programa de vacunación, cobertura de vacunación]
+    - name: Promoción de la salud
+      topics:
+        - name: Determinantes sociales de la salud
+          aliases: [determinantes sociales, marginación]
+        - name: Programas nacionales de salud
+          aliases: [programa de acción específico]
+    - name: Normatividad y ética
+      topics:
+        - name: Normas Oficiales Mexicanas
+          aliases: [NOM, norma oficial mexicana]
+        - name: Consentimiento informado
+          aliases: [autonomía del paciente, bioética]
+        - name: Certificados y documentos médico-legales
+          aliases: [certificado de defunción, expediente clínico]
+
+- name: Urgencias
+  kind: cross_cutting
+  color_token: red
+  branches:
+    - name: Reanimación
+      topics:
+        - name: Soporte vital básico y avanzado
+          aliases: [reanimación cardiopulmonar, RCP, paro cardiorrespiratorio]
+        - name: Manejo de la vía aérea
+          aliases: [intubación, vía aérea difícil]
+        - name: Estados de choque
+          aliases: [choque hipovolémico, choque cardiogénico, choque distributivo]
+    - name: Urgencias cardiovasculares
+      topics:
+        - name: Síndrome coronario agudo en urgencias
+          aliases: [dolor torácico, angina inestable]
+        - name: Crisis hipertensiva
+          aliases: [urgencia hipertensiva, emergencia hipertensiva]
+        - name: Arritmias inestables
+          aliases: [cardioversión, desfibrilación]
+    - name: Urgencias metabólicas
+      topics:
+        - name: Cetoacidosis y estado hiperosmolar
+          aliases: [cetoacidosis diabética, estado hiperglucémico hiperosmolar]
+        - name: Hipoglucemia grave
+          aliases: [hipoglucemia]
+        - name: Alteraciones electrolíticas graves
+          aliases: [hiperkalemia grave, hiponatremia grave]
+    - name: Toxicología
+      topics:
+        - name: Intoxicación por medicamentos
+          aliases: [intoxicación por paracetamol, sobredosis, intoxicación por benzodiacepinas]
+        - name: Intoxicación por plaguicidas
+          aliases: [organofosforados, carbamatos]
+        - name: Mordeduras y picaduras
+          aliases: [mordedura de serpiente, picadura de alacrán, aracnoidismo]
+        - name: Intoxicación por monóxido de carbono
+          aliases: [monóxido de carbono]
+    - name: Urgencias neurológicas
+      topics:
+        - name: Estado epiléptico
+          aliases: [crisis convulsiva prolongada]
+        - name: Alteración del estado de alerta
+          aliases: [coma, estupor, escala de Glasgow]
+
+- name: Medicina Familiar
+  kind: cross_cutting
+  color_token: violet
+  branches:
+    - name: Atención en el primer nivel
+      topics:
+        - name: Consulta de primer contacto
+          aliases: [primer nivel de atención, medicina general]
+        - name: Referencia y contrarreferencia
+          aliases: [referencia oportuna, sistema de referencia]
+    - name: Medicina preventiva
+      topics:
+        - name: Detección oportuna en el adulto
+          aliases: [chequeo, detección temprana, prevención primaria]
+        - name: Salud del adolescente
+          aliases: [atención al adolescente]
+        - name: Atención integral al adulto mayor
+          aliases: [salud del adulto mayor]
+    - name: Salud mental en el primer nivel
+      topics:
+        - name: Detección de depresión y ansiedad
+          aliases: [tamizaje de depresión]
+        - name: Detección de consumo de sustancias
+          aliases: [detección de adicciones, consumo de alcohol]
+    - name: Enfermedades crónicas en el primer nivel
+      topics:
+        - name: Control de diabetes e hipertensión
+          aliases: [control metabólico, seguimiento de enfermedad crónica]
+        - name: Adherencia terapéutica
+          aliases: [apego al tratamiento]

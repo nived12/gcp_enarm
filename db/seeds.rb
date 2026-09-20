@@ -1,9 +1,10 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
+# Runs on every deploy, from bin/boot. Everything here must be idempotent.
 #
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# The taxonomy seeds itself rather than being a deploy step someone has to remember:
+# it is derived from a file in the repo, costs a second, and is the one piece of
+# reference data the app cannot start empty. The GPC corpus is not here — it is
+# scraped or imported, and is far too large to belong in seeds. See DEPLOY.md.
+result = Taxonomy::Seeder.call
+abort("No se pudo sembrar la taxonomía: #{result.errors.full_messages.to_sentence}") unless result.success?
+
+Rails.logger.info("Taxonomía: #{result.payload.inspect}")

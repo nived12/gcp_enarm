@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_070000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "branches", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.string "slug", null: false
+    t.bigint "specialty_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_branches_on_slug", unique: true
+    t.index ["specialty_id", "position"], name: "index_branches_on_specialty_id_and_position"
+    t.index ["specialty_id"], name: "index_branches_on_specialty_id"
+  end
 
   create_table "guideline_sections", force: :cascade do |t|
     t.text "body", null: false
@@ -29,6 +41,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_070000) do
     t.index ["guideline_id", "position"], name: "index_guideline_sections_on_guideline_id_and_position"
     t.index ["guideline_id"], name: "index_guideline_sections_on_guideline_id"
     t.index ["kind"], name: "index_guideline_sections_on_kind"
+  end
+
+  create_table "guideline_topics", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "guideline_id", null: false
+    t.float "relevance", default: 0.0, null: false
+    t.bigint "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guideline_id", "topic_id"], name: "index_guideline_topics_on_guideline_id_and_topic_id", unique: true
+    t.index ["guideline_id"], name: "index_guideline_topics_on_guideline_id"
+    t.index ["relevance"], name: "index_guideline_topics_on_relevance"
+    t.index ["topic_id"], name: "index_guideline_topics_on_topic_id"
   end
 
   create_table "guidelines", force: :cascade do |t|
@@ -248,6 +272,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_070000) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "specialties", force: :cascade do |t|
+    t.string "color_token", null: false
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_specialties_on_slug", unique: true
+  end
+
+  create_table "topics", force: :cascade do |t|
+    t.jsonb "aliases", default: [], null: false
+    t.bigint "branch_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id", "position"], name: "index_topics_on_branch_id_and_position"
+    t.index ["branch_id"], name: "index_topics_on_branch_id"
+    t.index ["slug"], name: "index_topics_on_slug", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -263,7 +311,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_070000) do
     t.index ["granted_premium_until"], name: "index_users_on_granted_premium_until"
   end
 
+  add_foreign_key "branches", "specialties"
   add_foreign_key "guideline_sections", "guidelines"
+  add_foreign_key "guideline_topics", "guidelines"
+  add_foreign_key "guideline_topics", "topics"
   add_foreign_key "recommendations", "guideline_sections"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
@@ -274,4 +325,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_070000) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "topics", "branches"
 end

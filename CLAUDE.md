@@ -69,6 +69,17 @@ Mobile-first, 44px minimum tap targets, every list gets loading / empty / error 
 states. The home screen is: your average, today's plan, and a button that starts the quiz.
 Nothing else above the fold — including upgrade prompts.
 
+## The exam we are simulating
+
+Score is a **percentage over 100**, not a weighted total — the "alta 3 / media 2 / baja 1,
+560 puntos" figure in every prep blog is from the retired 450-reactivo format and the
+current convocatoria does not mention difficulty at all. Difficulty *is* official and it
+breaks ties: CIFRHS grades each reactivo Alta/Media/Baja and the tie-break order is Alta →
+Media → Medicina Interna → Pediatría → Gineco-Obstetricia → Cirugía → total correct →
+ponderación. Sources and the consequences are in the plan under "How the ENARM is actually
+scored". Difficulty uses that vocabulary (`low`/`medium`/`high`), never a competitor's
+Interno/Residente/Adscrito.
+
 ## Testing
 
 ```bash

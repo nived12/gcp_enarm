@@ -1,5 +1,8 @@
 # One entry in a guideline's table of contents, with the HTML the site returns for it.
 #
+# An archived guideline has no table of contents — it is a PDF — so it gets a single
+# section of kind archived_document holding the whole extracted text.
+#
 # The four graded kinds below are the ones worth generating from; everything else —
 # cuadros, algoritmos, bibliografía, the AGREE II appraisal — is stored so the
 # guideline can be re-parsed without hitting the site again, and ignored otherwise.
@@ -10,7 +13,7 @@ class GuidelineSection < ApplicationRecord
   enum :kind,
     { evidence: "evidence", recommendation: "recommendation",
       key_recommendation: "key_recommendation", good_practice: "good_practice",
-      other: "other" },
+      archived_document: "archived_document", other: "other" },
     prefix: :kind
 
   # The kinds that state what a clinician should do. Evidence sections are graded
