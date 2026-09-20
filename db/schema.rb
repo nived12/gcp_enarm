@@ -10,9 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_014304) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "guidelines", force: :cascade do |t|
+    t.string "catalog_key", null: false
+    t.string "catalog_url"
+    t.string "content_hash", null: false
+    t.datetime "created_at", null: false
+    t.string "document_url"
+    t.string "external_id"
+    t.datetime "ingested_at"
+    t.string "institution", null: false
+    t.jsonb "levels_of_care", default: [], null: false
+    t.string "source", null: false
+    t.jsonb "specialty_labels", default: [], null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "year"
+    t.index ["catalog_key"], name: "index_guidelines_on_catalog_key", unique: true
+    t.index ["institution"], name: "index_guidelines_on_institution"
+    t.index ["specialty_labels"], name: "index_guidelines_on_specialty_labels", using: :gin
+    t.index ["year"], name: "index_guidelines_on_year"
+  end
 
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false

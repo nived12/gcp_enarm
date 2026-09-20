@@ -27,6 +27,13 @@ source in the bundle or fetch the docs. A plausible-looking wrong answer costs m
 the two minutes it takes to check. This applies hardest to the GPC endpoints, which are
 undocumented.
 
+**Spanish copy never assumes the reader's gender.** Write `Te damos la bienvenida`, not
+`Bienvenido` or `Bienvenida`; `colega`, not `compañero`. Reach for a gender-neutral noun or
+rephrase around the adjective — never `@` or `x` endings, which screen readers mangle.
+Agreement with a grammatical noun is fine and unavoidable (`Contraseña actualizada`); what
+is banned is agreement with *the user*. A clinical vignette's patient has whatever gender
+the case calls for; that is content, not interface.
+
 **All user-facing text goes through i18n**, and `es.yml` / `en.yml` stay key-for-key
 identical — `spec/config/locales_spec.rb` enforces it. `default_locale` is `:es`, and
 `rails-i18n` supplies the Spanish for everything Rails itself emits.
