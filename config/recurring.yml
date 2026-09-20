@@ -10,6 +10,14 @@
 #     schedule: at 5am every day
 
 production:
+  # The GPC catalog is not frozen: guidelines are republished, new ones appear, and
+  # every guideline ages out of its five-year validity window. Quarterly is the cadence
+  # the source itself moves at, and it costs nothing — Solid Queue runs inside Puma.
+  refresh_gpc_catalog:
+    class: Gpc::RefreshCatalogJob
+    queue: ingestion
+    schedule: "0 3 1 1,4,7,10 *"
+
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12

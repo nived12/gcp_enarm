@@ -52,4 +52,47 @@ RSpec.describe Guideline do
       expect(guideline).to be_source_live_site
     end
   end
+
+  # Guidelines carry their own shelf life — "de 3 a 5 años" — and it is why the live
+  # catalog holds nothing older than 2020: CENETEC's successor republished only what was
+  # still inside the window. Expired is a fact to show a student, not a reason to drop a
+  # guideline: Cirugía General exists almost entirely among the expired ones.
+  describe "validity" do
+    around do |example|
+      travel_to(Date.new(2026, 6, 1)) { example.run }
+    end
+
+    it "counts the last five years as current" do
+      current = create(:guideline, year: 2021)
+      create(:guideline, year: 2020)
+
+      expect(described_class.current).to eq([current])
+    end
+
+    it "counts anything older as expired" do
+      create(:guideline, year: 2021)
+      expired = create(:guideline, year: 2008)
+
+      expect(described_class.expired).to eq([expired])
+    end
+
+    it "treats a guideline with no year as neither, because unknown is not expired" do
+      undated = create(:guideline, year: nil)
+
+      expect(described_class.current).to be_empty
+      expect(described_class.expired).to be_empty
+      expect(described_class.undated).to eq([undated])
+      expect(undated).not_to be_expired
+    end
+
+    it "says when a guideline runs out" do
+      expect(build(:guideline, year: 2018).expires_on).to eq(Date.new(2023, 12, 31))
+      expect(build(:guideline, year: nil).expires_on).to be_nil
+    end
+
+    it "answers #expired? consistently with the scopes" do
+      expect(build(:guideline, year: 2018)).to be_expired
+      expect(build(:guideline, year: 2024)).not_to be_expired
+    end
+  end
 end

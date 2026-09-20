@@ -80,6 +80,22 @@ ponderación. Sources and the consequences are in the plan under "How the ENARM 
 scored". Difficulty uses that vocabulary (`low`/`medium`/`high`), never a competitor's
 Interno/Residente/Adscrito.
 
+## The corpus is mostly expired, and that is load-bearing
+
+CENETEC was dissolved in 2025; its successor republished only guidelines still inside
+the 3–5 year validity the guidelines state for themselves, which is why the live catalog
+holds nothing older than 2020. As of 2026-09 the corpus is **56 current / 539 expired**,
+and **Cirugía General is 1 current of 36** — so expired guidelines cannot simply be
+dropped.
+
+`Guideline::VALIDITY_YEARS`, `.current`, `.expired`, `.undated` and `#expired?` exist for
+this. An undated guideline is never expired: unknown is not the same as out of date.
+**Phase 2 must prefer current guidelines and show the year on every citation.** Details
+and the reasoning are in the plan under "Why the catalog shrank".
+
+`Gpc::RefreshCatalogJob` keeps it accurate by itself, quarterly, from
+`config/recurring.yml`. It costs nothing — Solid Queue runs inside Puma.
+
 ## Testing
 
 ```bash

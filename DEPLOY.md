@@ -83,6 +83,17 @@ pinned to one thread in `config/queue.yml`. Leave it that way. The Internet Arch
 
 ## Keeping it fresh
 
+`Gpc::RefreshCatalogJob` runs quarterly on its own (03:00 on 1 Jan/Apr/Jul/Oct, from
+`config/recurring.yml`). It re-reads the catalog and re-ingests every live guideline,
+because the catalog row carries the title and year but says nothing about the
+recommendations inside — only a full re-read notices a silent republish. No extra
+Railway service and no extra cost: Solid Queue runs inside Puma.
+
+It does **not** refresh the web archive. Those captures are history and will not change;
+run `gpc:archive` by hand if you ever want to look again.
+
+Nothing else is scheduled. If you want it more or less often, that cron is the one knob.
+
 The live catalog changes — `SS-757-25` appeared after the first survey. Re-running
 `gpc:catalog` then `gpc:ingest` is safe at any time: a guideline whose `content_hash` is
 unchanged has only its `ingested_at` touched, so "we checked today" and "they republished"
