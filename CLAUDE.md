@@ -141,5 +141,13 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   `GuidelineSection#graded?` sections are read for recommendations.
 - **Sample before writing a parser, then check the whole corpus after.** Three sections
   per guideline said 1.5% of strips were unparseable; all 3,076 said 22%.
+- **`deepseek-flash` is a reasoning model, and its thinking is billed as output.**
+  Verified live 2026-09-20: a one-word answer spent 10 reasoning tokens against 2 of
+  content, returned in a `reasoning_content` field beside `content`, and counted under
+  `completion_tokens_details.reasoning_tokens`. Two consequences. A `max_tokens` budgeted
+  for the answer alone comes back with **empty `content` and no error** — the reasoning
+  consumed the budget. And DeepSeek's real output cost is a multiple of the visible
+  answer, so the plan's price comparison flatters it; the bake-off must compare *measured*
+  token counts, not list prices.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.

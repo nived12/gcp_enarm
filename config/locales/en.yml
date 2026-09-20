@@ -84,6 +84,10 @@ en:
   activerecord:
     errors:
       models:
+        question:
+          attributes:
+            source_quote:
+              not_in_recommendation: "does not appear in the cited recommendation"
         user:
           attributes:
             email:

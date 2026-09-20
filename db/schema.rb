@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "answer_options", force: :cascade do |t|
+    t.boolean "correct", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "position", null: false
+    t.bigint "question_id", null: false
+    t.text "text", null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_id", "position"], name: "index_answer_options_on_question_id_and_position", unique: true
+    t.index ["question_id"], name: "index_answer_options_on_question_id"
+  end
 
   create_table "branches", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -24,6 +35,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_090000) do
     t.index ["slug"], name: "index_branches_on_slug", unique: true
     t.index ["specialty_id", "position"], name: "index_branches_on_specialty_id_and_position"
     t.index ["specialty_id"], name: "index_branches_on_specialty_id"
+  end
+
+  create_table "clinical_cases", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "difficulty", default: "medium", null: false
+    t.bigint "generation_run_id"
+    t.bigint "guideline_id"
+    t.string "locale", default: "es", null: false
+    t.string "source", default: "gpc_generated", null: false
+    t.bigint "specialty_id"
+    t.string "status", default: "draft", null: false
+    t.text "stem", null: false
+    t.bigint "topic_id"
+    t.datetime "updated_at", null: false
+    t.text "verification_notes"
+    t.string "verification_verdict"
+    t.datetime "verified_at"
+    t.index ["generation_run_id"], name: "index_clinical_cases_on_generation_run_id"
+    t.index ["guideline_id"], name: "index_clinical_cases_on_guideline_id"
+    t.index ["specialty_id"], name: "index_clinical_cases_on_specialty_id"
+    t.index ["status", "difficulty"], name: "index_clinical_cases_on_status_and_difficulty"
+    t.index ["topic_id", "status"], name: "index_clinical_cases_on_topic_id_and_status"
+    t.index ["topic_id"], name: "index_clinical_cases_on_topic_id"
+    t.index ["verification_verdict"], name: "index_clinical_cases_on_verification_verdict"
+  end
+
+  create_table "generation_runs", force: :cascade do |t|
+    t.integer "attempts", default: 0, null: false
+    t.integer "cases_created", default: 0, null: false
+    t.decimal "cost_usd", precision: 12, scale: 8, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "finished_at"
+    t.integer "input_tokens", default: 0, null: false
+    t.string "model", null: false
+    t.text "notes"
+    t.integer "output_tokens", default: 0, null: false
+    t.string "provider", null: false
+    t.string "purpose", null: false
+    t.integer "rejections", default: 0, null: false
+    t.datetime "started_at"
+    t.string "status", default: "running", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "model"], name: "index_generation_runs_on_provider_and_model"
+    t.index ["status"], name: "index_generation_runs_on_status"
   end
 
   create_table "guideline_sections", force: :cascade do |t|
@@ -74,6 +129,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_090000) do
     t.index ["institution"], name: "index_guidelines_on_institution"
     t.index ["specialty_labels"], name: "index_guidelines_on_specialty_labels", using: :gin
     t.index ["year"], name: "index_guidelines_on_year"
+  end
+
+  create_table "questions", force: :cascade do |t|
+    t.bigint "clinical_case_id", null: false
+    t.datetime "created_at", null: false
+    t.text "explanation"
+    t.integer "position", null: false
+    t.bigint "recommendation_id"
+    t.text "source_quote"
+    t.text "text", null: false
+    t.datetime "updated_at", null: false
+    t.index ["clinical_case_id", "position"], name: "index_questions_on_clinical_case_id_and_position", unique: true
+    t.index ["clinical_case_id"], name: "index_questions_on_clinical_case_id"
+    t.index ["recommendation_id"], name: "index_questions_on_recommendation_id"
   end
 
   create_table "recommendations", force: :cascade do |t|
@@ -311,10 +380,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_090000) do
     t.index ["granted_premium_until"], name: "index_users_on_granted_premium_until"
   end
 
+  add_foreign_key "answer_options", "questions"
   add_foreign_key "branches", "specialties"
+  add_foreign_key "clinical_cases", "generation_runs"
+  add_foreign_key "clinical_cases", "guidelines"
+  add_foreign_key "clinical_cases", "specialties"
+  add_foreign_key "clinical_cases", "topics"
   add_foreign_key "guideline_sections", "guidelines"
   add_foreign_key "guideline_topics", "guidelines"
   add_foreign_key "guideline_topics", "topics"
+  add_foreign_key "questions", "clinical_cases"
+  add_foreign_key "questions", "recommendations"
   add_foreign_key "recommendations", "guideline_sections"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
