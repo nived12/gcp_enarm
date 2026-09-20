@@ -3,9 +3,14 @@
 /* ---------------------------------------------------------------------------
    Tokens.
 
-   Light is warm paper; dark is a warm near-black, not an inversion. The dark
-   ink is deliberately off-white: a full-white serif on black halates and gets
-   tiring across a 280-question sitting.
+   The light palette is lifted from Alan (alan.com) — cream ground, white cards,
+   indigo action, near-black ink — because it is a health product that reads as
+   calm and built rather than generated. Every hex below that carries an
+   `alan:` note was sampled from their live stylesheet, not approximated.
+
+   Alan ships no dark theme, so dark is derived rather than copied: the same
+   indigo ramp, read from the other end. Where light uses indigo500 for action,
+   dark uses indigo300 — a step on Alan's own scale, not a new hue.
 
    The cascade is ordered so an explicit choice always beats the system:
      :root                     → light
@@ -14,82 +19,109 @@
 --------------------------------------------------------------------------- */
 
 :root {
-  --ground: #faf7f2;
+  --ground: #fffcf5;        /* alan: lightCream */
+  --ground-tint: #fff3e5;   /* alan: orange50 — banded sections, not decoration */
   --surface: #ffffff;
-  --surface-sunk: #f3eee6;
-  --ink: #1c1917;
-  --ink-muted: #57534e;
-  --ink-faint: #8a827a;
-  --line: #e7e1d8;
-  --line-strong: #d6cec1;
+  --surface-sunk: #f0f3ff;  /* alan: indigo50 */
+  --ink: #282830;           /* alan: heading */
+  --ink-muted: #464754;     /* alan: paragraph */
+  --ink-faint: #656779;     /* alan: caption */
+  --line: #dbe2f4;          /* alan: grey200 — blue-tinted, never neutral grey */
+  --line-strong: #c9d1e7;   /* alan: grey300 */
 
-  --accent: #0b5951;
-  --accent-hover: #0e6f64;
-  --accent-soft: #e4efec;
+  --accent: #5c59f3;        /* alan: indigo500 */
+  --accent-hover: #2f33a8;  /* alan: indigo700 */
+  --accent-soft: #f0f3ff;   /* alan: indigo50 */
+  --accent-deep: #0c0a66;   /* alan: indigo900 */
   --accent-ink: #ffffff;
 
-  --correct: #2f6b3f;
-  --correct-soft: #e8f0e7;
-  --incorrect: #9f3d2f;
-  --incorrect-soft: #f7e9e5;
+  --correct: #367940;       /* alan: green700 */
+  --correct-soft: #ecf7e9;  /* alan: green50 */
+  --incorrect: #c9202e;     /* alan: red700 */
+  --incorrect-soft: #ffe8e9;/* alan: red50 */
 
+  /* alan: fluoYellow. Used in exactly one place — the highlighted span of a
+     recommendation a question was drawn from. It loses its meaning if it
+     appears anywhere else. Dark inverts the pair rather than dimming it: full
+     fluo on a night ground glares, and the yellow has to stay recognisable. */
+  --highlight: #fcff7e;
+  --highlight-ink: #282830;
+
+  --radius-card: 20px;
+  --radius-control: 14px;
+
+  --shadow-card: 0 1px 2px rgb(40 40 48 / 0.04), 0 8px 24px -12px rgb(40 40 48 / 0.12);
   --serif-weight: 400;
   --serif-weight-strong: 600;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ground: #14120f;
-    --surface: #1e1a16;
-    --surface-sunk: #100e0c;
-    --ink: #ede8e0;
-    --ink-muted: #a39c92;
-    --ink-faint: #7b746b;
-    --line: #2e2822;
-    --line-strong: #433b32;
+    --ground: #0e0e18;
+    --ground-tint: #14141f;
+    --surface: #191927;
+    --surface-sunk: #0a0a12;
+    --ink: #eceaf4;
+    --ink-muted: #b3b1c6;
+    --ink-faint: #8a88a0;
+    --line: #2a2a3c;
+    --line-strong: #3d3d55;
 
-    --accent: #4fb3a5;
-    --accent-hover: #6cc7ba;
-    --accent-soft: #17302d;
-    --accent-ink: #0b1f1c;
+    --accent: #8c99fa;      /* alan: indigo300 */
+    --accent-hover: #d6dbff;/* alan: indigo100 */
+    --accent-soft: #23234a;
+    --accent-deep: #d6dbff;
+    --accent-ink: #0c0a66;  /* alan: indigo900 — dark label on a light button */
 
-    --correct: #7cb389;
-    --correct-soft: #1a2a1d;
-    --incorrect: #d98a78;
-    --incorrect-soft: #2e1d19;
+    --correct: #7fca6c;     /* alan: green500 */
+    --correct-soft: #16281a;
+    --incorrect: #ed4e4e;   /* alan: red500 */
+    --incorrect-soft: #2d1418;
+
+    --highlight: #3f4210;
+    --highlight-ink: #fcff7e;
+
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
 
     /* Serif thins optically on a dark ground — step the weight up to match. */
-    --serif-weight: 450;
-    --serif-weight-strong: 650;
+    --serif-weight: 430;
+    --serif-weight-strong: 620;
   }
 }
 
 :root[data-theme="dark"] {
-  --ground: #14120f;
-  --surface: #1e1a16;
-  --surface-sunk: #100e0c;
-  --ink: #ede8e0;
-  --ink-muted: #a39c92;
-  --ink-faint: #7b746b;
-  --line: #2e2822;
-  --line-strong: #433b32;
+  --ground: #0e0e18;
+  --ground-tint: #14141f;
+  --surface: #191927;
+  --surface-sunk: #0a0a12;
+  --ink: #eceaf4;
+  --ink-muted: #b3b1c6;
+  --ink-faint: #8a88a0;
+  --line: #2a2a3c;
+  --line-strong: #3d3d55;
 
-  --accent: #4fb3a5;
-  --accent-hover: #6cc7ba;
-  --accent-soft: #17302d;
-  --accent-ink: #0b1f1c;
+  --accent: #8c99fa;
+  --accent-hover: #d6dbff;
+  --accent-soft: #23234a;
+  --accent-deep: #d6dbff;
+  --accent-ink: #0c0a66;
 
-  --correct: #7cb389;
-  --correct-soft: #1a2a1d;
-  --incorrect: #d98a78;
-  --incorrect-soft: #2e1d19;
+  --correct: #7fca6c;
+  --correct-soft: #16281a;
+  --incorrect: #ed4e4e;
+  --incorrect-soft: #2d1418;
 
-  --serif-weight: 450;
-  --serif-weight-strong: 650;
+  --highlight: #3f4210;
+  --highlight-ink: #fcff7e;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --serif-weight: 430;
+  --serif-weight-strong: 620;
 }
 
 @theme inline {
   --color-ground: var(--ground);
+  --color-ground-tint: var(--ground-tint);
   --color-surface: var(--surface);
   --color-surface-sunk: var(--surface-sunk);
   --color-ink: var(--ink);
@@ -100,15 +132,26 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-deep: var(--accent-deep);
   --color-accent-ink: var(--accent-ink);
   --color-correct: var(--correct);
   --color-correct-soft: var(--correct-soft);
   --color-incorrect: var(--incorrect);
   --color-incorrect-soft: var(--incorrect-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-ink: var(--highlight-ink);
 
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Source Serif 4", ui-serif, Georgia, serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --radius-card: var(--radius-card);
+  --radius-control: var(--radius-control);
+
+  /* Alan Sans is Alan's own typeface, released on Google Fonts under the OFL.
+     Literata carries the clinical vignettes: the case text is the one thing on
+     screen that is not interface, and it should not be set in the interface
+     face. Mono is the system stack — it only ever sets short strings, and a
+     third web font is not worth the request on a phone. */
+  --font-sans: "Alan Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Literata", ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 @layer base {
@@ -121,14 +164,13 @@
     background-color: var(--ground);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv05" 1;
     -webkit-font-smoothing: antialiased;
   }
 
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
   ::selection {
@@ -148,58 +190,53 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Signature: the graded marker.
-
-   Lifted from the GPC documents themselves, where every recommendation is
-   preceded by a block carrying its grade, its scale and its citation —
-   `A NICE Hong K, 2021`. That block is this product's structural unit: it
-   marks topics, calendar days, and every cited recommendation in an answer
-   review. Students read this notation daily; it needs no legend.
---------------------------------------------------------------------------- */
-
 @layer components {
+  /* ------------------------------------------------------------------------
+     Signature: the graded marker.
+
+     Lifted from the GPC documents themselves, where every recommendation is
+     preceded by a block carrying its grade, its scale and its citation —
+     `A NICE Hong K, 2021`. That block is this product's structural unit: it
+     marks topics, calendar days, and every cited recommendation in an answer
+     review. Students read this notation daily; it needs no legend.
+  ------------------------------------------------------------------------ */
   .grade-marker {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.25rem;
-    padding: 0.125rem 0.375rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 2px;
+    min-width: 1.75rem;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 999px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 500;
-    line-height: 1.4;
-    letter-spacing: 0.02em;
+    line-height: 1.35;
+    letter-spacing: 0.01em;
     color: var(--ink-muted);
-    background-color: var(--surface);
+    background-color: var(--surface-sunk);
   }
 
   .grade-marker--strong {
-    border-color: var(--accent);
-    color: var(--accent);
-    background-color: var(--accent-soft);
+    color: var(--accent-ink);
+    background-color: var(--accent);
   }
 
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     font-weight: 500;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ink-faint);
   }
 
-  /* Clinical vignettes are set in the serif, at a reading measure. The GPC PDFs
-     they are derived from are set in serif too — the vignette should feel like
-     the document it came from. */
+  /* Clinical vignettes read at a book measure, in the serif, so a case never
+     gets mistaken for interface copy. */
   .vignette {
     font-family: var(--font-serif);
     font-weight: var(--serif-weight);
     font-size: 1.0625rem;
-    line-height: 1.65;
-    letter-spacing: 0.003em;
+    line-height: 1.7;
     max-width: 62ch;
   }
 
@@ -207,8 +244,80 @@
     font-weight: var(--serif-weight-strong);
   }
 
+  /* The one place --highlight is allowed: the span of a recommendation a
+     question was actually generated from. */
+  .vignette mark {
+    padding: 0.04em 0.12em;
+    border-radius: 3px;
+    color: var(--highlight-ink);
+    background-color: var(--highlight);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
   .numeric {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+  }
+
+  .card {
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* min-height is the 44px tap target, not a look. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding-inline: 1.5rem;
+    border-radius: var(--radius-control);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 150ms, border-color 150ms, color 150ms;
+  }
+
+  .btn--primary {
+    color: var(--accent-ink);
+    background-color: var(--accent);
+  }
+
+  .btn--primary:hover {
+    background-color: var(--accent-hover);
+  }
+
+  .btn--ghost {
+    color: var(--ink);
+    background-color: var(--surface);
+    border: 1px solid var(--line-strong);
+  }
+
+  .btn--ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .input {
+    display: block;
+    width: 100%;
+    min-height: 3rem;
+    padding-inline: 0.875rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    background-color: var(--surface);
+    color: var(--ink);
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+
+  .input::placeholder {
+    color: var(--ink-faint);
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 }

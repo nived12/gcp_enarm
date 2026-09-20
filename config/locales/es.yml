@@ -54,13 +54,18 @@ es:
 
   home:
     landing:
-      eyebrow: "CATÁLOGO MAESTRO · GPC"
       headline_lead: "Cada pregunta"
       headline_accent: "tiene un origen."
       subhead: "Casos clínicos tipo ENARM construidos sobre las Guías de Práctica Clínica vigentes. Cada respuesta cita la recomendación exacta que la sustenta, con su grado de evidencia."
-      sample_recommendation: "Se recomienda otorgar educación prenatal para reducir niveles de estrés durante el embarazo."
-      sample_source: "Atención y cuidados multidisciplinarios en el embarazo"
-      provenance_note: "Así se ve la fuente de una pregunta. No tendrás que confiar en nosotros: podrás abrir la guía."
+      source_label: "Recomendación GPC"
+      sample_citation: "NICE · Hong K, 2021"
+      sample_recommendation_html: "Se recomienda <mark>otorgar educación prenatal</mark> para reducir niveles de estrés durante el embarazo."
+      sample_source: "IMSS-028-22 · Atención y cuidados multidisciplinarios en el embarazo"
+      derived_label: "La pregunta que sale de ahí"
+      sample_question: "Primigesta de 24 años, 28 SDG, refiere ansiedad persistente y alteraciones del sueño. ¿Cuál es la intervención inicial recomendada?"
+      sample_option: "Educación prenatal estructurada"
+      sample_option_label: "Respuesta correcta"
+      provenance_note: "Ninguna pregunta existe sin ese subrayado. Puedes abrir la guía y leer el párrafo completo."
     dashboard:
       today: "HOY"
       greeting: "Hola, %{name}"

@@ -54,13 +54,18 @@ en:
 
   home:
     landing:
-      eyebrow: "CATÁLOGO MAESTRO · GPC"
       headline_lead: "Every question"
       headline_accent: "has a source."
       subhead: "ENARM-style clinical cases built on the current clinical practice guidelines. Every answer cites the exact recommendation behind it, with its evidence grade."
-      sample_recommendation: "Prenatal education is recommended to reduce stress levels during pregnancy."
-      sample_source: "Multidisciplinary care in pregnancy"
-      provenance_note: "This is what a question's source looks like. You won't have to take our word for it — you can open the guideline."
+      source_label: "GPC recommendation"
+      sample_citation: "NICE · Hong K, 2021"
+      sample_recommendation_html: "Prenatal education is recommended to <mark>reduce stress levels</mark> during pregnancy."
+      sample_source: "IMSS-028-22 · Multidisciplinary care in pregnancy"
+      derived_label: "The question it produces"
+      sample_question: "A 24-year-old primigravida at 28 weeks reports persistent anxiety and disturbed sleep. What is the recommended initial intervention?"
+      sample_option: "Structured prenatal education"
+      sample_option_label: "Correct answer"
+      provenance_note: "No question exists without that underlined span. You can open the guideline and read the full paragraph."
     dashboard:
       today: "TODAY"
       greeting: "Hello, %{name}"

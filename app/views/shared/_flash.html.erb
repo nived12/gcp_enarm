@@ -2,11 +2,11 @@
   <% next if message.blank? %>
   <%
     tone = case type.to_s
-           when "alert", "error" then "border-incorrect/40 bg-incorrect-soft text-ink"
-           else "border-accent/30 bg-accent-soft text-ink"
+           when "alert", "error" then "bg-incorrect-soft text-incorrect"
+           else "bg-accent-soft text-accent-hover"
            end
   %>
-  <div role="status" class="mb-5 rounded-sm border px-4 py-3 text-sm <%= tone %>">
+  <div role="status" class="mb-5 rounded-control px-4 py-3 text-sm font-medium <%= tone %>">
     <%= message %>
   </div>
 <% end %>
