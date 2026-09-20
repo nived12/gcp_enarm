@@ -74,6 +74,21 @@ en:
         title: "No questions yet"
         body: "The bank is built from the GPC catalog. Once the first ingestion finishes, your plan for the day appears here."
 
+  passwords_mailer:
+    reset:
+      subject: "Reset your password"
+      intro: "You can choose a new password here:"
+      link: "reset my password"
+      expiry: "This link expires in %{duration}."
+
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            email_address:
+              taken: "already has an account"
+
   attributes:
     name: "Name"
     email_address: "Email address"

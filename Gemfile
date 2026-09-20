@@ -8,6 +8,12 @@ gem "rails", "~> 8.1.3", ">= 8.1.3.1"
 # a release that passes keyword options.
 gem "json", "~> 2.9"
 
+# Spanish translations for everything Rails itself emits — validation messages,
+# date formats, distance_of_time_in_words. default_locale is :es and the fallback
+# chain for :es does not reach :en, so without this the UI renders
+# "Translation missing" to students.
+gem "rails-i18n"
+
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record

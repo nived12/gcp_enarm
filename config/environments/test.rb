@@ -22,6 +22,11 @@ Rails.application.configure do
   config.consider_all_requests_local = true
   config.cache_store = :null_store
 
+  # rate_limit captures its store at class-definition time, so :null_store makes
+  # every rate limiter a no-op and untestable. Give Action Controller a real store
+  # — rails_helper clears it between examples so counters cannot leak across specs.
+  config.action_controller.cache_store = :memory_store
+
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
 

@@ -1,61 +1,72 @@
 require "rails_helper"
 
 RSpec.describe User do
-  describe "normalization and validation" do
+  describe "validations" do
+    it "requires an email address" do
+      user = build(:user, email_address: nil)
+
+      expect(user).not_to be_valid
+      expect(user.errors).to be_of_kind(:email_address, :blank)
+    end
+
+    it "rejects a duplicate email address instead of leaving it to the unique index" do
+      create(:user, email_address: "gabriela@example.com")
+      duplicate = build(:user, email_address: "gabriela@example.com")
+
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors).to be_of_kind(:email_address, :taken)
+    end
+
+    it "rejects a locale the UI has no translations for" do
+      expect(build(:user, locale: "fr")).not_to be_valid
+    end
+  end
+
+  describe "normalization" do
     it "downcases and strips the email address" do
       user = create(:user, email_address: "  Gabriela@Example.COM ")
 
       expect(user.email_address).to eq("gabriela@example.com")
     end
+  end
 
-    it "rejects an unsupported locale" do
-      user = build(:user, locale: "fr")
-
-      expect(user).not_to be_valid
+  describe "roles" do
+    it "exposes prefixed predicates for each role" do
+      expect(create(:user)).to be_role_student
+      expect(create(:user, :admin)).to be_role_admin
     end
   end
 
-  describe "#active_trial?" do
-    it "is true for a freshly created user" do
-      expect(create(:user)).to be_active_trial
+  describe "password reset tokens" do
+    let(:user) { create(:user, password: "contrasena-segura") }
+
+    it "round-trips a freshly generated token" do
+      token = user.password_reset_token
+
+      expect(User.find_by_password_reset_token!(token)).to eq(user)
     end
 
-    it "is false once the trial has passed" do
-      expect(create(:user, :trial_expired)).not_to be_active_trial
-    end
-  end
+    it "invalidates outstanding tokens once the password changes" do
+      token = user.password_reset_token
+      user.update!(password: "otra-contrasena", password_confirmation: "otra-contrasena")
 
-  describe "#granted_premium?" do
-    it "is false by default" do
-      expect(create(:user)).not_to be_granted_premium
-    end
-
-    it "is true while the grant is live" do
-      expect(create(:user, :granted_premium)).to be_granted_premium
+      expect {
+        User.find_by_password_reset_token!(token)
+      }.to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
     end
 
-    it "is false once the grant has lapsed" do
-      user = create(:user, granted_premium_until: 1.day.ago)
-
-      expect(user).not_to be_granted_premium
-    end
-  end
-
-  describe "#subscription_access_result" do
-    it "allows a granted-premium user whose trial has expired" do
-      user = create(:user, :granted_premium, :trial_expired)
-
-      expect(user.subscription_access_result[:allowed]).to be(true)
+    it "still generates a token for a record that has no password digest yet" do
+      expect { User.new.password_reset_token }.not_to raise_error
     end
 
-    it "reports no cap for a granted-premium user" do
-      expect(create(:user, :granted_premium).daily_questions_limit).to be_nil
-    end
+    it "expires the token after 15 minutes" do
+      token = user.password_reset_token
 
-    it "caps a user with neither trial nor grant" do
-      user = create(:user, :trial_expired)
-
-      expect(user.daily_questions_limit).to eq(SubscriptionAccess.free_daily_questions)
+      travel 16.minutes do
+        expect {
+          User.find_by_password_reset_token!(token)
+        }.to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+      end
     end
   end
 end

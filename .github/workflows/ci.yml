@@ -63,5 +63,13 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build && yarn build:css
-      - run: bin/rails db:test:prepare
-      - run: bundle exec rspec
+      - name: Run specs across all cores, with coverage
+        run: COVERAGE=1 bin/ci-test
+      - name: Check coverage against the committed floor
+        run: bin/coverage-check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7

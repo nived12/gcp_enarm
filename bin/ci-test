@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Run the RSpec suite split across CPU cores.
+#
+# One runner, N processes — not a CI matrix. A matrix pays container + bundle +
+# yarn setup per shard and needs result merging; this needs neither and is
+# roughly as fast.
+#
+# Each process gets its own database (gpc_enarm_test, _test2, _test3, …) because
+# DatabaseCleaner truncates in a before(:suite) hook — sharing one database would
+# let one process truncate tables another is mid-example on.
+#
+# Usage:
+#   bin/ci-test                 # all cores
+#   bin/ci-test -n 2            # 2 processes
+#   COVERAGE=1 bin/ci-test      # with a merged coverage report
+set -euo pipefail
+
+export RAILS_ENV=test
+export PARALLEL_TEST_PROCESSORS="${PARALLEL_TEST_PROCESSORS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)}"
+
+# DATABASE_URL must not be set: Rails merges it over database.yml, which pins
+# every process to ONE database and silently recreates the exact cross-process
+# truncation race this script exists to avoid. Translate it into libpq vars
+# instead, so database.yml keeps ownership of the database NAME and
+# parallel_tests can suffix it per process.
+if [[ -n "${DATABASE_URL:-}" ]]; then
+  echo "==> DATABASE_URL is set; converting to PG* vars so each process gets its own database"
+  eval "$(ruby -ruri -e '
+    u = URI.parse(ENV["DATABASE_URL"])
+    puts "export PGHOST=#{u.host}"         if u.host
+    puts "export PGPORT=#{u.port}"         if u.port
+    puts "export PGUSER=#{u.user}"         if u.user
+    puts "export PGPASSWORD=#{u.password}" if u.password
+  ')"
+  unset DATABASE_URL
+fi
+
+if [[ -n "${COVERAGE:-}" ]]; then
+  # Stale per-process results merge into the new run and inflate the total.
+  rm -rf coverage
+fi
+
+echo "==> Preparing $PARALLEL_TEST_PROCESSORS test databases"
+# create + load_schema rather than parallel:setup: setup routes through db:setup
+# (which also runs seeds), and we only ever want schema here.
+bundle exec rake parallel:create parallel:load_schema
+
+echo "==> Running specs across $PARALLEL_TEST_PROCESSORS processes"
+bundle exec parallel_rspec "$@"

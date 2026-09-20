@@ -45,3 +45,6 @@
 # Built assets
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Test coverage reports
+/coverage/

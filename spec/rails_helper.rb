@@ -1,5 +1,29 @@
 require "spec_helper"
 ENV["RAILS_ENV"] = "test"
+
+# Must start before any application code loads, or everything required during
+# boot is reported as zero-covered. Opt-in via COVERAGE=1 so a normal run stays
+# fast. Each parallel_tests process writes its own result under its own command
+# name; bin/coverage-check reads the merged total afterwards.
+if ENV["COVERAGE"]
+  require "simplecov"
+
+  SimpleCov.start "rails" do
+    enable_coverage :branch
+    command_name "rspec#{ENV["TEST_ENV_NUMBER"]}"
+    merge_timeout 3600
+
+    add_filter "/spec/"
+    add_filter "/config/"
+    add_filter "/db/"
+
+    add_group "Services", "app/services"
+    add_group "Models", "app/models"
+    add_group "Controllers", "app/controllers"
+    add_group "Jobs", "app/jobs"
+  end
+end
+
 require_relative "../config/environment"
 
 # Never let a spec run against production — DatabaseCleaner truncates.
@@ -31,6 +55,8 @@ RSpec.configure do |config|
 
   config.before(:each) do
     I18n.locale = :es
+    # Rate-limit counters live here; without this one spec's attempts throttle the next.
+    ActionController::Base.cache_store.clear
   end
 
   config.before(:suite) do
