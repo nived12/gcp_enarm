@@ -19,6 +19,22 @@ module Gpc
     KEY_LINE = /\A.{0,120}\z/m
     CATALOG_KEY = /(?<![[:alnum:]])[A-Z]{1,7}-\d{3,4}-\d{2}(?![[:alnum:]])/
 
+    # Content that repeats as often as a running header does, and is not one. Search
+    # strategies, bibliography entries, metadata tables, bullet lists and table cells all
+    # recur across pages, and when pdf-reader cannot recover a guideline's header they
+    # are what the most-repeated-line fallback lands on instead. A wrong title is worse
+    # than none: the student reads nonsense, and TopicLinker matches the nonsense.
+    JUNK = [
+      /#\d/, /\[PDAT\]/i, /\[Mesh/i, /\bOR\b.*\bAND\b/, /[•✓]/, /["“”]/,
+      /\A\d+\.\s/, /\A[-–]/, /\bet al\b/i, /\d\.\d+\./, %r{ / },
+      /\A(Profesionales|Secretario|Director|Resultados|Actualizaci[óo]n Fecha)\b/i,
+      /Fecha de publicaci[óo]n/i
+    ].freeze
+
+    # A title is prose: mostly letters and spaces, and more than a couple of words.
+    MINIMUM_WORDS = 2
+    MINIMUM_LETTER_RATIO = 0.75
+
     # Lines the template repeats as often as the title.
     EXCLUSIONS = [
       CATALOG_MARKER, /\AGu[íi]a de Pr[áa]ctica Cl[íi]nica/i, /\AEvidencias y Recomendaciones/i,
@@ -68,6 +84,7 @@ module Gpc
       line.match?(KEY_LINE) && line.match?(CATALOG_KEY)
     end
 
+    # Only reached when pdf-reader did not recover the running header.
     def most_repeated(lines)
       counts = Hash.new(0)
       lines.uniq.each do |line|
@@ -78,10 +95,22 @@ module Gpc
       counts.max_by { |line, count| [count, line.length] }&.first
     end
 
+    def prose?(line)
+      return false if JUNK.any? { |pattern| line.match?(pattern) }
+      return false if line.split(" ").size < MINIMUM_WORDS
+
+      # scan, not count: String#count reads "[[:alpha:]]" as a literal set of brackets
+      # and letters rather than as a character class, and silently scores every title
+      # about 0.30.
+      letters = line.scan(/[[:alpha:][:space:]]/).size
+      letters.to_f / line.length >= MINIMUM_LETTER_RATIO
+    end
+
     def usable?(line)
       return false unless LENGTH.cover?(line.to_s.length)
       return false if line.match?(LETTER_SPACED)
       return false if EXCLUSIONS.any? { |pattern| line.match?(pattern) }
+      return false unless prose?(line)
 
       line.split(" ").none? { |word| word.length > LONGEST_REAL_WORD }
     end

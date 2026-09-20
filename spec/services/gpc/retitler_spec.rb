@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Gpc::Retitler do
-  def archived(title:, body:)
-    guideline = create(:guideline, source: "web_archive", title: title)
+  def archived(title:, body:, catalog_key: "IMSS-051-18")
+    guideline = create(:guideline, source: "web_archive", title: title, catalog_key: catalog_key)
     create(:guideline_section, guideline: guideline, kind: "archived_document", body: body)
     guideline
   end
@@ -27,10 +27,22 @@ RSpec.describe Gpc::Retitler do
     expect(described_class.call.payload).to include(unchanged: 1)
   end
 
-  it "keeps the catalog key when the text still yields no readable title" do
+  it "leaves a guideline that already carries its catalog key alone" do
     guideline = archived(title: "IMSS-051-18", body: "Página 3\nCENETEC\n")
 
-    expect(described_class.call.payload).to include(unreadable: 1)
+    expect(described_class.call.payload).to include(unchanged: 1)
+    expect(guideline.reload.title).to eq("IMSS-051-18")
+  end
+
+  # Tightening the extractor has to be able to remove a bad title, not only add a good
+  # one. Otherwise a guideline named after a bibliography entry stays named after it.
+  it "retracts a title the extractor will no longer vouch for" do
+    guideline = archived(
+      title: "20. Goble DJ, Bilateral facilitation of upper limb movements",
+      body: "Página 3\nCENETEC\n"
+    )
+
+    expect(described_class.call.payload).to include(retracted: 1)
     expect(guideline.reload.title).to eq("IMSS-051-18")
   end
 

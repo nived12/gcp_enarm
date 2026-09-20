@@ -62,6 +62,34 @@ RSpec.describe Gpc::DocumentTitle do
       expect(title_for(*text)).to eq("Diagnóstico y tratamiento del sobrepeso y obesidad exógena")
     end
 
+    # When pdf-reader cannot recover a guideline's running header, the most-repeated
+    # line is whatever else recurs — and in these documents that is a search strategy, a
+    # bibliography entry or a metadata table. Each of these named a real guideline until
+    # it was refused. A wrong title is worse than none: the student reads nonsense, and
+    # the topic linker matches the nonsense.
+    {
+      "a search strategy" => "52. #49 (#6 OR #17 OR #27 OR #32) AND #50 (#7 OR #18 OR #28)",
+      "a bibliography entry" => "20. Goble DJ, Bilateral facilitation of upper limb movements in children",
+      "a professionals table row" => "Profesionales Reumatología, Medicina Interna, Medicina Familiar",
+      "a numbered staff list" => "1.24.Médicoen Rehabilitación 1.46.Médico Psiquiatra dos",
+      "a bulleted clinical list" => "• Que no cumpla ningún criterio • Diabetes Mellitus • IAM SEST",
+      "a table cell" => "Recién nacido / lactante prematuro tardío",
+      "a quoted search term" => "“gastroesophageal reflux” in infants and children under",
+      "a publication date line" => "Fecha de publicación de la actualización: 2 de diciembre de 2015"
+    }.each do |description, line|
+      it "refuses #{description}" do
+        expect(title_for(*page(line))).to be_nil
+      end
+    end
+
+    it "refuses a single long word, which is never a title" do
+      expect(title_for(*page("Electroencefalografía"))).to be_nil
+    end
+
+    it "refuses a line that is mostly not letters" do
+      expect(title_for(*page("2012/01/01 2019/02/15 1000 2000 3000 4000 5000"))).to be_nil
+    end
+
     it "rejects a line too short to be a title" do
       expect(title_for(*page("Objetivo"))).to be_nil
     end

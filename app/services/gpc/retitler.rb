@@ -21,14 +21,18 @@ module Gpc
 
     private
 
+    # A title the extractor will no longer vouch for has to be retracted, not merely
+    # left in place — otherwise tightening the extractor can add good titles but never
+    # remove bad ones, and the guidelines named after a bibliography entry stay named
+    # after a bibliography entry forever. The catalog key is the honest fallback; it is
+    # how a student cites the guideline anyway.
     def outcome(guideline, title)
-      # A guideline whose header never extracted keeps its catalog key as its name,
-      # which is how a student cites it anyway.
-      return :unreadable if title.blank?
+      title = guideline.catalog_key if title.blank?
       return :unchanged if title == guideline.title
 
+      was_named = guideline.title != guideline.catalog_key
       guideline.update!(title: title)
-      :retitled
+      title == guideline.catalog_key && was_named ? :retracted : :retitled
     end
   end
 end
