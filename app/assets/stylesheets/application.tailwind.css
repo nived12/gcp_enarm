@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Tokens.
+
+   Light is warm paper; dark is a warm near-black, not an inversion. The dark
+   ink is deliberately off-white: a full-white serif on black halates and gets
+   tiring across a 280-question sitting.
+
+   The cascade is ordered so an explicit choice always beats the system:
+     :root                     → light
+     @media dark + :not(light) → dark, unless the user picked light
+     [data-theme="dark"]       → dark, whatever the system says
+--------------------------------------------------------------------------- */
+
+:root {
+  --ground: #faf7f2;
+  --surface: #ffffff;
+  --surface-sunk: #f3eee6;
+  --ink: #1c1917;
+  --ink-muted: #57534e;
+  --ink-faint: #8a827a;
+  --line: #e7e1d8;
+  --line-strong: #d6cec1;
+
+  --accent: #0b5951;
+  --accent-hover: #0e6f64;
+  --accent-soft: #e4efec;
+  --accent-ink: #ffffff;
+
+  --correct: #2f6b3f;
+  --correct-soft: #e8f0e7;
+  --incorrect: #9f3d2f;
+  --incorrect-soft: #f7e9e5;
+
+  --serif-weight: 400;
+  --serif-weight-strong: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #14120f;
+    --surface: #1e1a16;
+    --surface-sunk: #100e0c;
+    --ink: #ede8e0;
+    --ink-muted: #a39c92;
+    --ink-faint: #7b746b;
+    --line: #2e2822;
+    --line-strong: #433b32;
+
+    --accent: #4fb3a5;
+    --accent-hover: #6cc7ba;
+    --accent-soft: #17302d;
+    --accent-ink: #0b1f1c;
+
+    --correct: #7cb389;
+    --correct-soft: #1a2a1d;
+    --incorrect: #d98a78;
+    --incorrect-soft: #2e1d19;
+
+    /* Serif thins optically on a dark ground — step the weight up to match. */
+    --serif-weight: 450;
+    --serif-weight-strong: 650;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #14120f;
+  --surface: #1e1a16;
+  --surface-sunk: #100e0c;
+  --ink: #ede8e0;
+  --ink-muted: #a39c92;
+  --ink-faint: #7b746b;
+  --line: #2e2822;
+  --line-strong: #433b32;
+
+  --accent: #4fb3a5;
+  --accent-hover: #6cc7ba;
+  --accent-soft: #17302d;
+  --accent-ink: #0b1f1c;
+
+  --correct: #7cb389;
+  --correct-soft: #1a2a1d;
+  --incorrect: #d98a78;
+  --incorrect-soft: #2e1d19;
+
+  --serif-weight: 450;
+  --serif-weight-strong: 650;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-correct: var(--correct);
+  --color-correct-soft: var(--correct-soft);
+  --color-incorrect: var(--incorrect);
+  --color-incorrect-soft: var(--incorrect-soft);
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html {
+    background-color: var(--ground);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv05" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Signature: the graded marker.
+
+   Lifted from the GPC documents themselves, where every recommendation is
+   preceded by a block carrying its grade, its scale and its citation —
+   `A NICE Hong K, 2021`. That block is this product's structural unit: it
+   marks topics, calendar days, and every cited recommendation in an answer
+   review. Students read this notation daily; it needs no legend.
+--------------------------------------------------------------------------- */
+
+@layer components {
+  .grade-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    background-color: var(--surface);
+  }
+
+  .grade-marker--strong {
+    border-color: var(--accent);
+    color: var(--accent);
+    background-color: var(--accent-soft);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* Clinical vignettes are set in the serif, at a reading measure. The GPC PDFs
+     they are derived from are set in serif too — the vignette should feel like
+     the document it came from. */
+  .vignette {
+    font-family: var(--font-serif);
+    font-weight: var(--serif-weight);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    letter-spacing: 0.003em;
+    max-width: 62ch;
+  }
+
+  .vignette strong {
+    font-weight: var(--serif-weight-strong);
+  }
+
+  .numeric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}

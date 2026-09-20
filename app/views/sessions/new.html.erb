@@ -1,0 +1,20 @@
+<% content_for :title, t("sessions.new.title") %>
+
+<%= render layout: "shared/auth_panel", locals: { title: t("sessions.new.title") } do %>
+  <%= form_with url: session_path do |form| %>
+    <%= render "shared/field", form: form, name: :email_address, type: :email,
+          label: t("attributes.email_address"), autocomplete: "username",
+          autofocus: true, value: params[:email_address] %>
+    <%= render "shared/field", form: form, name: :password, type: :password,
+          label: t("attributes.password"), autocomplete: "current-password" %>
+    <%= render "shared/submit", form: form, label: t("sessions.new.submit") %>
+  <% end %>
+
+  <div class="mt-6 flex flex-col gap-2 text-sm">
+    <%= link_to t("sessions.new.forgot"), new_password_path, class: "text-ink-muted hover:text-accent" %>
+    <p class="text-ink-muted">
+      <%= t("sessions.new.no_account") %>
+      <%= link_to t("navigation.sign_up"), new_registration_path, class: "font-medium text-accent hover:underline" %>
+    </p>
+  </div>
+<% end %>

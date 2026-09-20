@@ -1,0 +1,84 @@
+es:
+  app:
+    name: "GPCEnarm"
+    tagline: "Cada pregunta, respaldada por una Guía de Práctica Clínica"
+
+  navigation:
+    skip_to_content: "Ir al contenido"
+    home: "Inicio"
+    simulator: "Simulador"
+    calendar: "Calendario"
+    topics: "Temas"
+    stats: "Estadísticas"
+    account: "Mi cuenta"
+    sign_in: "Iniciar sesión"
+    sign_up: "Crear cuenta"
+    sign_out: "Cerrar sesión"
+
+  sessions:
+    new:
+      no_account: "¿Aún no tienes cuenta?"
+      forgot: "¿Olvidaste tu contraseña?"
+      title: "Iniciar sesión"
+      submit: "Entrar"
+    create:
+      invalid: "Correo o contraseña incorrectos."
+      rate_limited: "Demasiados intentos. Vuelve a intentar en unos minutos."
+    destroy:
+      success: "Sesión cerrada."
+
+  passwords:
+    new:
+      back: "Volver a iniciar sesión"
+      subtitle: "Te enviamos un enlace para elegir una contraseña nueva."
+      title: "Restablecer contraseña"
+      submit: "Enviar instrucciones"
+    create:
+      sent: "Si ese correo existe, te enviamos instrucciones para restablecer tu contraseña."
+    edit:
+      title: "Elige una contraseña nueva"
+      submit: "Guardar contraseña"
+    update:
+      success: "Contraseña actualizada."
+      invalid_token: "Ese enlace ya expiró. Solicita uno nuevo."
+
+  exams:
+    denied:
+      daily_limit_reached: "Llegaste a tus %{limit} preguntas gratuitas de hoy. Vuelve mañana o activa tu suscripción."
+
+  shared:
+    theme:
+      toggle: "Cambiar tema"
+      light: "Claro"
+      dark: "Oscuro"
+
+  home:
+    landing:
+      eyebrow: "CATÁLOGO MAESTRO · GPC"
+      headline_lead: "Cada pregunta"
+      headline_accent: "tiene un origen."
+      subhead: "Casos clínicos tipo ENARM construidos sobre las Guías de Práctica Clínica vigentes. Cada respuesta cita la recomendación exacta que la sustenta, con su grado de evidencia."
+      sample_recommendation: "Se recomienda otorgar educación prenatal para reducir niveles de estrés durante el embarazo."
+      sample_source: "Atención y cuidados multidisciplinarios en el embarazo"
+      provenance_note: "Así se ve la fuente de una pregunta. No tendrás que confiar en nosotros: podrás abrir la guía."
+    dashboard:
+      today: "HOY"
+      greeting: "Hola, %{name}"
+      fallback_name: "colega"
+      empty:
+        title: "Todavía no hay preguntas"
+        body: "El banco se construye a partir del catálogo de GPC. En cuanto termine la primera carga, aquí aparecerá tu plan del día."
+
+  attributes:
+    name: "Nombre"
+    email_address: "Correo electrónico"
+    password: "Contraseña"
+    password_confirmation: "Confirmar contraseña"
+  registrations:
+    new:
+      title: "Crear cuenta"
+      subtitle: "Empieza con 14 días de acceso completo. No pedimos tarjeta."
+      submit: "Crear cuenta"
+      have_account: "¿Ya tienes cuenta?"
+    create:
+      welcome: "Tu cuenta está lista. Bienvenida."

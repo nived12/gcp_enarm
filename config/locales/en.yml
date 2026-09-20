@@ -1,0 +1,84 @@
+en:
+  app:
+    name: "GPCEnarm"
+    tagline: "Every question backed by a clinical practice guideline"
+
+  navigation:
+    skip_to_content: "Skip to content"
+    home: "Home"
+    simulator: "Simulator"
+    calendar: "Calendar"
+    topics: "Topics"
+    stats: "Statistics"
+    account: "My account"
+    sign_in: "Sign in"
+    sign_up: "Sign up"
+    sign_out: "Sign out"
+
+  sessions:
+    new:
+      no_account: "Don't have an account yet?"
+      forgot: "Forgot your password?"
+      title: "Sign in"
+      submit: "Enter"
+    create:
+      invalid: "Incorrect email or password."
+      rate_limited: "Too many attempts. Try again in a few minutes."
+    destroy:
+      success: "Signed out."
+
+  passwords:
+    new:
+      back: "Back to sign in"
+      subtitle: "We'll email you a link to choose a new password."
+      title: "Reset password"
+      submit: "Send instructions"
+    create:
+      sent: "If that email exists, we sent instructions to reset your password."
+    edit:
+      title: "Choose a new password"
+      submit: "Save password"
+    update:
+      success: "Password updated."
+      invalid_token: "That link has expired. Request a new one."
+
+  exams:
+    denied:
+      daily_limit_reached: "You've used your %{limit} free questions for today. Come back tomorrow or subscribe."
+
+  shared:
+    theme:
+      toggle: "Switch theme"
+      light: "Light"
+      dark: "Dark"
+
+  home:
+    landing:
+      eyebrow: "CATÁLOGO MAESTRO · GPC"
+      headline_lead: "Every question"
+      headline_accent: "has a source."
+      subhead: "ENARM-style clinical cases built on the current clinical practice guidelines. Every answer cites the exact recommendation behind it, with its evidence grade."
+      sample_recommendation: "Prenatal education is recommended to reduce stress levels during pregnancy."
+      sample_source: "Multidisciplinary care in pregnancy"
+      provenance_note: "This is what a question's source looks like. You won't have to take our word for it — you can open the guideline."
+    dashboard:
+      today: "TODAY"
+      greeting: "Hello, %{name}"
+      fallback_name: "colleague"
+      empty:
+        title: "No questions yet"
+        body: "The bank is built from the GPC catalog. Once the first ingestion finishes, your plan for the day appears here."
+
+  attributes:
+    name: "Name"
+    email_address: "Email address"
+    password: "Password"
+    password_confirmation: "Confirm password"
+  registrations:
+    new:
+      title: "Create account"
+      subtitle: "Start with 14 days of full access. No card required."
+      submit: "Create account"
+      have_account: "Already have an account?"
+    create:
+      welcome: "Your account is ready. Welcome."

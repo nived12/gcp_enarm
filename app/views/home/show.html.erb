@@ -1,0 +1,5 @@
+<% if authenticated? %>
+  <%= render "home/dashboard" %>
+<% else %>
+  <%= render "home/landing" %>
+<% end %>

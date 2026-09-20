@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: gpc_enarm_development
+
+test:
+  <<: *default
+  # TEST_ENV_NUMBER is set by parallel_tests (empty for the first process, then
+  # "2", "3", …) so each process owns its own database.
+  database: gpc_enarm_test<%= ENV["TEST_ENV_NUMBER"] %>
+
+# One database, not the four Rails 8 scaffolds. Railway provides a single
+# DATABASE_URL; the Solid Queue/Cache/Cable tables live in the primary schema via
+# db/migrate rather than in their own databases.
+production:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>

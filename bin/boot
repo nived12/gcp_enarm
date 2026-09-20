@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+
+# Solid Queue runs inside Puma (config/puma.rb reads this), so one Railway service
+# covers web and jobs — no Redis, no second process to supervise.
+export SOLID_QUEUE_IN_PUMA=1
+
+./bin/rails db:prepare
+./bin/rails db:seed
+
+exec ./bin/rails server

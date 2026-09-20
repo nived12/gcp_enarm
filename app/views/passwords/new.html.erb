@@ -1,0 +1,14 @@
+<% content_for :title, t("passwords.new.title") %>
+
+<%= render layout: "shared/auth_panel",
+      locals: { title: t("passwords.new.title"), subtitle: t("passwords.new.subtitle") } do %>
+  <%= form_with url: passwords_path do |form| %>
+    <%= render "shared/field", form: form, name: :email_address, type: :email,
+          label: t("attributes.email_address"), autocomplete: "username", autofocus: true %>
+    <%= render "shared/submit", form: form, label: t("passwords.new.submit") %>
+  <% end %>
+
+  <p class="mt-6 text-sm">
+    <%= link_to t("passwords.new.back"), new_session_path, class: "text-ink-muted hover:text-accent" %>
+  </p>
+<% end %>

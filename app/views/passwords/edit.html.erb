@@ -1,0 +1,11 @@
+<% content_for :title, t("passwords.edit.title") %>
+
+<%= render layout: "shared/auth_panel", locals: { title: t("passwords.edit.title") } do %>
+  <%= form_with url: password_path(params[:token]), method: :put do |form| %>
+    <%= render "shared/field", form: form, name: :password, type: :password,
+          label: t("attributes.password"), autocomplete: "new-password", autofocus: true %>
+    <%= render "shared/field", form: form, name: :password_confirmation, type: :password,
+          label: t("attributes.password_confirmation"), autocomplete: "new-password" %>
+    <%= render "shared/submit", form: form, label: t("passwords.edit.submit") %>
+  <% end %>
+<% end %>

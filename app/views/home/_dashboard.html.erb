@@ -1,0 +1,15 @@
+<section>
+  <p class="eyebrow"><%= t("home.dashboard.today") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink">
+    <%= t("home.dashboard.greeting", name: Current.user.name.presence || t("home.dashboard.fallback_name")) %>
+  </h1>
+</section>
+
+<%# Honest empty state: the question bank does not exist until Phase 2 ingests and
+    generates it. Saying so beats a dashboard of zeroes pretending to be data. %>
+<div class="mt-8 rounded-sm border border-dashed border-line-strong bg-surface p-6 text-center">
+  <p class="text-sm font-medium text-ink"><%= t("home.dashboard.empty.title") %></p>
+  <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
+    <%= t("home.dashboard.empty.body") %>
+  </p>
+</div>

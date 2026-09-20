@@ -1,0 +1,12 @@
+<%# Shared chrome for the four unauthenticated forms. `title` is required;
+    `subtitle` and the block body are the page's own. %>
+<div class="mx-auto w-full max-w-sm pt-6">
+  <h1 class="text-2xl font-semibold tracking-tight text-ink"><%= title %></h1>
+  <% if local_assigns[:subtitle].present? %>
+    <p class="mt-2 text-sm leading-relaxed text-ink-muted"><%= subtitle %></p>
+  <% end %>
+
+  <div class="mt-6">
+    <%= yield %>
+  </div>
+</div>

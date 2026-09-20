@@ -1,0 +1,27 @@
+<% content_for :title, t("registrations.new.title") %>
+
+<%= render layout: "shared/auth_panel",
+      locals: { title: t("registrations.new.title"), subtitle: t("registrations.new.subtitle") } do %>
+  <%= form_with model: @user, url: registration_path do |form| %>
+    <% if @user.errors.any? %>
+      <div class="mb-4 rounded-sm border border-incorrect/40 bg-incorrect-soft px-4 py-3 text-sm text-ink">
+        <%= @user.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <%= render "shared/field", form: form, name: :name, type: :text,
+          label: t("attributes.name"), autocomplete: "name", autofocus: true, required: false %>
+    <%= render "shared/field", form: form, name: :email_address, type: :email,
+          label: t("attributes.email_address"), autocomplete: "username" %>
+    <%= render "shared/field", form: form, name: :password, type: :password,
+          label: t("attributes.password"), autocomplete: "new-password" %>
+    <%= render "shared/field", form: form, name: :password_confirmation, type: :password,
+          label: t("attributes.password_confirmation"), autocomplete: "new-password" %>
+    <%= render "shared/submit", form: form, label: t("registrations.new.submit") %>
+  <% end %>
+
+  <p class="mt-6 text-sm text-ink-muted">
+    <%= t("registrations.new.have_account") %>
+    <%= link_to t("navigation.sign_in"), new_session_path, class: "font-medium text-accent hover:underline" %>
+  </p>
+<% end %>
