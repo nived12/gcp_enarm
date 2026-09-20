@@ -7,7 +7,7 @@ require "rails_helper"
 # so a rejected sign-in followed by any other request is the cheapest probe.
 RSpec.describe "Encrypted session cookies", type: :request do
   it "decrypts a session cookie written by an earlier request" do
-    post session_path, params: { email_address: "nobody@example.com", password: "wrong" }
+    post session_path, params: { email: "nobody@example.com", password: "wrong" }
     expect(response.cookies).to include(Rails.application.config.session_options[:key])
 
     get root_path

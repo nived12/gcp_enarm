@@ -83,7 +83,8 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   is off on purpose.
 - No spec may make a live LLM call. `spec/support/llm_guard.rb` fails the suite on any
   request to a provider host.
-- Coverage floor only ever moves up. It is at 99.5% line / 100% branch; keep it there.
+- Coverage floor only ever moves up. It is at 99.7% line / 100% branch; keep it there.
+  Prefer deleting a speculative branch to writing a spec that proves it is unreachable.
 - `bundle exec rspec`, `rubocop` and `brakeman` are all green before a phase is closed.
 
 ## Gotchas already paid for
@@ -100,5 +101,10 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
 - **`rate_limit` captures its store at class-definition time.** The test environment gives
   Action Controller a `:memory_store` of its own so limiters are testable; `rails_helper`
   clears it between examples.
+- **The GPC grading strip is not a fixed grammar.** `1++ NICE Hong K, 2021` is the
+  common spelling, but `SIGN D Taylor M, 2015` puts the scale first, `Muy baja GRADE …`
+  has a two-word grade, and `PBP` looks like a scale but is a grade. The scale name is
+  the only dependable anchor, and `Recommendation#label` keeps the strip verbatim so a
+  bad split never loses the citation.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.

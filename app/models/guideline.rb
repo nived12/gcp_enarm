@@ -1,4 +1,7 @@
 class Guideline < ApplicationRecord
+  has_many :guideline_sections, -> { order(:position) }, dependent: :destroy, inverse_of: :guideline
+  has_many :recommendations, through: :guideline_sections
+
   # SS is the Secretaría de Salud; the rest are institution acronyms that read the
   # same in any language, so they stay as they are.
   enum :institution,

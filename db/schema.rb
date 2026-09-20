@@ -10,9 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_020000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_070000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "guideline_sections", force: :cascade do |t|
+    t.text "body", null: false
+    t.text "clinical_question"
+    t.string "content_hash", null: false
+    t.datetime "created_at", null: false
+    t.string "external_id", null: false
+    t.bigint "guideline_id", null: false
+    t.string "heading", null: false
+    t.string "kind", null: false
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guideline_id", "external_id"], name: "index_guideline_sections_on_guideline_id_and_external_id", unique: true
+    t.index ["guideline_id", "position"], name: "index_guideline_sections_on_guideline_id_and_position"
+    t.index ["guideline_id"], name: "index_guideline_sections_on_guideline_id"
+    t.index ["kind"], name: "index_guideline_sections_on_kind"
+  end
 
   create_table "guidelines", force: :cascade do |t|
     t.string "catalog_key", null: false
@@ -33,6 +50,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_020000) do
     t.index ["institution"], name: "index_guidelines_on_institution"
     t.index ["specialty_labels"], name: "index_guidelines_on_specialty_labels", using: :gin
     t.index ["year"], name: "index_guidelines_on_year"
+  end
+
+  create_table "recommendations", force: :cascade do |t|
+    t.string "citation"
+    t.datetime "created_at", null: false
+    t.string "grade"
+    t.bigint "guideline_section_id", null: false
+    t.string "label", null: false
+    t.integer "position", null: false
+    t.string "scale"
+    t.text "text", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grade"], name: "index_recommendations_on_grade"
+    t.index ["guideline_section_id", "position"], name: "index_recommendations_on_guideline_section_id_and_position", unique: true
+    t.index ["guideline_section_id"], name: "index_recommendations_on_guideline_section_id"
+    t.index ["scale"], name: "index_recommendations_on_scale"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -217,7 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_020000) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "email_address", null: false
+    t.string "email", null: false
     t.integer "exam_year"
     t.datetime "granted_premium_until"
     t.string "locale", default: "es", null: false
@@ -226,10 +259,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_020000) do
     t.string "role", default: "student", null: false
     t.datetime "trial_ends_at"
     t.datetime "updated_at", null: false
-    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["granted_premium_until"], name: "index_users_on_granted_premium_until"
   end
 
+  add_foreign_key "guideline_sections", "guidelines"
+  add_foreign_key "recommendations", "guideline_sections"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
   add_foreign_key "solid_queue_batch_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

@@ -6,7 +6,7 @@ require "rails_helper"
 RSpec.describe "Rate limiting", type: :request do
   it "throttles repeated sign-in attempts" do
     11.times do
-      post session_path, params: { email_address: "gabriela@example.com", password: "incorrecta" }
+      post session_path, params: { email: "gabriela@example.com", password: "incorrecta" }
     end
 
     expect(response).to redirect_to(new_session_path)
@@ -14,7 +14,7 @@ RSpec.describe "Rate limiting", type: :request do
   end
 
   it "throttles repeated password reset requests" do
-    11.times { post passwords_path, params: { email_address: "gabriela@example.com" } }
+    11.times { post passwords_path, params: { email: "gabriela@example.com" } }
 
     expect(response).to redirect_to(new_password_path)
     expect(flash[:alert]).to eq(I18n.t("sessions.create.rate_limited"))
@@ -23,7 +23,7 @@ RSpec.describe "Rate limiting", type: :request do
   it "throttles repeated sign-up attempts" do
     11.times do |n|
       post registration_path, params: {
-        user: { email_address: "nueva#{n}@example.com",
+        user: { email: "nueva#{n}@example.com",
                 password: "contrasena-segura", password_confirmation: "contrasena-segura" }
       }
     end

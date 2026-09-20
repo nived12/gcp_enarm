@@ -1,10 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Sessions", type: :request do
-  let!(:user) { create(:user, email_address: "gabriela@example.com", password: "contrasena-segura") }
+  let!(:user) { create(:user, email: "gabriela@example.com", password: "contrasena-segura") }
 
   def sign_in
-    post session_path, params: { email_address: "gabriela@example.com", password: "contrasena-segura" }
+    post session_path, params: { email: "gabriela@example.com", password: "contrasena-segura" }
   end
 
   describe "GET / when signed in" do

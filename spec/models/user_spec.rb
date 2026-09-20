@@ -3,18 +3,18 @@ require "rails_helper"
 RSpec.describe User do
   describe "validations" do
     it "requires an email address" do
-      user = build(:user, email_address: nil)
+      user = build(:user, email: nil)
 
       expect(user).not_to be_valid
-      expect(user.errors).to be_of_kind(:email_address, :blank)
+      expect(user.errors).to be_of_kind(:email, :blank)
     end
 
     it "rejects a duplicate email address instead of leaving it to the unique index" do
-      create(:user, email_address: "gabriela@example.com")
-      duplicate = build(:user, email_address: "gabriela@example.com")
+      create(:user, email: "gabriela@example.com")
+      duplicate = build(:user, email: "gabriela@example.com")
 
       expect(duplicate).not_to be_valid
-      expect(duplicate.errors).to be_of_kind(:email_address, :taken)
+      expect(duplicate.errors).to be_of_kind(:email, :taken)
     end
 
     it "rejects a locale the UI has no translations for" do
@@ -24,9 +24,9 @@ RSpec.describe User do
 
   describe "normalization" do
     it "downcases and strips the email address" do
-      user = create(:user, email_address: "  Gabriela@Example.COM ")
+      user = create(:user, email: "  Gabriela@Example.COM ")
 
-      expect(user.email_address).to eq("gabriela@example.com")
+      expect(user.email).to eq("gabriela@example.com")
     end
   end
 

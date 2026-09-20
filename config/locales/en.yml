@@ -59,7 +59,7 @@ en:
       subhead: "ENARM-style clinical cases built on the current clinical practice guidelines. Every answer cites the exact recommendation behind it, with its evidence grade."
       source_label: "GPC recommendation"
       sample_citation: "NICE · Hong K, 2021"
-      sample_recommendation_html: "Prenatal education is recommended to <mark>reduce stress levels</mark> during pregnancy."
+      sample_recommendation_html: "<mark>Prenatal education is recommended</mark> to reduce stress levels, lower the caesarean birth rate, and reduce the use of epidural anaesthesia."
       sample_source: "IMSS-028-22 · Multidisciplinary care in pregnancy"
       derived_label: "The question it produces"
       sample_question: "A 24-year-old primigravida at 28 weeks reports persistent anxiety and disturbed sleep. What is the recommended initial intervention?"
@@ -86,12 +86,12 @@ en:
       models:
         user:
           attributes:
-            email_address:
+            email:
               taken: "already has an account"
 
   attributes:
     name: "Name"
-    email_address: "Email address"
+    email: "Email address"
     password: "Password"
     password_confirmation: "Confirm password"
   registrations:

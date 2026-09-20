@@ -39,7 +39,7 @@ RSpec.describe "Authentication", type: :request do
     it "creates the account and signs the user in" do
       expect {
         post registration_path, params: {
-          user: { name: "Gabriela", email_address: "nueva@example.com",
+          user: { name: "Gabriela", email: "nueva@example.com",
                   password: "contrasena-segura", password_confirmation: "contrasena-segura" }
         }
       }.to change(User, :count).by(1)
@@ -49,7 +49,7 @@ RSpec.describe "Authentication", type: :request do
 
     it "re-renders the form when the passwords do not match" do
       post registration_path, params: {
-        user: { email_address: "nueva@example.com",
+        user: { email: "nueva@example.com",
                 password: "contrasena-segura", password_confirmation: "otra-cosa" }
       }
 
@@ -58,16 +58,16 @@ RSpec.describe "Authentication", type: :request do
   end
 
   describe "POST /session" do
-    let!(:user) { create(:user, email_address: "gabriela@example.com", password: "contrasena-segura") }
+    let!(:user) { create(:user, email: "gabriela@example.com", password: "contrasena-segura") }
 
     it "signs in with valid credentials" do
-      post session_path, params: { email_address: "gabriela@example.com", password: "contrasena-segura" }
+      post session_path, params: { email: "gabriela@example.com", password: "contrasena-segura" }
 
       expect(response).to redirect_to(root_path)
     end
 
     it "rejects a wrong password" do
-      post session_path, params: { email_address: "gabriela@example.com", password: "incorrecta" }
+      post session_path, params: { email: "gabriela@example.com", password: "incorrecta" }
 
       expect(response).to redirect_to(new_session_path)
       expect(flash[:alert]).to eq(I18n.t("sessions.create.invalid"))

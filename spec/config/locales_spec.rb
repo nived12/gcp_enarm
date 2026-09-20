@@ -20,4 +20,17 @@ RSpec.describe "locale files" do
   it "defaults to Spanish" do
     expect(I18n.default_locale).to eq(:es)
   end
+
+  # The landing page's whole claim is that a question never exists without the span it
+  # was generated from. The same invariant Phase 2 enforces on generated questions has
+  # to hold for the shop window: the highlight is part of the quote, not a gloss on it.
+  %i[es en].each do |locale|
+    it "highlights a span that is really inside the sample recommendation (#{locale})" do
+      html = I18n.t("home.landing.sample_recommendation_html", locale: locale)
+      highlighted = html[%r{<mark>(.*?)</mark>}, 1]
+
+      expect(highlighted).to be_present
+      expect(html.gsub(%r{</?mark>}, "")).to include(highlighted)
+    end
+  end
 end

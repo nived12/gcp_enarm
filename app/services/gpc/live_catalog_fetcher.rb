@@ -8,8 +8,7 @@
 # Returns an array of attribute hashes; persisting them is Gpc::CatalogImporter's
 # job. Keeping the parse pure is what lets it be tested against a saved page.
 module Gpc
-  class LiveCatalogFetcher < ApplicationService
-    BASE_URL = "https://gpc.salud.gob.mx".freeze
+  class LiveCatalogFetcher < LiveSiteFetcher
     CATALOG_PATH = "/DDIMBE".freeze
     GUIDELINE_PATH = "/DDIMBE/DDIMBE/ContenidoGuia".freeze
 
@@ -21,10 +20,6 @@ module Gpc
       levels_of_care: "Nivel de Atención",
       year: "Año de publicación"
     }.freeze
-
-    # A small government server with no CDN. One request per run is already polite;
-    # the timeout is generous because it is frequently slow rather than down.
-    TIMEOUT_SECONDS = 30
 
     def call
       body = fetch_catalog_page
@@ -39,17 +34,7 @@ module Gpc
     private
 
     def fetch_catalog_page
-      response = HTTParty.get(
-        "#{BASE_URL}#{CATALOG_PATH}", timeout: TIMEOUT_SECONDS,
-        headers: { "User-Agent" => user_agent }
-      )
-      return response.body if response.success?
-
-      failure("El catálogo respondió #{response.code}")
-      nil
-    rescue HTTParty::Error, SocketError, Timeout::Error, Errno::ECONNREFUSED => e
-      failure("No se pudo leer el catálogo: #{e.message}")
-      nil
+      get(CATALOG_PATH, "El catálogo")
     end
 
     def parse(body)
@@ -87,10 +72,6 @@ module Gpc
 
     def split_list(value)
       value.to_s.split(",").map(&:strip).reject(&:blank?)
-    end
-
-    def user_agent
-      ENV.fetch("GPC_USER_AGENT", "GPCEnarm/1.0 (+https://gpcenarm.mx; contacto@gpcenarm.mx)")
     end
   end
 end

@@ -59,7 +59,7 @@ es:
       subhead: "Casos clínicos tipo ENARM construidos sobre las Guías de Práctica Clínica vigentes. Cada respuesta cita la recomendación exacta que la sustenta, con su grado de evidencia."
       source_label: "Recomendación GPC"
       sample_citation: "NICE · Hong K, 2021"
-      sample_recommendation_html: "Se recomienda <mark>otorgar educación prenatal</mark> para reducir niveles de estrés durante el embarazo."
+      sample_recommendation_html: "Se recomienda <mark>otorgar educación prenatal</mark> para reducir niveles de estrés, disminuir la tasa de nacimientos por cesárea, y para reducir el uso de anestesia epidural."
       sample_source: "IMSS-028-22 · Atención y cuidados multidisciplinarios en el embarazo"
       derived_label: "La pregunta que sale de ahí"
       sample_question: "Primigesta de 24 años, 28 SDG, refiere ansiedad persistente y alteraciones del sueño. ¿Cuál es la intervención inicial recomendada?"
@@ -86,12 +86,12 @@ es:
       models:
         user:
           attributes:
-            email_address:
+            email:
               taken: "ya tiene una cuenta"
 
   attributes:
     name: "Nombre"
-    email_address: "Correo electrónico"
+    email: "Correo electrónico"
     password: "Contraseña"
     password_confirmation: "Confirmar contraseña"
   registrations:

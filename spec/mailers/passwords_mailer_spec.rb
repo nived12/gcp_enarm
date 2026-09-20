@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe PasswordsMailer do
   include Rails.application.routes.url_helpers
 
-  let(:user) { create(:user, email_address: "gabriela@example.com") }
+  let(:user) { create(:user, email: "gabriela@example.com") }
   let(:mail) { described_class.reset(user) }
 
   it "addresses the user with a Spanish subject" do

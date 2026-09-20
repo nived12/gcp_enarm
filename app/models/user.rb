@@ -6,9 +6,9 @@ class User < ApplicationRecord
 
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 
-  normalizes :email_address, with: ->(e) { e.strip.downcase }
+  normalizes :email, with: ->(e) { e.strip.downcase }
 
-  validates :email_address, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true
   validates :locale, inclusion: { in: %w[es en] }
 
   # Salting the token with the current digest invalidates outstanding reset links

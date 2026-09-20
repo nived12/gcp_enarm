@@ -1,12 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "Password resets", type: :request do
-  let!(:user) { create(:user, email_address: "gabriela@example.com", password: "contrasena-segura") }
+  let!(:user) { create(:user, email: "gabriela@example.com", password: "contrasena-segura") }
 
   describe "POST /passwords" do
     it "sends the reset mail to a known address" do
       expect {
-        post passwords_path, params: { email_address: "gabriela@example.com" }
+        post passwords_path, params: { email: "gabriela@example.com" }
       }.to have_enqueued_mail(PasswordsMailer, :reset)
 
       expect(response).to redirect_to(new_session_path)
@@ -17,7 +17,7 @@ RSpec.describe "Password resets", type: :request do
     # account-enumeration oracle.
     it "gives an unknown address the identical response, and sends nothing" do
       expect {
-        post passwords_path, params: { email_address: "desconocida@example.com" }
+        post passwords_path, params: { email: "desconocida@example.com" }
       }.not_to have_enqueued_mail(PasswordsMailer, :reset)
 
       expect(response).to redirect_to(new_session_path)

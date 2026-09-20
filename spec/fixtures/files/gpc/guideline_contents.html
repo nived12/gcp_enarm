@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DDIMBE - SS-757-25</title>
+    <link href="https://framework-gb.cdn.gob.mx/gm/v3/assets/images/favicon.ico" rel="shortcut icon">
+    <link href="https://framework-gb.cdn.gob.mx/gm/v3/assets/styles/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="/DDIMBE/css/DDIMBE_Style.css?v=6It3ukH1emUvIUckZIzfknhPd53kM1gqlWBzr6H1GIY" />
+</head>
+<body>
+      
+
+    <main b-bbbc0dcwk7 class="flex-shrink-0">
+
+        <!--Subnavegacion DGMOSS-->
+        <nav b-bbbc0dcwk7 class="navbar navbar-expand-md navbar-dark sub-navbar fixed-top">
+            
+            <div b-bbbc0dcwk7 class="container-fluid">
+                
+                <button b-bbbc0dcwk7 class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span b-bbbc0dcwk7 class="navbar-toggler-icon"></span>
+                </button>
+                
+                <span b-bbbc0dcwk7 class="navbar-brand sub-navbar pb-1 pt-4 mb-0" >
+                    
+<!--Si el usuario inicia sesión, se pone  su nombre junto al bot´´on cn el icono de una casa -->
+    <a href="https://www.gob.mx/gobierno" class="me-0 d-inline-block">
+        <span class="bootstrap-icons" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="DGMOSS - Dirección General de Modernización del Sector Salud">
+            <i class="icon icon-home"></i>
+            DGMOSS
+        </span>
+    </a>
+
+                    
+                    
+                </span>
+                <div b-bbbc0dcwk7 class="collapse navbar-collapse pt-4" id="navbarCollapse">
+                    <ul b-bbbc0dcwk7 class="navbar-nav ">
+                        <li b-bbbc0dcwk7 class="nav-item">
+                            <a class="nav-link subnav-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Guías de práctica clínica" href="/DDIMBE">DOCUMENTOS MBE</a>
+                        </li>
+                        <li b-bbbc0dcwk7 class="nav-item">
+                            <a class="nav-link subnav-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Manuales Metodólogicos" href="/DDIMBE/DDIMBE/ContenidoManual">MANUALES METODÓLOGICOS</a>
+                        </li>
+                            <li b-bbbc0dcwk7 class="nav-item">
+                                <a class="nav-link subnav-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Iniciar Sesión" href="/DDIMBE/DDIMBE/LoginConfig_DDIMBE">
+                                    <span b-bbbc0dcwk7 class="icon-user" aria-hidden="true"></span>
+                                </a>
+                            </li>
+                        
+                        <li b-bbbc0dcwk7 class="nav-item">
+                                <form class="d-flex align-items-center" id="BuscarGM" action="/DDIMBE/DDIMBE/BuscarGuiaMaster" method="post">
+                                    <a b-bbbc0dcwk7 href="#" class="nav-link subnav-link" id="EjecutarBusqueda">
+                                        <span b-bbbc0dcwk7 class="bootstrap-icons" aria-hidden="true"><i b-bbbc0dcwk7 class="bi bi-search text-white"></i></span>
+                                    </a>
+                                <input b-bbbc0dcwk7 class="form-control " style="min-width: 200px;max-width: 300px;" type="text" placeholder="Buscar GPC..." aria-label="Search" maxlength="20" name="buscarGuia">
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A6-bPw9ZDJKli5AW-37slywnmSwCfWXpGznAzlKGIjt33qmcTcSvaW4XO5qr-m2O2KhUVq8f0S-LMPxWS-qzRSupom_zhoqtA_JLpUuHS8D-upIyyOW2jk89qjQhPUTiUBU4scPyV_8EZIaiX38JPk" /></form>
+                            
+                        </li>
+                       
+                    </ul>
+                    
+                    
+                    
+                </div>
+            </div>
+        </nav>
+
+        <!--Subnavegacion DGMOSS-->
+
+
+
+        <div b-bbbc0dcwk7 id="ContenedorPagina" class="container-fluid">
+            
+<div class="container-fluid position-relative">
+
+    <!-- Botón flotante en móviles -->
+    <button id="toggleFormBtn" class="btn btn-primary floating-btn d-lg-none opacity-75" title="Abrir filtros">
+        <i class="bi bi-filter"></i> <!-- Usa Bootstrap Icons -->
+    </button>
+    <!-- Contenedor principal -->
+    <div class="layout-container">
+
+        <!-- Panel del formulario -->
+        <div id="formSlidePanel" class="slide-panel rounded border">
+            <div class="slide-content">
+
+                <div class="slide-middle-Secciones">
+                    <!-- Menu secciones -->
+                    <div class="p-3 mb-2 bg-white rounded border shadow-sm w-100">
+                        <!-- Aquí se actualizará el HTML de _VistaSecciones.cshtml -->
+                        <div id="contenedorSecciones" class="ListaSecciones pe-3">
+                            
+    <h3 class="mb-4">Prevenci&#xF3;n, diagn&#xF3;stico y tratamiento de la Infecci&#xF3;n por Chikungunya en poblaci&#xF3;n mayor de 18 a&#xF1;os de edad en el primer nivel de atenci&#xF3;n</h3>
+    <!-- Accordion jerárquico: muestra las secciones de una guía-->
+<div class="accordion mb-3" id="accordionRaiz">
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36769">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36769" aria-expanded="false" aria-controls="collapse-36769">
+                                    OBJETIVOS
+                                </button>
+                            </h4>
+                            <div id="collapse-36769" class="accordion-collapse collapse" aria-labelledby="heading-36769"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36769">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36770">
+                           OBJETIVOS
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36771">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36771" aria-expanded="false" aria-controls="collapse-36771">
+                                    INTRODUCCI&#211;N Y JUSTIFICACI&#211;N
+                                </button>
+                            </h4>
+                            <div id="collapse-36771" class="accordion-collapse collapse" aria-labelledby="heading-36771"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36771">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36772">
+                           INTRODUCCI&#211;N
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36773">
+                           JUSTIFICACI&#211;N
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36774">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36774" aria-expanded="false" aria-controls="collapse-36774">
+                                    PREVENCI&#211;N
+                                </button>
+                            </h4>
+                            <div id="collapse-36774" class="accordion-collapse collapse" aria-labelledby="heading-36774"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36774">
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36775">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36775" aria-expanded="false" aria-controls="collapse-36775">
+                                    PREGUNTA 1
+                                </button>
+                            </h4>
+                            <div id="collapse-36775" class="accordion-collapse collapse" aria-labelledby="heading-36775"
+                                 data-bs-parent="#accordion-sub-36774">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36775">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36776">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36777">
+                           RECOMENDACIONES
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36778">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36778" aria-expanded="false" aria-controls="collapse-36778">
+                                    PREGUNTA 2
+                                </button>
+                            </h4>
+                            <div id="collapse-36778" class="accordion-collapse collapse" aria-labelledby="heading-36778"
+                                 data-bs-parent="#accordion-sub-36774">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36778">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36779">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36780">
+                           RECOMENDACIONES
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36781">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36781" aria-expanded="false" aria-controls="collapse-36781">
+                                    DIAGN&#211;STICO
+                                </button>
+                            </h4>
+                            <div id="collapse-36781" class="accordion-collapse collapse" aria-labelledby="heading-36781"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36781">
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36782">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36782" aria-expanded="false" aria-controls="collapse-36782">
+                                    PREGUNTA 3
+                                </button>
+                            </h4>
+                            <div id="collapse-36782" class="accordion-collapse collapse" aria-labelledby="heading-36782"
+                                 data-bs-parent="#accordion-sub-36781">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36782">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36783">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36784">
+                           RECOMENDACIONES
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36785">
+                           RECOMENDACIONES CLAVE
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36786">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36786" aria-expanded="false" aria-controls="collapse-36786">
+                                    PREGUNTA 4
+                                </button>
+                            </h4>
+                            <div id="collapse-36786" class="accordion-collapse collapse" aria-labelledby="heading-36786"
+                                 data-bs-parent="#accordion-sub-36781">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36786">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36787">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36788">
+                           RECOMENDACIONES
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36789">
+                           RECOMENDACIONES CLAVE
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36790">
+                           PUNTOS DE BUENA PR&#193;CTICA
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36791">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36791" aria-expanded="false" aria-controls="collapse-36791">
+                                    PREGUNTA 5
+                                </button>
+                            </h4>
+                            <div id="collapse-36791" class="accordion-collapse collapse" aria-labelledby="heading-36791"
+                                 data-bs-parent="#accordion-sub-36781">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36791">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36792">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36793">
+                           RECOMENDACIONES CLAVE
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36794">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36794" aria-expanded="false" aria-controls="collapse-36794">
+                                    TRATAMIENTO
+                                </button>
+                            </h4>
+                            <div id="collapse-36794" class="accordion-collapse collapse" aria-labelledby="heading-36794"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36794">
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36795">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36795" aria-expanded="false" aria-controls="collapse-36795">
+                                    PREGUNTA 6
+                                </button>
+                            </h4>
+                            <div id="collapse-36795" class="accordion-collapse collapse" aria-labelledby="heading-36795"
+                                 data-bs-parent="#accordion-sub-36794">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36795">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36796">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36797">
+                           RECOMENDACIONES
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36798">
+                           RECOMENDACIONES CLAVE
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36799">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36799" aria-expanded="false" aria-controls="collapse-36799">
+                                    PREGUNTA 7
+                                </button>
+                            </h4>
+                            <div id="collapse-36799" class="accordion-collapse collapse" aria-labelledby="heading-36799"
+                                 data-bs-parent="#accordion-sub-36794">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36799">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36800">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36801">
+                           RECOMENDACIONES
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36802">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36802" aria-expanded="false" aria-controls="collapse-36802">
+                                    PREGUNTA 8
+                                </button>
+                            </h4>
+                            <div id="collapse-36802" class="accordion-collapse collapse" aria-labelledby="heading-36802"
+                                 data-bs-parent="#accordion-sub-36794">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36802">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36803">
+                           EVIDENCIAS
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36804">
+                           RECOMENDACIONES CLAVE
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36805">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36805" aria-expanded="false" aria-controls="collapse-36805">
+                                    DIAGRAMAS DE FLUJO
+                                </button>
+                            </h4>
+                            <div id="collapse-36805" class="accordion-collapse collapse" aria-labelledby="heading-36805"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36805">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36806">
+                           DIAGRAMA 1
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36807">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36807" aria-expanded="false" aria-controls="collapse-36807">
+                                    METODOLOG&#205;A
+                                </button>
+                            </h4>
+                            <div id="collapse-36807" class="accordion-collapse collapse" aria-labelledby="heading-36807"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36807">
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36808">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36808" aria-expanded="false" aria-controls="collapse-36808">
+                                    ESCALAS DE GRADACI&#211;N
+                                </button>
+                            </h4>
+                            <div id="collapse-36808" class="accordion-collapse collapse" aria-labelledby="heading-36808"
+                                 data-bs-parent="#accordion-sub-36807">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36808">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36809">
+                           ESCALA NICE
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36810">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36810" aria-expanded="false" aria-controls="collapse-36810">
+                                    BIBLIOGRAF&#205;A
+                                </button>
+                            </h4>
+                            <div id="collapse-36810" class="accordion-collapse collapse" aria-labelledby="heading-36810"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36810">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36811">
+                           BIBLIOGRAF&#205;A
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36812">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36812" aria-expanded="false" aria-controls="collapse-36812">
+                                    ANEXOS
+                                </button>
+                            </h4>
+                            <div id="collapse-36812" class="accordion-collapse collapse" aria-labelledby="heading-36812"
+                                 data-bs-parent="#accordionRaiz">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36812">
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36813">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36813" aria-expanded="false" aria-controls="collapse-36813">
+                                    DIRECTORIO
+                                </button>
+                            </h4>
+                            <div id="collapse-36813" class="accordion-collapse collapse" aria-labelledby="heading-36813"
+                                 data-bs-parent="#accordion-sub-36812">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36813">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36814">
+                           DIRECTORIO SECTORIAL
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36815">
+                           GRUPO DE DESARROLLO
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36816">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36816" aria-expanded="false" aria-controls="collapse-36816">
+                                    PROTOCOLO DE B&#218;SQUEDA
+                                </button>
+                            </h4>
+                            <div id="collapse-36816" class="accordion-collapse collapse" aria-labelledby="heading-36816"
+                                 data-bs-parent="#accordion-sub-36812">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36816">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36817">
+                           PROTOCOLO DE B&#218;SQUEDA
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="heading-36818">
+                                <button class="accordion-button btn-secondary collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-36818" aria-expanded="false" aria-controls="collapse-36818">
+                                    CUADRO DE MEDICAMENTOS
+                                </button>
+                            </h4>
+                            <div id="collapse-36818" class="accordion-collapse collapse" aria-labelledby="heading-36818"
+                                 data-bs-parent="#accordion-sub-36812">
+                                <div class="accordion-body">
+                                    <p></p>
+                                    <div class="accordion mb-3" id="accordion-sub-36818">
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36819">
+                           CUADRO DE MEDICAMENTOS
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+<ul class="ul-noneStyle">
+
+                    <li>
+                        <a href="#" class="a-noneStyle btn-secondary link-cargar-seccion"
+                           data-id="36820">
+                           GLOSARIO DE TERMINOS
+                        </a>
+                    </li>
+</ul>
+</div>
+
+                                </div>
+                            </div>
+                        </div>
+</div>
+
+
+
+
+                        </div>
+
+                    </div>
+                    
+                    <button id="closeFormBtnCG" class="btn btn-danger d-lg-none pull-right">Cerrar <span class="bootstrap-icons" aria-hidden="true"><i class="bi bi-x-lg"></i></span></button>
+                    
+                </div>
+
+                <div class="slide-bottom">
+                    <!-- Pie o info adicional -->
+                    <p class="text-white text-center p-2 fs-5">Desarrollador: PSS - Fernando Arellano García</p>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="result-container">
+            <div class="ps-3 py-3 mb-2 bg-white rounded border shadow-sm w-100">
+                <div id="contenedor-seccion" class="pe-3 m-4 ListaGuias PdList justificado">
+                            <h2>OBJETIVOS</h2>
+                            <hr class="red" />
+<p>La Gu&#237;a de Pr&#225;ctica Cl&#237;nica <strong>Prevenci&#243;n, diagn&#243;stico y tratamiento de la infecci&#243;n por Chikungunya en poblaci&#243;n mayor de 18 a&#241;os en el primer nivel de atenci&#243;n </strong>parte del Cat&#225;logo Maestro de Gu&#237;as de Pr&#225;ctica Cl&#237;nica, el cual se instrumenta a trav&#233;s del Programa de Acci&#243;n Espec&#237;fico: Evaluaci&#243;n y Gesti&#243;n de Tecnolog&#237;as para la Salud, de acuerdo con las estrategias y l&#237;neas de acci&#243;n que considera el Programa Nacional de Salud 2019-2024.</p>
+<p>La finalidad de este cat&#225;logo es establecer un referente nacional para orientar la toma de decisiones cl&#237;nicas basadas en recomendaciones sustentadas en la mejor evidencia disponible.</p>
+<p>Esta gu&#237;a pone a disposici&#243;n del personal del <strong>primer nivel </strong>de atenci&#243;n las recomendaciones basadas en la mejor evidencia disponible con la intenci&#243;n de estandarizar las acciones nacionales acerca de:</p>
+<li ><strong>Identificar las principales manifestaciones cl&#237;nicas y de laboratorio que permitan diferenciar la infecci&#243;n por el CHIKV de otras arbovirosis en pacientes mayores de 18 a&#241;os de edad.</strong></li>
+<li ><strong>Lograr el diagn&#243;stico oportuno y limitar las complicaciones graves de la infecci&#243;n por el CHIKV agudo en pacientes mayores de 18 a&#241;os de edad.</strong></li>
+<li ><strong>Describir el tratamiento sintom&#225;tico de primera l&#237;nea para el manejo de la infecci&#243;n por el CHIKV agudo no grave en pacientes mayores de 18 a&#241;os de edad.</strong></li>
+<p></p>
+<p>Lo anterior favorecer&#225; la mejora en la calidad y efectividad de la atenci&#243;n a la salud contribuyendo al bienestar de las personas, el cual constituye el objetivo central y la raz&#243;n de ser de los servicios de salud.</p>
+<p></p>
+<p></p>
+<p></p>
+
+                </div>
+
+                <div id="modalImagen" class="modal-imagen">
+                    <span class="cerrar-modal">&times;</span>
+                    <img class="contenido-GuiaModal" id="imagenAmpliada" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+        </div>
+    </main>
+
+
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            //var baseUrl = '/DDIMBE/';
+            const link = document.getElementById('EjecutarBusqueda');
+            const form = document.getElementById('BuscarGM');
+
+            link.addEventListener('click', function (e) {
+            e.preventDefault(); // Evita navegación
+
+            console.log("Buscar guía...");
+            if (form) {
+                form.submit(); // Dispara el submit
+            } else {
+                console.warn('Formulario no encontrado');
+            }
+            });
+
+
+            //Obtener la url base
+            var baseUrl = '/DDIMBE/';
+            console.log("Base definida: " + baseUrl);
+
+            window.addEventListener("load", ajustarMainOffset);
+            window.addEventListener("resize", ajustarMainOffset); // Por si cambia en responsive
+
+            function ajustarMainOffset() {
+                const nav = document.querySelector("nav.navbar");
+                const subnav = document.querySelector("nav.sub-navbar");
+                const ContDiv = document.getElementById("ContenedorPagina");
+
+                //Descomentar lineas si la barra de subnaevgación queda obstruida
+                // if (ContDiv && subnav) {
+                //     const altoNav = subnav.offsetHeight
+                //     ContDiv.style.paddingTop = altoNav + "px";
+                // }
+                if (nav && subnav) {
+                    const altoNav2 = nav.offsetHeight
+                    if(altoNav2 >= 60){
+                        //subnav.style.paddingTop = (altoNav2 - 30) + "px";
+                    }
+
+                }
+
+            }
+
+
+        });
+
+        
+    </script>
+   
+    
+    <script src="https://framework-gb.cdn.gob.mx/gm/v3/assets/js/gobmx.js"></script>
+    
+    <script>
+         $gmx(document).ready(function() {
+
+            //console.log("Base definida: " + baseUrl);
+            //Mensaje a mostrar al momento de intentar descargar un archivo PDF
+            const mensajeDescarga = '';
+            console.log(mensajeDescarga);
+            if (mensajeDescarga) {
+                alert(mensajeDescarga);
+            }
+
+
+
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var baseUrl = '/DDIMBE/';
+            //console.log("Base definida: " + baseUrl);
+
+            const toggleBtn = document.getElementById("toggleFormBtn");
+            const closeBtn = document.getElementById("closeFormBtnCG");
+            const panel = document.getElementById("formSlidePanel");
+
+            // Mostrar panel
+            toggleBtn.addEventListener("click", function () {
+                panel.classList.toggle("active");
+            });
+
+            // Cerrar panel
+            closeBtn.addEventListener("click", function () {
+                panel.classList.toggle("active");
+            });
+
+            // Cerrar al hacer clic fuera del panel
+            document.addEventListener("click", function (e) {
+                if (panel.classList.contains("active") &&
+                    !panel.contains(e.target) &&
+                    !toggleBtn.contains(e.target)) {
+                    panel.classList.toggle("active");
+                }
+            });
+
+
+            const listaG = document.querySelector('.ListaGuias');
+            const listaS = document.querySelector('.ListaSecciones');
+            function ajustarAltura() {
+              const contenidoAltura = listaG.scrollHeight;
+
+              // Si el contenido es menor que el límite, se quita el max-height
+              //Ajuste para el contenido de las guías
+              if (contenidoAltura <= 720) {
+                listaG.style.maxHeight = '';
+                listaG.style.overflowY = '';
+              } else {
+                listaG.style.maxHeight = '720px';
+                listaG.style.overflowY = 'auto';
+              }
+              //Ajuste para la lista de secciones de la guía
+              // if (contenidoAltura <= 720) {
+              //   listaS.style.maxHeight = '';
+              //   listaS.style.overflowY = '';
+              // } else {
+              //   listaS.style.maxHeight = '720px';
+              //   listaS.style.overflowY = 'auto';
+              // }
+            }
+
+
+            function procesarHtmlConRutas(htmlCrudo) {
+                const baseAlias = window.location.origin + "/";
+                console.log("Ruta: " + baseAlias)
+                console.log("UrlContent: " + baseUrl);
+                return htmlCrudo.replace(/~/g, baseUrl);
+
+            }
+
+
+            //Método que obtiene el contenido de una sección en especifico
+            document.addEventListener("click", function (e) {
+                const link = e.target.closest(".link-cargar-seccion");
+                if (link) {
+                    e.preventDefault();
+                    const id = link.getAttribute("data-id");
+                    console.log(baseUrl);
+                    console.log(baseUrl +`DDIMBE/ObtenerContenidoSeccion?id=${encodeURIComponent(id)}`)
+                    fetch(baseUrl +`DDIMBE/ObtenerContenidoSeccion?id=${encodeURIComponent(id)}`, {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            const contenedor = document.getElementById("contenedor-seccion");
+                            contenedor.innerHTML = procesarHtmlConRutas(data);
+                            //Ajustar div al contenido
+                            ajustarAltura();
+
+                            //Cerrar el panel
+                            panel.classList.toggle("active");
+                        })
+                        .catch(() => {
+                            document.getElementById("contenedor-seccion").innerHTML =
+                                '<p class="text-danger">Error al cargar la sección.</p>';
+                        });
+                }
+            });
+
+            const contenedor = document.getElementById("contenedor-seccion");
+
+            //Método que abre una ventana donde se muestra una imagen al darle clic
+            contenedor.addEventListener("click", (e) => {
+                if (e.target.classList.contains("imagen-modal")) {
+                    const modal = document.getElementById("modalImagen");
+                    const modalImg = document.getElementById("imagenAmpliada");
+                    modal.style.display = "block";
+                    modalImg.src = e.target.src;
+
+                    modalImg.onload = () => {
+                        let nav = document.querySelector("nav.navbar");
+                        let subnav = document.querySelector("nav.sub-navbar");
+                        let altoNav = 150
+                        if (nav && subnav) {
+                            altoNav = subnav.offsetHeight + nav.offsetHeight + 20;
+                        }
+                        //const maxHeight = (window.innerHeight - nav.offsetHeight) * 0.8;
+                        const maxHeight = window.innerHeight * 0.85;
+                        const maxWidth = window.innerWidth * 0.9;
+                        const imgHeight = modalImg.naturalHeight;
+                        const imgWidth = modalImg.naturalWidth;
+
+                        console.log("Maxheight: " + maxHeight +"\nImgHeight: " + imgHeight);
+
+                        let scale = 1;
+                        if (imgHeight > maxHeight || imgWidth > maxWidth) {
+                            const scaleHeight = maxHeight / imgHeight;
+                            const scaleWidth = maxWidth / imgWidth;
+                            scale = Math.min(scaleHeight, scaleWidth);
+                        } else if (imgHeight < maxHeight) {
+                            scale = maxHeight / imgHeight;
+                            if (imgWidth * scale > maxWidth) {
+                                scale = maxWidth / imgWidth;
+                            }
+                        }
+
+                        modalImg.style.width = `${imgWidth * scale}px`;
+                        modalImg.style.height = `${imgHeight * scale}px`;
+
+                        //Ajuste de posición vertical
+                        // let nav = document.querySelector("nav.navbar");
+                        // let subnav = document.querySelector("nav.sub-navbar");
+                        // let altoNav = 150
+                        // if (nav && subnav) {
+                        //     altoNav = subnav.offsetHeight + nav.offsetHeight + 20;
+                        // }
+                        // console.log("Espaciado nav: "+ altoNav);
+
+                        //modalImg.style.marginTop = altoNav + "px";
+                    };
+                }
+            });
+
+            //Metodo para mostrar imagenes con link(<a>)
+            contenedor.addEventListener("click", (e) => {
+                if (e.target.classList.contains("imagen-modal-link")) {
+                    e.preventDefault();
+                    const modal = document.getElementById("modalImagen");
+                    const modalImg = document.getElementById("imagenAmpliada");
+                    const imgSrc = e.target.dataset.img;
+
+                    modal.style.display = "block";
+                    modalImg.src = imgSrc;
+
+                    modalImg.onload = () => {
+                        const maxHeight = window.innerHeight * 0.8;
+                        const maxWidth = window.innerWidth * 0.9;
+                        const imgHeight = modalImg.naturalHeight;
+                        const imgWidth = modalImg.naturalWidth;
+
+                        let scale = 1;
+                        if (imgHeight > maxHeight || imgWidth > maxWidth) {
+                            scale = Math.min(maxHeight / imgHeight, maxWidth / imgWidth);
+                        } else if (imgHeight < maxHeight) {
+                            scale = maxHeight / imgHeight;
+                            if (imgWidth * scale > maxWidth) {
+                                scale = maxWidth / imgWidth;
+                            }
+                        }
+
+                        modalImg.style.width = `${imgWidth * scale}px`;
+                        modalImg.style.height = `${imgHeight * scale}px`;
+
+                        // Ajuste vertical considerando navbars
+                        let nav = document.querySelector("nav.navbar");
+                        let subnav = document.querySelector("nav.sub-navbar");
+                        let altoNav = 100;
+                        // if (nav && subnav) {
+                        //     altoNav = subnav.offsetHeight + nav.offsetHeight + 20;
+                        // }
+                        modalImg.style.marginTop = altoNav + "px";
+                    };
+                }
+            });
+
+
+
+            document.querySelector(".cerrar-modal")?.addEventListener("click", () => {
+                document.getElementById("modalImagen").style.display = "none";
+            });
+
+            window.addEventListener("click", (e) => {
+                if (e.target.id === "modalImagen") {
+                    document.getElementById("modalImagen").style.display = "none";
+                }
+            });
+
+
+            //Cntador de visita (mayor a 3 min se contabiliza)
+            const documentoId = '4081'; // cambia dinámicamente
+            const tiempoLectura = 15 * 1000; //Tiempo en segundos multiplicado por 1000 (milisegundos)
+            console.log("Tiempo total para lectura: " + tiempoLectura);
+            setTimeout(() => {
+                console.log("Enviando lectura...");
+                fetch(baseUrl +'DDIMBE/RegistrarLectura', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({ Id: documentoId })
+                }).catch(err => console.warn('Lectura no registrada:', err));
+
+            }, tiempoLectura);
+
+            //Funcion para descargar una guía
+            document.getElementById("btnDescargarPDF").addEventListener("click", async function (e) {
+                e.preventDefault();
+
+                const url = this.href;
+
+                try {
+                    const response = await fetch(url);
+
+                    if (!response.ok || response.headers.get("Content-Type") !== "application/pdf") {
+                        const errorText = await response.text();
+                        alert(errorText || "Error al descargar el PDF.");
+                        return;
+                    }
+
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+
+                    const a = document.createElement("a");
+                    a.href = downloadUrl;
+
+                    // Extraer nombre del archivo si lo deseas
+                    const disposition = response.headers.get("Content-Disposition");
+                    const nombre = disposition?.match(/filename="?([^"]+)"?/i)?.[1] || "documento.pdf";
+
+                    a.download = nombre;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(downloadUrl);
+                } catch (err) {
+                    alert("Error inesperado al intentar descargar el PDF.");
+                }
+            });
+
+
+        });
+    </script>
+
+
+</body>
+</html>

@@ -11,8 +11,8 @@
 
     <%= render "shared/field", form: form, name: :name, type: :text,
           label: t("attributes.name"), autocomplete: "name", autofocus: true, required: false %>
-    <%= render "shared/field", form: form, name: :email_address, type: :email,
-          label: t("attributes.email_address"), autocomplete: "username" %>
+    <%= render "shared/field", form: form, name: :email, type: :email,
+          label: t("attributes.email"), autocomplete: "username" %>
     <%= render "shared/field", form: form, name: :password, type: :password,
           label: t("attributes.password"), autocomplete: "new-password" %>
     <%= render "shared/field", form: form, name: :password_confirmation, type: :password,

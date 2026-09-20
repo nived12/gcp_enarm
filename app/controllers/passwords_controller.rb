@@ -10,7 +10,7 @@ class PasswordsController < ApplicationController
   end
 
   def create
-    user = User.find_by(email_address: params[:email_address])
+    user = User.find_by(email: params[:email])
     PasswordsMailer.reset(user).deliver_later if user
 
     # Always the same message: a different response for a known address turns this
