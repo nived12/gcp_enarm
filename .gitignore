@@ -7,8 +7,9 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore all environment files.
+# Ignore all environment files, except the checked-in template.
 /.env*
+!/.env.example
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -38,9 +39,6 @@
 !/app/assets/builds/.keep
 
 /node_modules
-
-# Local environment
-.env
 
 # Built assets
 /app/assets/builds/*
