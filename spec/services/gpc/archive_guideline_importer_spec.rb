@@ -11,6 +11,10 @@ RSpec.describe Gpc::ArchiveGuidelineImporter do
 
   def stub_pdf(body: nil) = stub_request(:get, url).to_return(status: 200, body: body || pdf)
 
+  # The fetcher waits between retries because the archive throttles. Nothing here is
+  # testing that wait, and paying for it would add twenty seconds to the suite.
+  before { allow_any_instance_of(Gpc::ArchivePdfFetcher).to receive(:sleep) }
+
   describe "importing" do
     before { stub_pdf }
 
@@ -84,8 +88,10 @@ RSpec.describe Gpc::ArchiveGuidelineImporter do
       expect(Guideline.count).to eq(0)
     end
 
-    it "fails without writing when the bytes are not a readable PDF" do
-      stub_pdf(body: "%PDF-1.4 roto")
+    # Header and end marker both present, so the fetcher accepts it; there is no
+    # readable document between them.
+    it "fails without writing when the bytes are a PDF only on the outside" do
+      stub_pdf(body: "%PDF-1.4\nbasura\n%%EOF\n")
 
       expect(described_class.call(entry)).not_to be_success
       expect(Guideline.count).to eq(0)
