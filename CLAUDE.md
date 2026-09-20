@@ -103,8 +103,15 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   clears it between examples.
 - **The GPC grading strip is not a fixed grammar.** `1++ NICE Hong K, 2021` is the
   common spelling, but `SIGN D Taylor M, 2015` puts the scale first, `Muy baja GRADE …`
-  has a two-word grade, and `PBP` looks like a scale but is a grade. The scale name is
-  the only dependable anchor, and `Recommendation#label` keeps the strip verbatim so a
-  bad split never loses the citation.
+  has a two-word grade, and `PBP`, `C-LD` and `IIA` look like scale acronyms and are
+  grades. The scale is recognised by shape, not by a list of societies — the catalog
+  cites 30-odd — and `Recommendation#label` keeps the strip verbatim, so a bad split
+  never loses the citation. About 11% name no scale at all; that is the authors, not us.
+- **`div.separador` only means "grading strip" inside a graded section.** The anexos
+  reuse it for the directory and for the tables that define the scales, so parsing
+  every section manufactured 457 recommendations out of institution names. Only
+  `GuidelineSection#graded?` sections are read for recommendations.
+- **Sample before writing a parser, then check the whole corpus after.** Three sections
+  per guideline said 1.5% of strips were unparseable; all 3,076 said 22%.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.

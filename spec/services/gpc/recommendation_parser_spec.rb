@@ -11,11 +11,11 @@ RSpec.describe Gpc::RecommendationParser do
   end
 
   it "returns one statement per separador that is followed by text" do
-    expect(statements.size).to eq(8)
+    expect(statements.size).to eq(11)
   end
 
   it "numbers statements in document order" do
-    expect(statements.map { |s| s[:position] }).to eq((1..8).to_a)
+    expect(statements.map { |s| s[:position] }).to eq((1..11).to_a)
   end
 
   it "keeps the strip verbatim in label" do
@@ -46,11 +46,29 @@ RSpec.describe Gpc::RecommendationParser do
     expect(statement("IIa")).to include(scale: "ACC/AHA/ESC", citation: "Thygesen K, 2018")
   end
 
-  it "leaves grade, scale and citation nil when no scale is recognised" do
-    unparsed = statements.find { |s| s[:label] == "FUERTE SHRE 2022" }
+  # Recognising the scale by shape rather than by name means a society we have never
+  # seen — or, here, one the authors misspelled — still yields a citation.
+  it "reads a scale it has no list entry for" do
+    misspelled = statements.find { |s| s[:label] == "FUERTE SHRE 2022" }
+
+    expect(misspelled).to include(grade: "FUERTE", scale: "SHRE", citation: "2022")
+  end
+
+  # A recommendation class in Roman numerals is three capitals and would otherwise
+  # pass for a scale acronym, stranding the real scale inside the citation.
+  it "does not read a recommendation class as the scale" do
+    expect(statement("IIA")).to include(scale: "ACC/AHA", citation: "Powers W, 2019")
+  end
+
+  it "drops the label word some guidelines put before the scale" do
+    expect(statement("III")).to include(scale: "ESCMID", citation: "Krishnasami Z, 2002")
+  end
+
+  it "leaves grade, scale and citation nil when the strip names no scale at all" do
+    unparsed = statements.find { |s| s[:label] == "Condicional a favor" }
 
     expect(unparsed).to include(grade: nil, scale: nil, citation: nil)
-    expect(unparsed[:text]).to start_with("Se recomienda ofrecer tratamiento")
+    expect(unparsed[:text]).to start_with("Se sugiere individualizar")
   end
 
   it "does not mistake a good-practice marker for a scale" do

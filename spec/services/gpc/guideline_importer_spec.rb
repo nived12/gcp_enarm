@@ -62,6 +62,21 @@ RSpec.describe Gpc::GuidelineImporter do
     expect(guideline.guideline_sections.sole.body).to include("Sin evidencia")
   end
 
+  # The anexos reuse div.separador for the directory and for the tables that define
+  # the scales, so parsing them would manufacture recommendations out of institution
+  # names. The section is still stored whole.
+  it "stores a non-graded section without reading statements out of it" do
+    directory = section(
+      heading: "DIRECTORIO SECTORIAL", kind: "other",
+      body: "<div class=\"separador\">Secretaría de Salud</div><p>Titular.</p>"
+    )
+
+    response = described_class.call(guideline, [directory])
+
+    expect(response.payload).to include(created: 1, recommendations: 0)
+    expect(guideline.guideline_sections.sole.body).to include("Secretaría de Salud")
+  end
+
   it "fails without writing anything when a section is invalid" do
     response = described_class.call(guideline, [section.merge(heading: "")])
 

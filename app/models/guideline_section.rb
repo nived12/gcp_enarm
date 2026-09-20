@@ -18,13 +18,18 @@ class GuidelineSection < ApplicationRecord
   # cites one has to be worded differently.
   ACTIONABLE_KINDS = %w[recommendation key_recommendation good_practice].freeze
 
+  # Everything above plus evidence. Outside these, a div.separador is not a grading
+  # strip at all — the anexos use it for directory entries and for the tables that
+  # define the scales — so nothing else is parsed for recommendations.
+  GRADED_KINDS = (ACTIONABLE_KINDS + ["evidence"]).freeze
+
   validates :external_id, presence: true, uniqueness: { scope: :guideline_id }
   validates :heading, presence: true
   validates :position, presence: true
   validates :content_hash, presence: true
 
   scope :actionable, -> { where(kind: ACTIONABLE_KINDS) }
-  scope :graded, -> { where(kind: ACTIONABLE_KINDS + ["evidence"]) }
+  scope :graded, -> { where(kind: GRADED_KINDS) }
 
   # The site's menu labels every section in Spanish and repeats the same handful of
   # words across all 53 guidelines, so the kind is read off the label rather than
@@ -35,6 +40,10 @@ class GuidelineSection < ApplicationRecord
     /\AEVIDENCIAS/ => "evidence",
     /\APUNTOS DE BUENA PR[ÁA]CTICA/ => "good_practice"
   }.freeze
+
+  def graded?
+    GRADED_KINDS.include?(kind)
+  end
 
   def self.kind_from_heading(heading)
     normalized = heading.to_s.squish.upcase

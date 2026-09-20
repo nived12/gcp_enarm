@@ -67,6 +67,17 @@ RSpec.describe GuidelineSection do
     end
   end
 
+  describe "#graded?" do
+    it "is true for the kinds whose separadores are grading strips" do
+      expect(GuidelineSection::GRADED_KINDS.map { |kind| build(:guideline_section, kind: kind).graded? })
+        .to all(be(true))
+    end
+
+    it "is false for everything else, where a separador means something else entirely" do
+      expect(build(:guideline_section, kind: "other")).not_to be_graded
+    end
+  end
+
   it "takes its recommendations with it when it is destroyed" do
     section = create(:guideline_section)
     create(:recommendation, guideline_section: section)

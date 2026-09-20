@@ -15,13 +15,28 @@ module Gpc
     # Sampled from every guideline in the live catalog on 2026-09-20; ~1.5% of strips
     # name no scale we recognise, and those keep #label with the other three nil.
     #
-    # Only scales actually seen in the live catalog. PBP ("punto de buena práctica")
-    # looks like one but is a grade — it appears as "PBP ESPEN Volkert D, 2022" — and
-    # the archive corpus will add its own, SHEKELLE above all. Adding one is safe
-    # because #label keeps the strip whole either way.
-    SCALES = [
-      "ACC/AHA/ESC", "ESHRE", "ESPEN", "CHEST", "GRADE",
-      "GEMA", "GINA", "IDSA", "NICE", "SEGG", "SIGN", "ESA"
+    # The scale is named as an acronym — NICE, GRADE, SIGN, ACC/AHA/ESC, ESCMID. Which
+    # society wrote it is open-ended (the live catalog cites 30+), so the scale is
+    # recognised by shape rather than by a list that would always be one guideline
+    # behind: three or more capitals, optionally joined by / or -.
+    SCALE_SHAPE = %r{\A[A-Z][A-Z0-9]*(?:[/-][A-Z0-9]+)*\z}
+
+    # Grades written the same way, which the shape alone cannot tell apart. Unlike the
+    # societies this set really is closed: evidence levels (the AHA's B-NR, C-LD), the
+    # good-practice marker, and the GRADE strength and certainty words in caps.
+    # Recommendation classes, written as Roman numerals: I, IIa, III. Only the ones in
+    # capitals reach here, and no scale acronym is spelled from these letters alone.
+    ROMAN_GRADE = /\A[IVX]+[AB]?\z/
+
+    # Some guidelines write "III Escala ESCMID …". The word is a label for what
+    # follows, not part of the grade.
+    SCALE_LABEL_WORD = /\Aescala\z/i
+
+    NON_SCALE_TOKENS = %w[
+      PBP GPP BPP
+      B-R B-NR C-LD C-EO
+      FUERTE DÉBIL DEBIL CONDICIONAL FAVOR CONTRA
+      ALTA ALTO MODERADA MODERADO BAJA BAJO MUY
     ].freeze
 
     # Only used when the strip leads with the scale; a longer token in that position
@@ -82,7 +97,7 @@ module Gpc
       index = tokens.index { |token| scale_for(token) }
       return { label: label, grade: nil, scale: nil, citation: nil } if index.nil?
 
-      grade = tokens[0...index]
+      grade = tokens[0...index].grep_v(SCALE_LABEL_WORD)
       citation = tokens[(index + 1)..]
       grade = [citation.shift] if grade.empty? && short_grade?(citation.first)
 
@@ -98,9 +113,16 @@ module Gpc
       token.to_s.match?(SHORT_GRADE)
     end
 
+    # Author initials are capitals too, so a two-letter token is never a scale —
+    # "Dhatariya KK, 2020" must not read as a scale called KK.
     def scale_for(token)
-      normalized = token.gsub(/[[:punct:]]+\z/, "").upcase
-      SCALES.find { |scale| scale == normalized }
+      normalized = token.gsub(/[[:punct:]]+\z/, "")
+      return unless normalized.length >= 3
+      return unless normalized.match?(SCALE_SHAPE)
+      return if NON_SCALE_TOKENS.include?(normalized)
+      return if ROMAN_GRADE.match?(normalized)
+
+      normalized
     end
   end
 end

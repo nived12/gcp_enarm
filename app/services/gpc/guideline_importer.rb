@@ -49,7 +49,7 @@ module Gpc
         counts[:updated] += 1
       end
 
-      counts[:recommendations] += build_recommendations(section)
+      counts[:recommendations] += build_recommendations(section) if section.graded?
     end
 
     def build_recommendations(section)
