@@ -28,8 +28,21 @@ module Gpc
       /#\d/, /\[PDAT\]/i, /\[Mesh/i, /\bOR\b.*\bAND\b/, /[•✓]/, /["“”]/,
       /\A\d+\.\s/, /\A[-–]/, /\bet al\b/i, /\d\.\d+\./, %r{ / },
       /\A(Profesionales|Secretario|Director|Resultados|Actualizaci[óo]n Fecha)\b/i,
-      /Fecha de publicaci[óo]n/i
+      /Fecha de publicaci[óo]n/i,
+      /\A(Fuente|Bibliograf|Algoritmo de b[úu]squeda|Divisi[óo]n de Excelencia|Coordinaci[óo]n de UMAE)/i,
+      /\bUMAE\b|\bIMSS\b.*\bCoordinaci/i
     ].freeze
+
+    # A guideline title is a title: it starts with a capital. Nearly everything the
+    # fallback otherwise lands on is a fragment cut out of the middle of a sentence, a
+    # flowchart cell or an English journal citation — "pronation in paralytic supination
+    # posture", "sin antecedentes de cardiopatía", "en los tres niveles de atención".
+    SENTENCE_START = /\A[[:upper:]]/
+
+    # The bibliography is English and the guidelines are not. Two function words is
+    # enough to tell them apart and far too few to appear in a Spanish title.
+    ENGLISH_MARKERS = /(?<![[:alnum:]])(the|of|and|in|for|with|from|study|journal)(?![[:alnum:]])/i
+    MAXIMUM_ENGLISH_MARKERS = 1
 
     # A title is prose: mostly letters and spaces, and more than a couple of words.
     MINIMUM_WORDS = 2
@@ -96,7 +109,9 @@ module Gpc
     end
 
     def prose?(line)
+      return false unless line.match?(SENTENCE_START)
       return false if JUNK.any? { |pattern| line.match?(pattern) }
+      return false if line.scan(ENGLISH_MARKERS).size > MAXIMUM_ENGLISH_MARKERS
       return false if line.split(" ").size < MINIMUM_WORDS
 
       # scan, not count: String#count reads "[[:alpha:]]" as a literal set of brackets

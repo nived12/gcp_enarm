@@ -75,7 +75,9 @@ RSpec.describe Gpc::DocumentTitle do
       "a bulleted clinical list" => "• Que no cumpla ningún criterio • Diabetes Mellitus • IAM SEST",
       "a table cell" => "Recién nacido / lactante prematuro tardío",
       "a quoted search term" => "“gastroesophageal reflux” in infants and children under",
-      "a publication date line" => "Fecha de publicación de la actualización: 2 de diciembre de 2015"
+      "a publication date line" => "Fecha de publicación de la actualización: 2 de diciembre de 2015",
+      "an English journal citation" => "Plexus Center and Baylor College of Medicine. Seminar in plastic surgery",
+      "a fragment cut from mid-sentence" => "en los tres niveles de atención médica del sistema"
     }.each do |description, line|
       it "refuses #{description}" do
         expect(title_for(*page(line))).to be_nil

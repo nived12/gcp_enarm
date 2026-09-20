@@ -22,6 +22,13 @@ module Gpc
       se segun sin so sobre su sus tras un una unas unos y
     ].to_set.freeze
 
+    # Spanish turns nouns into adjectives freely, and the catalog and the taxonomy pick
+    # different ones: "Asma en pediatría" against "asma en edad pediátrica", "cirugía"
+    # against "quirúrgico". Comparing a fixed-length stem catches those without a
+    # dictionary. Seven characters is the shortest length that does not also merge words
+    # that mean different things — at six, "cardiopatía" and "cardiología" collide.
+    STEM_LENGTH = 7
+
     # Below this, a match is one short word inside a long title — true, but too thin to
     # build a study day from. Kept rather than dropped so it can still widen a search.
     CONFIDENT_RELEVANCE = 0.2
@@ -63,8 +70,11 @@ module Gpc
 
     # How much of the title the topic accounts for. A guideline whose title is almost
     # exactly the topic name is squarely about it; one that mentions it in passing is not.
+    # Measured on stems, every word would weigh the same. The proportion that matters is
+    # how much of the title the topic accounts for, so it is counted in matched stems
+    # against total stems.
     def relevance(phrase, title)
-      [phrase.sum(&:length).to_f / title.sum(&:length), 1.0].min.round(4)
+      [phrase.size.to_f / title.size, 1.0].min.round(4)
     end
 
     def words(text)
@@ -72,8 +82,12 @@ module Gpc
           .downcase
           .scan(/[[:alnum:]]+/)
           .reject { |word| STOPWORDS.include?(word) }
-          .map { |word| singularize(word) }
+          .map { |word| stem(word) }
           .to_set
+    end
+
+    def stem(word)
+      singularize(word)[0, STEM_LENGTH]
     end
 
     # Spanish plurals well enough for matching a title: "dislipidemias" and

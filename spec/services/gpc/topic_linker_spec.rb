@@ -39,6 +39,23 @@ RSpec.describe Gpc::TopicLinker do
     expect(link_for("Tratamiento de la cetoacidosis diabetica")).to be_present
   end
 
+  # Spanish makes adjectives out of nouns and the catalog picks different ones than the
+  # taxonomy does. Comparing stems is what lets "Asma en pediatría" reach a guideline
+  # titled "Tratamiento del asma en edad pediátrica".
+  it "matches a noun in the topic against its adjective in the title" do
+    topic("Asma en pediatría")
+
+    expect(link_for("Tratamiento del asma en edad pediátrica")).to be_present
+  end
+
+  # At six characters these would collide, and every cardiology guideline would link to
+  # every cardiopathy topic.
+  it "does not merge words that merely start alike" do
+    topic("Cardiopatía isquémica crónica", ["cardiopatía"])
+
+    expect(link_for("Diagnóstico y tratamiento en cardiología nuclear")).to be_empty
+  end
+
   it "matches a plural in the title against a singular topic" do
     topic("Dislipidemia")
 
@@ -83,8 +100,10 @@ RSpec.describe Gpc::TopicLinker do
     it "is low when the topic is one word of a long title" do
       topic("Sepsis y choque séptico", ["sepsis"])
 
-      expect(link_for("Prevención, diagnóstico y tratamiento de la sepsis materna").sole.relevance)
-        .to be < described_class::CONFIDENT_RELEVANCE
+      title = "Prevención, diagnóstico, tratamiento y referencia oportuna de la sepsis materna " \
+              "en el primer nivel de atención"
+
+      expect(link_for(title).sole.relevance).to be < described_class::CONFIDENT_RELEVANCE
     end
 
     it "marks a link confident once it accounts for enough of the title" do
