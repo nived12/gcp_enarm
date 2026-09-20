@@ -40,7 +40,7 @@ RSpec.describe "Authentication", type: :request do
       expect {
         post registration_path, params: {
           user: { name: "Gabriela", email_address: "nueva@example.com",
-                  password: "contrasena-segura", password_confirmation: "contrasena-segura" },
+                  password: "contrasena-segura", password_confirmation: "contrasena-segura" }
         }
       }.to change(User, :count).by(1)
 
@@ -50,7 +50,7 @@ RSpec.describe "Authentication", type: :request do
     it "re-renders the form when the passwords do not match" do
       post registration_path, params: {
         user: { email_address: "nueva@example.com",
-                password: "contrasena-segura", password_confirmation: "otra-cosa" },
+                password: "contrasena-segura", password_confirmation: "otra-cosa" }
       }
 
       expect(response).to have_http_status(:unprocessable_content)

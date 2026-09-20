@@ -2,6 +2,12 @@ source "https://rubygems.org"
 
 gem "rails", "~> 8.1.3", ">= 8.1.3.1"
 
+# json 3.0 dropped the positional-options form of JSON.parse, which
+# ActiveSupport::JSON.decode still calls. Every request carrying an encrypted
+# cookie raises ArgumentError inside session decryption. Unpin once Rails ships
+# a release that passes keyword options.
+gem "json", "~> 2.9"
+
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record

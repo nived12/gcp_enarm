@@ -3,5 +3,8 @@
 # Version of your assets, change this if you want to expire all your assets.
 Rails.application.config.assets.version = "1.0"
 
-# Add additional assets to the asset load path.
-# Rails.application.config.assets.paths << Emoji.images_path
+# The Tailwind source is an input to the css build, not an asset. Propshaft
+# serves everything under its load path, and `@import "tailwindcss"` means
+# nothing to a browser — without this the raw source ships alongside the
+# compiled bundle. Only app/assets/builds/application.css is served.
+Rails.application.config.assets.excluded_paths << Rails.root.join("app/assets/stylesheets")
