@@ -64,4 +64,27 @@ namespace :questions do
 
     puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
   end
+
+  desc "Have a second model family judge unverified cases: rake questions:verify[count]"
+  task :verify, [:count] => :environment do |_task, args|
+    count = (args[:count] || 10).to_i
+    provider = Llm::Provider.for(:verifier)
+    abort("Falta la clave del verificador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "verification", provider: provider.name,
+      model: provider.model, started_at: Time.current
+    )
+
+    tally = Hash.new(0)
+    ClinicalCase.where(verification_verdict: nil).order(:id).limit(count).each do |kase|
+      result = Questions::Verifier.call(kase, run: run)
+      state = result.success? ? result.payload[:verdict] : result.errors.full_messages.first
+      tally[state] += 1
+      puts "caso #{kase.id}: #{state}"
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    puts "\n#{tally.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")} tokens=#{run.total_tokens}"
+  end
 end

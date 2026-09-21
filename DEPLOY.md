@@ -156,6 +156,7 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
 | `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. |
 | `taxonomy:seed` | Rebuild the topic tree after editing `db/seeds/taxonomy.yml`. Runs automatically on deploy. |
+| `questions:verify` | Run the second-opinion pass over unverified cases. A case only becomes publishable once another model family has agreed with its answer. |
 | `llm:status` | Show which model each role resolved to and whether its key is set. Run it before any paid generation. |
 
 ## Before the first paying subscriber
