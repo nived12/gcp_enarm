@@ -44,6 +44,14 @@ class GuidelineSection < ApplicationRecord
     /\APUNTOS DE BUENA PR[ÁA]CTICA/ => "good_practice"
   }.freeze
 
+  # The path a reader has to click on the live site to reach this section:
+  # "FACTORES DE RIESGO › PREGUNTA 1 › RECOMENDACIONES CLAVE". The site's menu is a
+  # two-level accordion with no addressable sections, so repeating its own wording is
+  # the only way a citation can point at anything narrower than the whole guideline.
+  def menu_path
+    [chapter, question_label, heading].compact_blank.join(" › ")
+  end
+
   def graded?
     GRADED_KINDS.include?(kind)
   end

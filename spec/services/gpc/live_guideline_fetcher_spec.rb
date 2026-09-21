@@ -55,10 +55,66 @@ RSpec.describe Gpc::LiveGuidelineFetcher do
       )
     end
 
+    it "records the menu path a reader has to click, since no section has a URL" do
+      entry = fetch.payload.find { |s| s[:heading] == "RECOMENDACIONES CLAVE" }
+
+      expect(entry[:chapter]).to be_present
+      expect(entry[:question_label]).to match(/PREGUNTA/)
+    end
+
+    it "leaves the question blank for a section that sits under no numbered question" do
+      entry = fetch.payload.find { |s| s[:heading] == "OBJETIVOS" }
+
+      expect(entry[:question_label]).to be_nil
+      expect(entry[:chapter]).to be_present
+    end
+
+    it "keeps a loose section in a chapter that also holds numbered questions" do
+      # ANEXOS carries GLOSARIO DE TERMINOS beside three numbered questions. Descending
+      # from the chapters dropped it; the ancestor walk does not.
+      headings = fetch.payload.map { |s| s[:heading] }
+
+      expect(headings).to include("GLOSARIO DE TERMINOS")
+    end
+
+    it "survives a menu that has moved out from under the accordion" do
+      # The site is undocumented and has drifted before. A leaf with no accordion around
+      # it should cost the menu path, not the whole run.
+      stub_contents(body: <<~HTML)
+        <a class="link-cargar-seccion" data-id="9">RECOMENDACIONES</a>
+      HTML
+
+      entry = fetch.payload.first
+
+      expect(entry).to include(external_id: "9", chapter: nil, question_label: nil)
+    end
+
+    it "survives a chapter whose header button is gone" do
+      stub_contents(body: <<~HTML)
+        <div id="accordionRaiz">
+          <div class="accordion-item">
+            <h4 class="accordion-header"></h4>
+            <div class="accordion-body">
+              <a class="link-cargar-seccion" data-id="9">RECOMENDACIONES</a>
+            </div>
+          </div>
+        </div>
+      HTML
+
+      expect(fetch.payload.first[:chapter]).to be_nil
+    end
+
     it "skips a menu entry with no label" do
       stub_contents(body: <<~HTML)
-        <a class="link-cargar-seccion" data-id="1"> </a>
-        <a class="link-cargar-seccion" data-id="2">EVIDENCIAS</a>
+        <div id="accordionRaiz">
+          <div class="accordion-item">
+            <h4 class="accordion-header"><button>FACTORES DE RIESGO</button></h4>
+            <div class="accordion-body">
+              <a class="link-cargar-seccion" data-id="1"> </a>
+              <a class="link-cargar-seccion" data-id="2">EVIDENCIAS</a>
+            </div>
+          </div>
+        </div>
       HTML
 
       expect(fetch.payload.map { |s| s[:external_id] }).to eq(["2"])

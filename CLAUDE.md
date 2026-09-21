@@ -202,9 +202,15 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   and a much larger sample before believing any ranking.
 - **The live GPC site has no URL for a section.** Sections load by AJAX from
   `link-cargar-seccion[data-id]` — no `href`, no anchor, nothing addressable — so the best
-  a link can do is open the guideline at its first section, which looks to a reader like
-  being dumped on a landing page. Verified 2026-09-21 against the live page. The citation
-  therefore names the section, because the site's own menu lists them under exactly the
-  headings we store in `GuidelineSection#heading`.
+  a link can do is open the guideline at its first section, which reads as being dumped on
+  a landing page. Verified 2026-09-21 against the live page.
+  The menu is a two-level accordion — chapter, then the question the site numbers itself,
+  then the section — so `GuidelineSection#menu_path` repeats that path verbatim
+  ("DIAGNÓSTICO › PREGUNTA 3 › RECOMENDACIONES CLAVE") and a citation tells the reader
+  what to click. `Gpc::NavigationRefresher` backfills it from one page per guideline;
+  a full re-ingest would cost ~3,100 requests for metadata the bodies do not carry.
+  **A chapter can hold loose sections and numbered questions at once** — ANEXOS carries
+  GLOSARIO DE TERMINOS beside three questions — so the path is walked from each leaf
+  outwards, never descended from the chapters, which silently drops the loose ones.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.

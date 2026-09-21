@@ -35,10 +35,30 @@ module Gpc
       { catalog_key: guideline.catalog_key, external_id: guideline.external_id }
     end
 
-    private
+    # The contents menu on its own, without fetching a single section body. Used to
+    # backfill the menu path onto sections whose text is already current.
+    def section_index
+      return [] if guideline.external_id.blank?
+
+      contents = get(GUIDELINE_PATH, "La guía", DocumentoID: guideline.external_id)
+      return [] if contents.nil?
+
+      section_entries(contents)
+    end
 
     attr_reader :guideline, :interval
 
+    private
+
+    # The contents menu is a two-level accordion: a chapter ("FACTORES DE RIESGO"), then
+    # the clinical question the site numbers itself ("PREGUNTA 1"), then the leaves. None
+    # of those levels is addressable, so the only way to point a reader at a
+    # recommendation is to repeat the path they have to click.
+    #
+    # Walked from each leaf outwards rather than from the chapters down, because a chapter
+    # can hold loose sections *and* numbered questions at once — ANEXOS carries GLOSARIO DE
+    # TERMINOS beside three of them — and descending from the chapters silently dropped the
+    # loose ones.
     def section_entries(contents)
       links = Nokogiri::HTML(contents).css("a.link-cargar-seccion[data-id]")
 
@@ -46,8 +66,31 @@ module Gpc
         heading = link.text.squish
         next if heading.blank?
 
-        { external_id: link["data-id"], heading: heading, position: position }
+        { external_id: link["data-id"], heading: heading, position: position,
+          chapter: chapter_for(link), question_label: question_label_for(link) }
       end
+    end
+
+    # Nokogiri lists ancestors nearest first, so the outermost accordion item is the
+    # chapter and the innermost is the numbered question — when there is one.
+    def chapter_for(link)
+      header_of(link.ancestors(".accordion-item").last)
+    end
+
+    def question_label_for(link)
+      items = link.ancestors(".accordion-item")
+      return if items.size < 2
+
+      header_of(items.first)
+    end
+
+    # Both guards are for markup drift, not for the page as it stands: this site is
+    # undocumented and has already moved once, and a leaf that ends up outside the
+    # accordion should cost a missing menu path, not a NoMethodError that kills the run.
+    # `text` is not guarded — Nokogiri always returns a String for it.
+    def header_of(item)
+      button = item&.at_css("> .accordion-header button")
+      button&.text&.squish
     end
 
     def fetch_section(entry)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,6 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_100000) do
 
   create_table "guideline_sections", force: :cascade do |t|
     t.text "body", null: false
+    t.string "chapter"
     t.text "clinical_question"
     t.string "content_hash", null: false
     t.datetime "created_at", null: false
@@ -91,6 +92,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_100000) do
     t.string "heading", null: false
     t.string "kind", null: false
     t.integer "position", null: false
+    t.string "question_label"
     t.datetime "updated_at", null: false
     t.index ["guideline_id", "external_id"], name: "index_guideline_sections_on_guideline_id_and_external_id", unique: true
     t.index ["guideline_id", "position"], name: "index_guideline_sections_on_guideline_id_and_position"

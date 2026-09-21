@@ -80,4 +80,12 @@ namespace :gpc do
 
     puts "#{guidelines.count} guías encoladas en la cola ingestion"
   end
+
+  desc "Re-read each live guideline's menu and store where its sections sit, without refetching bodies"
+  task renav: :environment do
+    result = Gpc::NavigationRefresher.call
+    abort(result.errors.full_messages.to_sentence) unless result.success?
+
+    puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
+  end
 end
