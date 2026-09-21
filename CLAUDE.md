@@ -119,6 +119,19 @@ there. It is applied per *case*, never per question — a case and its questions
 language — and the `quote` stays in Spanish, because the substring gate checks it against
 the Spanish guideline and an English quote would fail every time.
 
+## Clinical images are an open question, not a feature
+
+Nothing is built. `image_based` is an exam mode in the plan and there is no image source
+behind it. The constraint is licensing: this is a paid product, so Radiopaedia (CC BY-NC-SA)
+is unusable however good it is. **PTB-XL** (21,799 labelled 12-lead ECGs, CC BY 4.0) is
+usable; **NIH ChestX-ray14** probably is but its terms need checking at the primary source.
+CT, MRI and ultrasound have no licensed labelled source yet.
+
+The part that shapes the code: **image selection has to happen before generation**, because
+the vignette must lead into the image ("se decide realizar electrocardiograma") and the
+question must ask about it. It cannot be attached to a finished case. Details in the plan
+under "Clinical images".
+
 ## Testing
 
 ```bash
