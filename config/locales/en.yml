@@ -122,7 +122,7 @@ en:
       back: "Back to cases"
       question_label: "Question %{number}"
       source: "Cited recommendation"
-      open_guideline: "Open the guideline ↗"
+      open_guideline: "Open the guideline ↗ (section %{section})"
       undated: "undated"
       expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."
   activerecord:

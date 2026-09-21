@@ -70,10 +70,13 @@
         <p class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink-faint">
           <span><%= question.citation %></span>
           <% if @case.guideline&.source_url.present? %>
-            <%# She asked for this: a reviewer, and later a student, should be one tap from
-                the guideline itself rather than taking our word for the quote. %>
-            <%= link_to t("review.show.open_guideline"), @case.guideline.source_url,
-                  target: "_blank", rel: "noopener",
+            <%# The live site loads sections by AJAX — no href, no anchor, no URL of their
+                own — so a link can only open the guideline at its first section, which
+                looks like a landing page. Naming the section is the best available
+                signpost: the site's own menu lists them under exactly these headings. %>
+            <%= link_to t("review.show.open_guideline",
+                          section: question.recommendation.guideline_section.heading),
+                  @case.guideline.source_url, target: "_blank", rel: "noopener",
                   class: "text-accent underline underline-offset-2 hover:text-accent-hover" %>
           <% end %>
         </p>

@@ -200,5 +200,11 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   8-guideline comparison scored Gemini 97% and then 91% on consecutive runs. At 32
   questions the confidence interval is about ±8 points: use these runs to find *defects*,
   and a much larger sample before believing any ranking.
+- **The live GPC site has no URL for a section.** Sections load by AJAX from
+  `link-cargar-seccion[data-id]` — no `href`, no anchor, nothing addressable — so the best
+  a link can do is open the guideline at its first section, which looks to a reader like
+  being dumped on a landing page. Verified 2026-09-21 against the live page. The citation
+  therefore names the section, because the site's own menu lists them under exactly the
+  headings we store in `GuidelineSection#heading`.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.
