@@ -95,4 +95,27 @@ RSpec.describe Guideline do
       expect(build(:guideline, year: 2024)).not_to be_expired
     end
   end
+
+  describe "#source_url" do
+    it "sends a live guideline to its own page on the government site" do
+      guideline = build(
+        :guideline, source: "live_site",
+        document_url: "https://gpc.salud.gob.mx/DDIMBE/ContenidoGuia?DocumentoID=3079",
+        catalog_url: "https://gpc.salud.gob.mx/DDIMBE"
+      )
+
+      expect(guideline.source_url).to eq("https://gpc.salud.gob.mx/DDIMBE/ContenidoGuia?DocumentoID=3079")
+    end
+
+    it "sends an archived guideline to the readable capture, not the raw-bytes form" do
+      guideline = build(
+        :guideline, source: "web_archive",
+        catalog_url: "https://web.archive.org/web/20200605002220/http://x/ER.pdf",
+        document_url: "https://web.archive.org/web/20200605002220id_/http://x/ER.pdf"
+      )
+
+      expect(guideline.source_url).to eq("https://web.archive.org/web/20200605002220/http://x/ER.pdf")
+      expect(guideline.source_url).not_to include("id_/")
+    end
+  end
 end

@@ -122,6 +122,7 @@ es:
       back: "Volver a los casos"
       question_label: "Pregunta %{number}"
       source: "Recomendación citada"
+      open_guideline: "Abrir la guía ↗"
       undated: "sin año"
       expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
   activerecord:

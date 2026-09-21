@@ -129,6 +129,25 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include("<mark>electrocardiograma de 12 derivaciones</mark>")
     end
 
+    it "links out to the guideline so a reviewer need not take the quote on trust" do
+      guideline = create(
+        :guideline, source: "live_site",
+        document_url: "https://gpc.salud.gob.mx/DDIMBE/ContenidoGuia?DocumentoID=42"
+      )
+      cited = create(:clinical_case, guideline: guideline)
+      recommendation = create(:recommendation, text: "Se recomienda realizar electrocardiograma.")
+      create(
+        :question, clinical_case: cited, recommendation: recommendation,
+        source_quote: "realizar electrocardiograma"
+      )
+      sign_in(reviewer)
+
+      get review_clinical_case_path(cited)
+
+      expect(response.body).to include("https://gpc.salud.gob.mx/DDIMBE/ContenidoGuia?DocumentoID=42")
+      expect(response.body).to include(I18n.t("review.show.open_guideline"))
+    end
+
     it "warns when the guideline behind the case is out of date" do
       old = create(:guideline, year: 2010)
       stale = create(:clinical_case, guideline: old)

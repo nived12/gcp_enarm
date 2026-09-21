@@ -97,6 +97,28 @@ and the reasoning are in the plan under "Why the catalog shrank".
 `Gpc::RefreshCatalogJob` keeps it accurate by itself, quarterly, from
 `config/recurring.yml`. It costs nothing — Solid Queue runs inside Puma.
 
+## What a vignette has to carry
+
+Checked against a doctor 2026-09-21. The first generated cases were ~45 words with
+**every fact pointing at the answer**, which reads as far easier than the real exam. A real
+ENARM vignette is 150–200 words carrying the whole patient — comorbidities with durations
+and treatment, complete vitals with units, a systematic examination including normal
+findings, labs where relevant — and then asks about one part of it. Deciding what matters
+is the skill being tested.
+
+`Questions::CaseGenerator::DETAIL_LEVELS` is `focused` (60–90 words, 2 questions) and
+`full_workup` (150–200 words, 3 questions), mixed across a run because not every real item
+is long either.
+
+The extra material is **realistic completeness, never misdirection**. Background history
+and normal findings belong in any chart; inventing findings that contradict the diagnosis
+would be a different and worse thing, and the prompt forbids it.
+
+**About 5–10% of the real exam is in English**, so `ENGLISH_SHARE` puts a slice of cases
+there. It is applied per *case*, never per question — a case and its questions must be one
+language — and the `quote` stays in Spanish, because the substring gate checks it against
+the Spanish guideline and an English quote would fail every time.
+
 ## Testing
 
 ```bash

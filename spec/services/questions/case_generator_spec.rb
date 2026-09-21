@@ -174,6 +174,66 @@ RSpec.describe Questions::CaseGenerator do
     end
   end
 
+  describe "how much of the patient the vignette carries" do
+    it "asks for a whole-patient vignette and three questions on a full workup" do
+      stub_model(one_case(question, question(index: 1), question(index: 1)))
+
+      described_class.call(guideline, detail: :full_workup)
+
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).to include("paciente COMPLETO")
+        expect(prompt).to include("Signos vitales COMPLETOS")
+        expect(prompt).to include("3 preguntas")
+      end
+    end
+
+    it "asks for a short vignette and two questions when focused" do
+      stub_model(one_case(question))
+
+      described_class.call(guideline, detail: :focused)
+
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).to include("breve y centrada")
+        expect(prompt).to include("2 preguntas")
+      end
+    end
+
+    it "falls back to focused rather than trusting an unknown detail level" do
+      stub_model(one_case(question))
+
+      described_class.call(guideline, detail: :novela)
+
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).to include("breve y centrada")
+      end
+    end
+  end
+
+  describe "language" do
+    it "leaves the case in Spanish by default" do
+      stub_model(one_case(question))
+
+      kase = described_class.call(guideline).payload[:cases].first
+
+      expect(kase.locale).to eq("es")
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).not_to include("EN INGLÉS")
+      end
+    end
+
+    it "asks for English and records it, keeping the quote in Spanish so the gate still holds" do
+      stub_model(one_case(question))
+
+      kase = described_class.call(guideline, locale: "en").payload[:cases].first
+
+      expect(kase.locale).to eq("en")
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).to include("EN INGLÉS")
+        expect(prompt).to include("cita textual se queda en español")
+      end
+    end
+  end
+
   it "labels the case with the guideline's topic and specialty when it has one" do
     topic = create(:topic)
     create(:guideline_topic, guideline: guideline, topic: topic)

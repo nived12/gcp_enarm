@@ -8,8 +8,23 @@ module Questions
   class CaseGenerator < ApplicationService
     RECOMMENDATIONS_PER_CALL = 8
     CASES_PER_CALL = 2
-    QUESTIONS_PER_CASE = 2
-    MAX_TOKENS = 8_000
+    MAX_TOKENS = 12_000
+
+    # A real ENARM vignette carries a whole patient — comorbidities with durations,
+    # complete vitals with units, a systematic examination — and then asks about one
+    # part of it. Ours were about 45 words with every fact pointing at the answer, which
+    # a doctor reading them spotted immediately as too easy. `full_workup` is that whole
+    # patient; `focused` stays short, because not every real item is long either.
+    DETAIL_LEVELS = %i[focused full_workup].freeze
+
+    # Questions per case. The convocatoria says two to three; a longer vignette earns
+    # the third, since there is more in it to ask about.
+    QUESTIONS_BY_DETAIL = { focused: 2, full_workup: 3 }.freeze
+
+    # The real exam is written in Spanish with a small English share, so the bank has to
+    # be too. Kept as a fraction of *cases*, not questions, because a case and its
+    # questions must be in one language.
+    ENGLISH_SHARE = 0.08
 
     # Seeded from the strength of the evidence behind the case: a strong recommendation
     # makes a more clear-cut item than a weak one. Recalibrated from real answer data
@@ -17,11 +32,14 @@ module Questions
     STRONG_GRADES = /\A(A|1\+{1,2}|I{1,2}[ab]?|alta|fuerte)\b/i
     WEAK_GRADES = /\A(D|4|IV|muy baja|baja|d[ée]bil)\b/i
 
-    def initialize(guideline, run: nil, limit: RECOMMENDATIONS_PER_CALL)
+    def initialize(guideline, run: nil, limit: RECOMMENDATIONS_PER_CALL,
+                   detail: :focused, locale: "es")
       super()
       @guideline = guideline
       @run = run
       @limit = limit
+      @detail = DETAIL_LEVELS.include?(detail) ? detail : :focused
+      @locale = locale
     end
 
     def call
@@ -45,7 +63,7 @@ module Questions
 
     private
 
-    attr_reader :guideline, :run, :limit
+    attr_reader :guideline, :run, :limit, :detail, :locale
 
     def recommendations
       @recommendations ||= Recommendation.joins(:guideline_section)
@@ -62,15 +80,13 @@ module Questions
 
       <<~TEXT
         Eres redactor de reactivos para el ENARM, el examen nacional de residencias médicas
-        en México. Escribes en español de México, con terminología clínica formal.
+        en México. Escribes con terminología clínica formal.
 
         A partir de las siguientes recomendaciones de la guía de práctica clínica
-        "#{guideline.title}", escribe #{CASES_PER_CALL} casos clínicos.
+        "#{guideline.title}", escribe #{CASES_PER_CALL} casos clínicos, cada uno con
+        #{questions_per_case} preguntas de opción múltiple.
 
-        Cada caso:
-        - Una viñeta clínica de 3 a 5 líneas: edad, sexo, antecedentes relevantes, motivo de
-          consulta y hallazgos. Realista, como la de un examen real.
-        - #{QUESTIONS_PER_CASE} preguntas sobre ese mismo caso.
+        #{vignette_instructions}
 
         Cada pregunta:
         - Exactamente CUATRO opciones: una correcta y tres distractores plausibles, del tipo
@@ -83,9 +99,8 @@ module Questions
         Sobre la cita: copia un fragmento CONTINUO, palabra por palabra, tal como aparece.
         NUNCA uses puntos suspensivos ni omitas palabras intermedias. Si el fragmento útil
         es largo, cita una parte contigua más corta.
-
-        Devuelve SOLO JSON, sin markdown ni texto alrededor. Las llaves van en inglés y
-        los valores en español:
+        #{language_instruction}
+        Devuelve SOLO JSON, sin markdown ni texto alrededor. Las llaves van en inglés:
         {"cases":[{"stem":"...","questions":[{"text":"...","explanation":"...",
         "recommendation":1,"quote":"...","options":[{"text":"...","correct":true},
         {"text":"...","correct":false},{"text":"...","correct":false},
@@ -94,6 +109,53 @@ module Questions
         Recomendaciones:
         #{listing}
       TEXT
+    end
+
+    def questions_per_case
+      QUESTIONS_BY_DETAIL.fetch(detail)
+    end
+
+    # The difference a doctor asked for. A real vignette presents the whole patient and
+    # then asks about one part of it; ours presented only the part that answered the
+    # question, which makes the item easier than the exam it is simulating.
+    #
+    # The extra material is realistic completeness, not misdirection: normal findings and
+    # background history belong in a real chart, and deciding what matters is the skill
+    # being tested. Inventing misleading findings would be a different thing entirely.
+    def vignette_instructions
+      if detail == :full_workup
+        <<~TEXT.strip
+          La viñeta debe presentar al paciente COMPLETO, como en el examen real (150 a 200
+          palabras):
+          - Edad, sexo y antecedentes con su duración y tratamiento ("diabetes mellitus tipo 2
+            de 12 años en manejo irregular", "hipertensión controlada con IECA").
+          - Motivo de consulta con inicio, duración y evolución precisas.
+          - Signos vitales COMPLETOS con unidades: TA, FC, FR, SatO2, temperatura.
+          - Exploración física sistemática, incluyendo hallazgos normales.
+          - Cuando la recomendación lo justifique, resultados de laboratorio con sus valores.
+
+          Incluye datos clínicos reales que NO apuntan a la respuesta: antecedentes de fondo,
+          hallazgos normales, cifras dentro de rango. No son distractores ni pistas falsas —
+          son lo que trae cualquier paciente real, y distinguir lo relevante es justo lo que
+          el reactivo evalúa. Nunca inventes hallazgos que contradigan el diagnóstico.
+
+          Las #{questions_per_case} preguntas se apoyan en el mismo caso, cada una sobre un
+          aspecto distinto.
+        TEXT
+      else
+        <<~TEXT.strip
+          La viñeta es breve y centrada (60 a 90 palabras): edad, sexo, antecedentes
+          relevantes, motivo de consulta y los hallazgos necesarios. No todo reactivo del
+          examen real es largo.
+        TEXT
+      end
+    end
+
+    def language_instruction
+      return "" unless locale == "en"
+
+      "\nEscribe la viñeta, las preguntas, las opciones y las explicaciones EN INGLÉS. " \
+        "La cita textual se queda en español, tal como aparece en la recomendación.\n"
     end
 
     def parse(content)
@@ -116,7 +178,8 @@ module Questions
 
       kase = ClinicalCase.new(
         stem: attributes["stem"], guideline: guideline, generation_run: run,
-        topic: guideline.topics.first, specialty: specialty, source: "gpc_generated"
+        topic: guideline.topics.first, specialty: specialty, source: "gpc_generated",
+        locale: locale
       )
       built = questions.filter_map.with_index(1) { |q, position| build_question(kase, q, position) }
 

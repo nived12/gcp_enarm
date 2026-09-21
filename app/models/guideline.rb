@@ -51,6 +51,16 @@ class Guideline < ApplicationRecord
 
   # Nil when the year never parsed. Unknown is not the same as expired, and a question
   # generated from it should say so rather than imply currency.
+  # Where a student can go and read the guideline for herself.
+  #
+  # The live site opens the guideline's own page; an archived one opens the Wayback
+  # capture rather than the `id_/` raw-bytes form the importer used, because that form
+  # serves the PDF without the archive's header saying when it was captured — and the
+  # capture date is the honest part.
+  def source_url
+    source_web_archive? ? catalog_url : document_url
+  end
+
   def expires_on
     Date.new(year + VALIDITY_YEARS, 12, 31) if year
   end
