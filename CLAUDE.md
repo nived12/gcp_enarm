@@ -94,6 +94,21 @@ finding that contradicts the diagnosis.
 must be one language, and the `quote` stays in Spanish whatever the case language: the
 substring gate checks it against a Spanish guideline, so an English quote fails every time.
 
+**A figure is chosen before the prompt, never attached after.** A vignette that was not
+written towards an image reads as one with a picture stapled to it, so
+`Questions::CaseGenerator` takes `with_image:` and picks the figure itself. **The model
+never sees the image**, so nothing may ask it about the figure's contents — it would
+invent rows, and the citation gate checks the quote against the recommendation, not the
+figure. The item rests on the quoted recommendation; the figure is what that
+recommendation already sends the reader to. Attach it only if the model actually cited
+that recommendation.
+
+**The corpus files its working papers as figures too.** A GRADE appraisal is published
+under "CUADRO 4" exactly like a criteria table is, so the heading decides whether a section
+holds figures and the **filename** decides whether each one is medicine —
+`Gpc::ImageParser::METHODOLOGY_FILE`. Never widen that filter without measuring what it
+lets through.
+
 **Difficulty uses the exam's own vocabulary** — `low`/`medium`/`high`, rendered Baja /
 Media / Alta — never a competitor's Interno/Residente/Adscrito. Score is a plain
 percentage; do not weight it.
