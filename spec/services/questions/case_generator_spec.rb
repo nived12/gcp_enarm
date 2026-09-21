@@ -244,4 +244,66 @@ RSpec.describe Questions::CaseGenerator do
     expect(kase.topic).to eq(topic)
     expect(kase.specialty).to eq(topic.branch.specialty)
   end
+
+  describe "cases that carry a figure" do
+    let!(:with_figure) do
+      create(
+        :recommendation, guideline_section: section, position: 90,
+        text: "Se recomienda estratificar el riesgo según el cuadro 1."
+      )
+    end
+    let!(:image) do
+      create(
+        :clinical_image, :stored, guideline_section: section, label: "CUADRO 1",
+        caption: "CRITERIOS DE ESTRATIFICACIÓN"
+      )
+    end
+
+    def prompt_for(**options)
+      captured = nil
+      allow(Llm::Completion).to receive(:call) do |**arguments|
+        captured = arguments[:prompt]
+        ApplicationService::Response.new(
+          success: true, errors: nil,
+          payload: { content: one_case(question).to_json, input_tokens: 1, output_tokens: 1,
+                     reasoning_tokens: 0 }
+        )
+      end
+      described_class.call(guideline, **options)
+      captured
+    end
+
+    # The figure has to be picked before the prompt is written. A vignette that was not
+    # written towards an image reads as a vignette with a picture stapled to it.
+    it "names the figure in the prompt, so the vignette is written towards it" do
+      expect(prompt_for(with_image: true)).to include("CUADRO 1: CRITERIOS DE ESTRATIFICACIÓN")
+    end
+
+    # The model never sees the image. Asking it about the contents would invent them, and
+    # the citation gate only checks the quote — it could not catch a fabricated table row.
+    it "tells the model not to describe what it cannot see" do
+      expect(prompt_for(with_image: true)).to include("No describas el contenido de la figura")
+    end
+
+    it "attaches the figure to the case that cited the recommendation pointing at it" do
+      index = Recommendation.order(:id).pluck(:id).index(with_figure.id) + 1
+      stub_model(one_case(question(index: index, quote: "estratificar el riesgo")))
+
+      result = described_class.call(guideline, with_image: true)
+
+      expect(result.payload[:cases].sole.clinical_image).to eq(image)
+    end
+
+    # It is told which recommendation to use, but nothing forces it to comply.
+    it "leaves the case without a figure when the model wrote about something else" do
+      stub_model(one_case(question))
+
+      expect(described_class.call(guideline, with_image: true).payload[:cases].sole.clinical_image)
+        .to be_nil
+    end
+
+    it "says nothing about figures when none was asked for" do
+      expect(prompt_for).not_to include("CUADRO 1")
+    end
+  end
 end

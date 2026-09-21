@@ -21,12 +21,13 @@ module Review
     PER_PAGE = 10
 
     def index
-      @pagy, @cases = pagy(ordered.includes(:guideline, :topic, :questions), limit: PER_PAGE)
+      @pagy, @cases = pagy(ordered.includes(:guideline, :topic, :questions, :clinical_image), limit: PER_PAGE)
       @runs = GenerationRun.recent.limit(5)
     end
 
     def show
-      @case = scope.includes(questions: %i[answer_options recommendation]).find(params[:id])
+      @case = scope.includes(:clinical_image, questions: %i[answer_options recommendation])
+                   .find(params[:id])
       @position = ordered.where(created_at: @case.created_at..).where.not(id: @case.id).count + 1
       @total = scope.count
       @previous = ordered.where(created_at: @case.created_at..).where.not(id: @case.id).last

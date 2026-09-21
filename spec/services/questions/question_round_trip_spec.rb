@@ -148,6 +148,46 @@ RSpec.describe "question bank export and import" do
     end
   end
 
+  describe "the figure a case was written around" do
+    def build_with_figure
+      kase = build_bank
+      section = Guideline.find_by(catalog_key: "IMSS-028-22").guideline_sections.sole
+      image = create(:clinical_image, :stored, guideline_section: section, position: 1)
+      kase.update!(clinical_image: image)
+      image
+    end
+
+    # The rows are rebuilt on the far side by gpc:images, the same way recommendations
+    # are by gpc:reparse, so only the reference travels — a megabyte of bytes we can
+    # fetch again for free has no business in the backup of the thing we cannot.
+    it "carries the reference and resolves it against the far side's own rows" do
+      build_with_figure
+      export
+      clear_generated
+      import
+
+      expect(ClinicalCase.sole.clinical_image.label).to eq("CUADRO 2")
+    end
+
+    it "carries nothing for a case that never had one" do
+      build_bank
+      export
+      clear_generated
+      import
+
+      expect(ClinicalCase.sole.clinical_image).to be_nil
+    end
+
+    it "refuses the case when gpc:images has not been run here" do
+      build_with_figure
+      export
+      clear_generated
+      ClinicalImage.destroy_all
+
+      expect(import.errors.full_messages.first).to include("la figura 1 de la sección")
+    end
+  end
+
   describe "when the file is not what it should be" do
     it "fails on a missing file" do
       expect(Questions::Importer.call("#{path}-nope").errors.full_messages.first).to include("No existe")

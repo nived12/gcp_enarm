@@ -10,6 +10,7 @@ class ClinicalCase < ApplicationRecord
   belongs_to :specialty, optional: true
   belongs_to :guideline, optional: true
   belongs_to :generation_run, optional: true
+  belongs_to :clinical_image, optional: true
 
   has_many :questions, -> { order(:position) }, dependent: :destroy, inverse_of: :clinical_case
 

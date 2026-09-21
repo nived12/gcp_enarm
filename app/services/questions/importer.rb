@@ -55,12 +55,13 @@ module Questions
 
     def import_case(attributes, counts)
       questions = attributes.delete("questions")
+      figure = attributes.delete("image")
       references = attributes.extract!("run_key", "catalog_key", "topic_slug", "specialty_slug")
 
       ClinicalCase.transaction do
         kase = ClinicalCase.find_or_initialize_by(export_key: attributes["export_key"])
         counts[kase.new_record? ? :cases_created : :cases_updated] += 1
-        kase.update!(attributes.merge(resolve(references)))
+        kase.update!(attributes.merge(resolve(references), clinical_image: image_for(figure)))
         Array(questions).each { |question| import_question(kase, question, counts) }
       end
     rescue MissingReference => e
@@ -76,6 +77,17 @@ module Questions
         topic: find_by!(Topic, :slug, references["topic_slug"], "el tema"),
         specialty: find_by!(Specialty, :slug, references["specialty_slug"], "la especialidad")
       }
+    end
+
+    # Figures are rebuilt here by gpc:images rather than carried in the file, so a
+    # missing one means that task has not run — say so instead of quietly dropping the
+    # image out of a case that was written around it.
+    def image_for(reference)
+      return if reference.nil?
+
+      section = section_for(reference)
+      section.clinical_images.find_by(position: reference["position"]) ||
+        missing("la figura #{reference["position"]} de la sección #{reference["section"]}")
     end
 
     def import_question(kase, attributes, counts)

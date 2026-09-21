@@ -30,6 +30,23 @@
   <%# Serif and roomy: the vignette is the one thing on screen that is not interface, and
       it is what she is actually being asked to judge. %>
   <p class="vignette mt-8 font-serif text-lg leading-loose text-ink"><%= @case.stem %></p>
+
+  <%# The figure the cited recommendation sends the reader to, under the vignette because
+      that is the order the exam asks for: read the patient, then look at the film. The
+      attribution is a licence condition, so it is rendered from the row rather than
+      assembled here. %>
+  <% if @case.clinical_image&.file&.attached? %>
+    <figure class="mt-8">
+      <%= image_tag @case.clinical_image.file,
+            alt: @case.clinical_image.caption.presence || @case.clinical_image.label,
+            class: "w-full rounded-card border border-line bg-surface" %>
+      <figcaption class="mt-3 text-xs leading-relaxed text-ink-faint">
+        <span class="font-medium text-ink-muted"><%= @case.clinical_image.label %></span><%
+          if @case.clinical_image.caption.present? %> — <%= @case.clinical_image.caption %><% end %>
+        <span class="mt-1 block"><%= @case.clinical_image.attribution %></span>
+      </figcaption>
+    </figure>
+  <% end %>
 </section>
 
 <% @case.questions.each_with_index do |question, index| %>

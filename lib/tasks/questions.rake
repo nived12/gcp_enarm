@@ -24,6 +24,7 @@ namespace :questions do
     # instead — the sample is deliberately over-representative, which is what a sample is
     # for.
     english_every = (1 / Questions::CaseGenerator::ENGLISH_SHARE).round
+    image_every = (1 / Questions::CaseGenerator::IMAGE_SHARE).round
     forced_english = count < english_every ? count - 1 : nil
 
     guidelines.each_with_index do |guideline, index|
@@ -31,9 +32,15 @@ namespace :questions do
       scheduled = english_every.positive? && index.positive? && (index % english_every).zero?
       locale = index == forced_english || scheduled ? "en" : "es"
 
-      result = Questions::CaseGenerator.call(guideline, run: run, detail: detail, locale: locale)
+      # Unlike English, an over-representation of figures in a small batch is wanted:
+      # the point of a review batch is that a doctor sees one of everything.
+      with_image = (index % image_every).zero?
+
+      result = Questions::CaseGenerator.call(
+        guideline, run: run, detail: detail, locale: locale, with_image: with_image
+      )
       state = result.success? ? "#{result.payload[:cases].size} casos" : result.errors.full_messages.first
-      puts "#{guideline.catalog_key} [#{detail}/#{locale}] #{state}"
+      puts "#{guideline.catalog_key} [#{detail}/#{locale}#{with_image ? "/figura" : ""}] #{state}"
     end
 
     run.update!(status: "completed", finished_at: Time.current)

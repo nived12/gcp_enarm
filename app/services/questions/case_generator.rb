@@ -26,6 +26,11 @@ module Questions
     # questions must be in one language.
     ENGLISH_SHARE = 0.08
 
+    # Roughly one item in six carries a figure. A real exam shows far fewer images than a
+    # competitor's marketing suggests, and this number is an estimate until a doctor has
+    # read a batch and said otherwise.
+    IMAGE_SHARE = 0.15
+
     # Seeded from the strength of the evidence behind the case: a strong recommendation
     # makes a more clear-cut item than a weak one. Recalibrated from real answer data
     # later, which is what CIFRHS itself does.
@@ -33,13 +38,14 @@ module Questions
     WEAK_GRADES = /\A(D|4|IV|muy baja|baja|d[ée]bil)\b/i
 
     def initialize(guideline, run: nil, limit: RECOMMENDATIONS_PER_CALL,
-                   detail: :focused, locale: "es")
+                   detail: :focused, locale: "es", with_image: false)
       super()
       @guideline = guideline
       @run = run
       @limit = limit
       @detail = DETAIL_LEVELS.include?(detail) ? detail : :focused
       @locale = locale
+      @with_image = with_image
     end
 
     def call
@@ -63,7 +69,7 @@ module Questions
 
     private
 
-    attr_reader :guideline, :run, :limit, :detail, :locale
+    attr_reader :guideline, :run, :limit, :detail, :locale, :with_image
 
     def recommendations
       @recommendations ||= Recommendation.joins(:guideline_section)
@@ -99,7 +105,7 @@ module Questions
         Sobre la cita: copia un fragmento CONTINUO, palabra por palabra, tal como aparece.
         NUNCA uses puntos suspensivos ni omitas palabras intermedias. Si el fragmento útil
         es largo, cita una parte contigua más corta.
-        #{language_instruction}
+        #{language_instruction}#{image_instructions}
         Devuelve SOLO JSON, sin markdown ni texto alrededor. Las llaves van en inglés:
         {"cases":[{"stem":"...","questions":[{"text":"...","explanation":"...",
         "recommendation":1,"quote":"...","options":[{"text":"...","correct":true},
@@ -151,6 +157,34 @@ module Questions
       end
     end
 
+    # The figure has to be chosen before the prompt is written, not attached to a
+    # finished case: a vignette that was not written towards an image reads as a vignette
+    # with a picture stapled to it, and the real exam does not do that.
+    #
+    # The model is not shown the image and must not be asked about what is in it. What it
+    # is told is that the recommendation it is citing sends the reader to a figure, and
+    # that the figure will be on screen — so the item still rests entirely on the quoted
+    # text, which is the only thing the citation gate can check.
+    def image_instructions
+      return "" if figure.nil?
+
+      recommendation, image = figure
+      number = recommendations.index(recommendation) + 1
+
+      "\nUno de los casos debe apoyarse en la recomendación #{number}, que remite a " \
+        "«#{[image.label, image.caption].compact_blank.join(": ")}». Esa figura se mostrará " \
+        "junto al caso, así que la viñeta debe llegar de forma natural a consultarla y una " \
+        "de sus preguntas debe referirse a ella.\n" \
+        "No describas el contenido de la figura ni inventes cifras, filas ni valores suyos: " \
+        "no la estás viendo. La pregunta debe poder responderse con la recomendación citada.\n"
+    end
+
+    def figure
+      return @figure if defined?(@figure)
+
+      @figure = with_image ? ClinicalImage.cited_by(recommendations) : nil
+    end
+
     def language_instruction
       return "" unless locale == "en"
 
@@ -167,9 +201,22 @@ module Questions
     def persist(payload)
       @rejected = 0
 
-      Array(payload["cases"]).filter_map do |attributes|
-        build_case(attributes)
+      cases = Array(payload["cases"]).filter_map { |attributes| build_case(attributes) }
+      attach_figure(cases)
+      cases
+    end
+
+    # Only if the model actually cited the recommendation that points at the figure. It
+    # is told which one to use, but a case that went elsewhere gets no image rather than
+    # an image belonging to something it never mentions.
+    def attach_figure(cases)
+      return if figure.nil?
+
+      recommendation, image = figure
+      cited = cases.find do |kase|
+        kase.questions.any? { |question| question.recommendation_id == recommendation.id }
       end
+      cited&.update!(clinical_image: image)
     end
 
     def build_case(attributes)

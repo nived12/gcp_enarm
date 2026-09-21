@@ -9,6 +9,7 @@
 class GuidelineSection < ApplicationRecord
   belongs_to :guideline
   has_many :recommendations, -> { order(:position) }, dependent: :destroy, inverse_of: :guideline_section
+  has_many :clinical_images, -> { order(:position) }, dependent: :destroy, inverse_of: :guideline_section
 
   enum :kind,
     { evidence: "evidence", recommendation: "recommendation",

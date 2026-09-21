@@ -68,6 +68,7 @@ module Questions
 
     def cases
       ClinicalCase.order(:id).includes(
+        { clinical_image: { guideline_section: :guideline } },
         questions: [:answer_options, { recommendation: { guideline_section: :guideline } }]
       )
     end
@@ -80,8 +81,23 @@ module Questions
         "catalog_key" => kase.guideline&.catalog_key,
         "topic_slug" => kase.topic&.slug,
         "specialty_slug" => kase.specialty&.slug,
+        "image" => figure_payload(kase.clinical_image),
         "questions" => kase.questions.map { |question| question_payload(question) }
       )
+    end
+
+    # Only the reference. The figure rows themselves are rebuilt on the far side from
+    # section text it already has, the same way recommendations are — the bytes are free
+    # to fetch again, so there is no reason to carry a megabyte of them.
+    def figure_payload(image)
+      return if image.nil?
+
+      section = image.guideline_section
+      {
+        "catalog_key" => section.guideline.catalog_key,
+        "section" => section.external_id,
+        "position" => image.position
+      }
     end
 
     def question_payload(question)

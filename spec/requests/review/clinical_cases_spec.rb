@@ -155,6 +155,22 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include("RECOMENDACIONES CLAVE")
     end
 
+    it "shows the figure the case was written around, with its attribution" do
+      image = create(
+        :clinical_image, :stored, label: "CUADRO 2",
+        caption: "MARCADORES DE CONGESTIÓN", attribution: "GPC SS-219-24 · 2024"
+      )
+      clinical_case.update!(clinical_image: image)
+      sign_in(reviewer)
+
+      get review_clinical_case_path(clinical_case)
+
+      expect(response.body).to include("CUADRO 2")
+      expect(response.body).to include("MARCADORES DE CONGESTIÓN")
+      # The licence asks for it, so it is on the page and not only in the database.
+      expect(response.body).to include("GPC SS-219-24 · 2024")
+    end
+
     it "warns when the guideline behind the case is out of date" do
       old = create(:guideline, year: 2010)
       stale = create(:clinical_case, guideline: old)

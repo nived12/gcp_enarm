@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "answer_options", force: :cascade do |t|
     t.boolean "correct", default: false, null: false
@@ -38,6 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_120000) do
   end
 
   create_table "clinical_cases", force: :cascade do |t|
+    t.bigint "clinical_image_id"
     t.datetime "created_at", null: false
     t.string "difficulty", default: "medium", null: false
     t.string "export_key", null: false
@@ -53,6 +82,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_120000) do
     t.text "verification_notes"
     t.string "verification_verdict"
     t.datetime "verified_at"
+    t.index ["clinical_image_id"], name: "index_clinical_cases_on_clinical_image_id"
     t.index ["export_key"], name: "index_clinical_cases_on_export_key", unique: true
     t.index ["generation_run_id"], name: "index_clinical_cases_on_generation_run_id"
     t.index ["guideline_id"], name: "index_clinical_cases_on_guideline_id"
@@ -61,6 +91,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_120000) do
     t.index ["topic_id", "status"], name: "index_clinical_cases_on_topic_id_and_status"
     t.index ["topic_id"], name: "index_clinical_cases_on_topic_id"
     t.index ["verification_verdict"], name: "index_clinical_cases_on_verification_verdict"
+  end
+
+  create_table "clinical_images", force: :cascade do |t|
+    t.string "attribution", null: false
+    t.string "caption"
+    t.datetime "created_at", null: false
+    t.bigint "guideline_section_id", null: false
+    t.string "kind", default: "figure", null: false
+    t.string "label", null: false
+    t.integer "position", null: false
+    t.string "remote_path", null: false
+    t.string "source", default: "gpc", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guideline_section_id", "position"], name: "index_clinical_images_on_guideline_section_id_and_position", unique: true
+    t.index ["guideline_section_id"], name: "index_clinical_images_on_guideline_section_id"
+    t.index ["kind"], name: "index_clinical_images_on_kind"
+    t.index ["label"], name: "index_clinical_images_on_label"
   end
 
   create_table "generation_runs", force: :cascade do |t|
@@ -386,12 +433,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_120000) do
     t.index ["granted_premium_until"], name: "index_users_on_granted_premium_until"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answer_options", "questions"
   add_foreign_key "branches", "specialties"
+  add_foreign_key "clinical_cases", "clinical_images"
   add_foreign_key "clinical_cases", "generation_runs"
   add_foreign_key "clinical_cases", "guidelines"
   add_foreign_key "clinical_cases", "specialties"
   add_foreign_key "clinical_cases", "topics"
+  add_foreign_key "clinical_images", "guideline_sections"
   add_foreign_key "guideline_sections", "guidelines"
   add_foreign_key "guideline_topics", "guidelines"
   add_foreign_key "guideline_topics", "topics"

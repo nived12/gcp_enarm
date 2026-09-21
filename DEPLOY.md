@@ -110,8 +110,8 @@ DATABASE_URL="postgresql://…proxy.rlwy.net:PORT/railway" \
 **Order matters, and the importer will tell you if you get it wrong.** Nothing in the
 file is referenced by row id: a case names its guideline by `catalog_key` and its topic
 and specialty by slug, and a question names its recommendation by guideline, section and
-position. So production needs `gpc:import`, then `gpc:reparse`, then `taxonomy:seed` and
-`gpc:link`, *before* `questions:import`. A reference that does not resolve fails the
+position. So production needs `gpc:import`, then `gpc:reparse` and `gpc:images`, then
+`taxonomy:seed` and `gpc:link`, *before* `questions:import`. A reference that does not resolve fails the
 import and names what is missing, rather than writing a case that looks complete while
 citing nothing.
 
@@ -151,6 +151,7 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | Task | What it is for |
 |---|---|
 | `gpc:reparse` | Re-read stored section text through the current parser. Use after any parser change — it does not touch the network. |
+| `gpc:images` | Rebuild the figure library from stored section text and download what is missing. Safe to re-run; it skips files it already has. |
 | `gpc:retitle` | Re-derive archived titles from stored text. Same idea, for the PDF title heuristic. |
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
 | `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. |

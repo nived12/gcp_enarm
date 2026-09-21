@@ -88,4 +88,11 @@ namespace :gpc do
 
     puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
   end
+
+  desc "Build the figure library from stored section text, downloading what is missing"
+  task images: :environment do
+    result = Gpc::ImageIngester.call
+    puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
+    puts result.errors.full_messages.first(10) if result.errors.any?
+  end
 end
