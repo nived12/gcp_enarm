@@ -39,4 +39,22 @@ namespace :questions do
     run.update!(status: "completed", finished_at: Time.current)
     puts "\ncasos=#{run.cases_created} descartadas=#{run.rejections} tokens=#{run.total_tokens}"
   end
+
+  desc "Write the generated bank to one portable file: rake questions:export[path]"
+  task :export, [:path] => :environment do |_task, args|
+    result = Questions::Exporter.call(args[:path] || "tmp/question-bank.jsonl.gz")
+    abort(result.errors.full_messages.to_sentence) unless result.success?
+
+    payload = result.payload
+    puts "#{payload[:path]} · #{payload[:cases]} casos · #{payload[:questions]} preguntas · " \
+         "#{payload[:runs]} corridas · #{ActiveSupport::NumberHelper.number_to_human_size(payload[:bytes])}"
+  end
+
+  desc "Load a file written by questions:export into this database [path]"
+  task :import, [:path] => :environment do |_task, args|
+    result = Questions::Importer.call(args[:path] || "tmp/question-bank.jsonl.gz")
+    abort(result.errors.full_messages.to_sentence) unless result.success?
+
+    puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
+  end
 end

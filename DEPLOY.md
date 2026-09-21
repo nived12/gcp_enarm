@@ -86,25 +86,47 @@ pinned to one thread in `config/queue.yml`. Leave it that way. The Internet Arch
 
 ## Moving generated questions into production
 
-**Not built yet — this is a Phase 2 deliverable, and the rule above is a policy with no
-tool behind it so far.** `gpc:export` carries guidelines and section text only. The
-`clinical_cases`, `questions` and `answer_options` tables do not exist until Phase 2
-creates them, so there is nothing to export today.
-
-When they do exist, questions need the opposite treatment from the corpus. Guideline text
-is cheap to move and its derivatives are rebuilt on arrival; a generated question is the
-one thing here that costs money and **cannot be reproduced** — the same prompt against the
-same model returns different wording, different distractors, and a different quality draw.
-So:
+Guideline text is cheap to move and its derivatives are rebuilt on arrival. A generated
+question is the opposite: it costs money and **cannot be reproduced** — the same prompt
+against the same model returns different wording, different distractors and a different
+quality draw. So the file is not a convenience, it is the backup, and it is worth more
+than the database it came from.
 
 - Generate **once**, locally, against the local corpus.
-- Export the result to a file, import it into production, and keep that file. It is the
-  backup, and it is worth more than the database it came from.
+- Export, import into production, and keep the file somewhere that is not that database.
 - Turn on Railway's Postgres backups before the run, not after.
 - Never point the generator at production "just to fill it in". That is how you pay twice.
 
-Until the exporter exists, do not start a paid generation run against a database you are
-not backing up.
+```bash
+# 1. Locally, after a generation run.
+bin/rails "questions:export[tmp/question-bank.jsonl.gz]"
+
+# 2. Against production. The corpus, its recommendations and the taxonomy must
+#    already be there — see the order below.
+DATABASE_URL="postgresql://…proxy.rlwy.net:PORT/railway" \
+  bin/rails "questions:import[tmp/question-bank.jsonl.gz]"
+```
+
+**Order matters, and the importer will tell you if you get it wrong.** Nothing in the
+file is referenced by row id: a case names its guideline by `catalog_key` and its topic
+and specialty by slug, and a question names its recommendation by guideline, section and
+position. So production needs `gpc:import`, then `gpc:reparse`, then `taxonomy:seed` and
+`gpc:link`, *before* `questions:import`. A reference that does not resolve fails the
+import and names what is missing, rather than writing a case that looks complete while
+citing nothing.
+
+`questions:import` is idempotent on `export_key`, a token each case and run carries from
+birth, so replaying a file over a database that already holds part of it updates instead
+of duplicating.
+
+One check the importer gets for free: production rebuilds recommendations with its own
+parser, so a parser change could renumber a section and hand a question a different
+statement under the same position. Nothing would be missing, so only the text can tell —
+and `Question`'s citation gate is exactly that test. The case fails to save rather than
+arriving mis-cited.
+
+The file is small. The 24-case dev bank is 20 KB gzipped, so the full corpus run lands
+around a megabyte — keep every one of them.
 
 ## Keeping it fresh
 
@@ -131,6 +153,7 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | `gpc:reparse` | Re-read stored section text through the current parser. Use after any parser change — it does not touch the network. |
 | `gpc:retitle` | Re-derive archived titles from stored text. Same idea, for the PDF title heuristic. |
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
+| `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. |
 | `taxonomy:seed` | Rebuild the topic tree after editing `db/seeds/taxonomy.yml`. Runs automatically on deploy. |
 | `llm:status` | Show which model each role resolved to and whether its key is set. Run it before any paid generation. |
 

@@ -5,6 +5,8 @@
 # That matters because generation is the one thing in this app that costs real money and
 # cannot be reproduced: the same prompt against the same model returns different wording.
 class GenerationRun < ApplicationRecord
+  include Exportable
+
   has_many :clinical_cases, dependent: :nullify
 
   enum :purpose,

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_010000) do
   create_table "clinical_cases", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "difficulty", default: "medium", null: false
+    t.string "export_key", null: false
     t.bigint "generation_run_id"
     t.bigint "guideline_id"
     t.string "locale", default: "es", null: false
@@ -52,6 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_010000) do
     t.text "verification_notes"
     t.string "verification_verdict"
     t.datetime "verified_at"
+    t.index ["export_key"], name: "index_clinical_cases_on_export_key", unique: true
     t.index ["generation_run_id"], name: "index_clinical_cases_on_generation_run_id"
     t.index ["guideline_id"], name: "index_clinical_cases_on_guideline_id"
     t.index ["specialty_id"], name: "index_clinical_cases_on_specialty_id"
@@ -66,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_010000) do
     t.integer "cases_created", default: 0, null: false
     t.decimal "cost_usd", precision: 12, scale: 8, default: "0.0", null: false
     t.datetime "created_at", null: false
+    t.string "export_key", null: false
     t.datetime "finished_at"
     t.integer "input_tokens", default: 0, null: false
     t.string "model", null: false
@@ -77,6 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_010000) do
     t.datetime "started_at"
     t.string "status", default: "running", null: false
     t.datetime "updated_at", null: false
+    t.index ["export_key"], name: "index_generation_runs_on_export_key", unique: true
     t.index ["provider", "model"], name: "index_generation_runs_on_provider_and_model"
     t.index ["status"], name: "index_generation_runs_on_status"
   end

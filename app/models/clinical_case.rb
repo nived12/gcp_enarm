@@ -4,6 +4,8 @@
 # correct option and three distractors, so the case is the unit throughout — exams select
 # whole cases, never orphan questions.
 class ClinicalCase < ApplicationRecord
+  include Exportable
+
   belongs_to :topic, optional: true
   belongs_to :specialty, optional: true
   belongs_to :guideline, optional: true

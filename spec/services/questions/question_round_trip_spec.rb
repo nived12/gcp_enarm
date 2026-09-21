@@ -1,0 +1,174 @@
+require "rails_helper"
+
+# The one file in this app that is worth real money. A generated case cannot be
+# regenerated — the same prompt returns different wording and different distractors — so
+# the round trip is tested as one thing, and the tests that matter most are the ones about
+# a citation that fails to resolve on the far side.
+RSpec.describe "question bank export and import" do
+  let(:path) { Rails.root.join("tmp/spec-questions-#{SecureRandom.hex(4)}.jsonl.gz").to_s }
+
+  after { FileUtils.rm_f(path) }
+
+  def export = Questions::Exporter.call(path)
+  def import = Questions::Importer.call(path)
+
+  def build_bank
+    guideline = create(:guideline, catalog_key: "IMSS-028-22")
+    section = create(:guideline_section, guideline: guideline, external_id: "34142")
+    recommendation = create(
+      :recommendation, guideline_section: section, position: 3,
+      text: "Se recomienda realizar electrocardiograma de 12 derivaciones."
+    )
+    kase = create(
+      :clinical_case, guideline: guideline, topic: create(:topic), specialty: create(:specialty),
+      generation_run: create(:generation_run), stem: "Paciente de 54 años con dolor torácico."
+    )
+    question = create(
+      :question, clinical_case: kase, position: 1, recommendation: recommendation,
+      source_quote: "electrocardiograma de 12 derivaciones"
+    )
+    create(:answer_option, question: question, position: 1, text: "Electrocardiograma", correct: true)
+    create(:answer_option, question: question, position: 2, text: "Radiografía de tórax", correct: false)
+    kase
+  end
+
+  # The generated rows go; everything they point at stays, because the far side already
+  # has the corpus and rebuilds the taxonomy from code.
+  def clear_generated
+    ClinicalCase.destroy_all
+    GenerationRun.destroy_all
+  end
+
+  it "carries a case, its questions and its options across" do
+    build_bank
+
+    expect(export.payload).to include(runs: 1, cases: 1, questions: 1)
+
+    clear_generated
+    result = import
+
+    expect(result).to be_success
+    expect(result.payload).to include(cases_created: 1, questions_created: 1, runs_created: 1)
+    expect(AnswerOption.count).to eq(2)
+  end
+
+  it "restores what the review screen reads" do
+    build_bank
+    export
+    clear_generated
+    import
+
+    question = ClinicalCase.sole.questions.sole
+
+    expect(question.source_quote).to eq("electrocardiograma de 12 derivaciones")
+    expect(question.recommendation.text).to include("12 derivaciones")
+    expect(question.correct_option.text).to eq("Electrocardiograma")
+    expect(question.clinical_case.guideline.catalog_key).to eq("IMSS-028-22")
+  end
+
+  it "resolves references by key, whatever the row ids are on the far side" do
+    build_bank
+    export
+    clear_generated
+    # A fresh production database numbers its rows from somewhere else entirely.
+    create(:recommendation, position: 3)
+    import
+
+    expect(ClinicalCase.sole.questions.sole.recommendation.guideline.catalog_key).to eq("IMSS-028-22")
+  end
+
+  it "is idempotent, so replaying a file does not pay for the batch twice" do
+    build_bank
+    export
+    import
+
+    expect(import.payload).to include(cases_updated: 1, questions_updated: 1, runs_updated: 1)
+    expect(ClinicalCase.count).to eq(1)
+    expect(AnswerOption.count).to eq(2)
+  end
+
+  it "keeps the run a case came from, so a bad prompt can still be retired wholesale" do
+    kase = build_bank
+    export
+    key = kase.generation_run.export_key
+    clear_generated
+    import
+
+    expect(ClinicalCase.sole.generation_run.export_key).to eq(key)
+  end
+
+  describe "when a reference does not resolve on the far side" do
+    it "refuses a case whose guideline this database does not have" do
+      build_bank
+      export
+      clear_generated
+      Guideline.destroy_all
+
+      expect(import.errors.full_messages.first).to include("la guía IMSS-028-22, que no existe")
+    end
+
+    it "refuses a question whose recommendation was never rebuilt here" do
+      build_bank
+      export
+      clear_generated
+      Recommendation.destroy_all
+
+      expect(import.errors.full_messages.first).to include("la recomendación 3 de la sección 34142")
+    end
+
+    it "refuses a case whose topic is missing rather than importing it unfiled" do
+      build_bank
+      export
+      clear_generated
+      Topic.destroy_all
+
+      expect(import.errors.full_messages.first).to include("el tema")
+    end
+
+    # The far side runs its own parser over the stored sections, so a parser that numbers
+    # a section differently hands back a different statement under the same position.
+    # Nothing is missing, so only the quote can tell — and it does.
+    it "refuses a question whose quote is not in the recommendation it landed on" do
+      build_bank
+      export
+      clear_generated
+      Recommendation.sole.update!(text: "Se recomienda vigilancia clínica estrecha.")
+
+      expect(import.errors.full_messages.first).to include("no se pudo guardar")
+    end
+
+    it "writes nothing at all when one question of a case fails" do
+      build_bank
+      export
+      clear_generated
+      Recommendation.destroy_all
+      import
+
+      expect(ClinicalCase.count).to eq(0)
+    end
+  end
+
+  describe "when the file is not what it should be" do
+    it "fails on a missing file" do
+      expect(Questions::Importer.call("#{path}-nope").errors.full_messages.first).to include("No existe")
+    end
+
+    it "fails on a file that is not gzip" do
+      File.write(path, "no soy gzip")
+
+      expect(import.errors.full_messages.first).to include("no se pudo descomprimir")
+    end
+
+    it "fails on a line that is not JSON" do
+      Zlib::GzipWriter.open(path) { |file| file.puts("{roto") }
+
+      expect(import.errors.full_messages.first).to include("no es JSON")
+    end
+
+    it "fails on an unknown record type rather than skipping it" do
+      Zlib::GzipWriter.open(path) { |file| file.puts({ record: "lo-que-sea" }.to_json) }
+
+      expect(import.errors.full_messages.first).to include("Registro desconocido")
+    end
+  end
+end
