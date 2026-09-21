@@ -1,40 +1,51 @@
-<%= link_to t("review.show.back"), review_clinical_cases_path,
-      class: "text-sm text-ink-muted hover:text-accent" %>
+<nav class="flex items-center justify-between gap-4 text-sm">
+  <%= link_to t("review.show.back"), review_clinical_cases_path, class: "text-ink-muted hover:text-accent" %>
+  <span class="text-ink-faint"><%= t("review.show.position", position: @position, total: @total) %></span>
+</nav>
 
-<section class="mt-4">
-  <div class="flex flex-wrap items-center gap-2">
-    <%= render "shared/difficulty_badge", difficulty: @case.difficulty %>
-    <% if @case.topic %>
-      <span class="text-xs text-ink-muted"><%= @case.topic.name %></span>
+<%# The case: what it is about, then the vignette, with nothing competing between them. %>
+<section class="mt-10">
+  <h1 class="text-xl font-semibold tracking-tight text-ink">
+    <%= @case.topic&.name || @case.guideline&.title %>
+  </h1>
+
+  <p class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-faint">
+    <span><%= t("difficulties.#{@case.difficulty}") %></span>
+    <% if @case.guideline %>
+      <span aria-hidden="true">·</span>
+      <span><%= @case.guideline.catalog_key %></span>
+      <span aria-hidden="true">·</span>
+      <span><%= @case.guideline.year || t("review.show.undated") %></span>
     <% end %>
-  </div>
+  </p>
 
   <%# Shown on the case rather than per question: a reviewer needs to know the guideline
-      is past its validity before reading the vignette, not after, and whether any single
-      question happens to cite a recommendation is beside the point. %>
+      is past its validity before reading the vignette, not after. %>
   <% if @case.guideline&.expired? %>
-    <p class="mt-4 rounded-card border border-incorrect px-3 py-2 text-xs text-incorrect">
+    <p class="mt-6 rounded-card border border-incorrect bg-incorrect-soft px-4 py-3 text-sm text-incorrect">
       <%= t("review.show.expired_warning") %>
     </p>
   <% end %>
 
-  <%# Serif, because a viñeta should read like a journal vignette rather than a form field. %>
-  <p class="mt-4 font-serif text-lg leading-relaxed text-ink"><%= @case.stem %></p>
+  <%# Serif and roomy: the vignette is the one thing on screen that is not interface, and
+      it is what she is actually being asked to judge. %>
+  <p class="vignette mt-8 font-serif text-lg leading-loose text-ink"><%= @case.stem %></p>
 </section>
 
-<% @case.questions.each do |question| %>
-  <article class="mt-8 border-t border-line pt-6">
-    <h2 class="text-base font-medium text-ink"><%= question.text %></h2>
+<% @case.questions.each_with_index do |question, index| %>
+  <%# Each question is a block with its own label and a wide gap before it, so two
+      questions about the same case never read as one run-on wall of text. %>
+  <article class="mt-16">
+    <p class="eyebrow"><%= t("review.show.question_label", number: index + 1) %></p>
+    <h2 class="mt-3 text-base font-medium leading-relaxed text-ink"><%= question.text %></h2>
 
-    <ul class="mt-4 space-y-2">
+    <ul class="mt-6 space-y-3">
       <% question.answer_options.each do |option| %>
         <%# Correct and incorrect must never rely on hue alone — roughly 8% of her male
             colleagues are colour-blind, and this is the one screen where misreading a
-            colour costs real learning. The check mark carries the meaning; colour agrees. %>
-        <li class="flex items-start gap-3 rounded-card border p-3 text-sm
-                   <%= option.correct? ? "border-correct bg-correct-soft" : "border-line" %>">
-          <span class="mt-0.5 w-4 shrink-0 text-center font-medium
-                       <%= option.correct? ? "text-correct" : "text-ink-muted" %>">
+            colour costs real learning. The mark carries the meaning; colour agrees. %>
+        <li class="flex items-start gap-4 rounded-card border px-5 py-4 text-sm leading-relaxed <%= option.correct? ? "border-correct bg-correct-soft" : "border-line" %>">
+          <span class="mt-px w-4 shrink-0 text-center font-medium <%= option.correct? ? "text-correct" : "text-ink-faint" %>">
             <%= option.correct? ? "✓" : "·" %>
           </span>
           <span class="text-ink"><%= option.text %></span>
@@ -43,28 +54,39 @@
     </ul>
 
     <% if question.explanation.present? %>
-      <p class="mt-4 text-sm leading-relaxed text-ink-muted"><%= question.explanation %></p>
+      <p class="mt-6 leading-relaxed text-ink-muted"><%= question.explanation %></p>
     <% end %>
 
     <% if question.recommendation %>
-      <div class="mt-4 rounded-card bg-surface-sunk p-4">
+      <div class="mt-6 rounded-card bg-surface-sunk px-6 py-5">
         <p class="eyebrow"><%= t("review.show.source") %></p>
 
         <%# The quoted span is marked inside the full recommendation, so a reviewer can see
             at a glance whether the question used it fairly or lifted it out of context. %>
-        <p class="vignette mt-2 text-sm leading-relaxed text-ink">
+        <p class="vignette mt-4 text-sm leading-loose text-ink">
           <%= highlighted(question.recommendation.text, question.source_quote) %>
         </p>
 
-        <p class="mt-3 text-xs text-ink-muted">
-          <%= question.citation %>
-          <% if @case.guideline %>
-            · <%= @case.guideline.catalog_key %>
-            · <%= @case.guideline.year || t("review.show.undated") %>
-          <% end %>
-        </p>
-
+        <p class="mt-5 text-xs text-ink-faint"><%= question.citation %></p>
       </div>
     <% end %>
   </article>
 <% end %>
+
+<nav class="mt-20 flex items-center justify-between gap-4 border-t border-line pt-8">
+  <% if @previous %>
+    <%= link_to t("review.show.previous"), review_clinical_case_path(@previous),
+          class: "inline-flex min-h-11 items-center rounded-full border border-line px-5 text-sm text-ink hover:border-accent" %>
+  <% else %>
+    <span></span>
+  <% end %>
+
+  <%# The point of this screen is reading through a batch, so the next case is one tap
+      away rather than a trip back to the list. %>
+  <% if @next %>
+    <%= link_to t("review.show.next"), review_clinical_case_path(@next),
+          class: "inline-flex min-h-11 items-center rounded-full bg-accent px-5 text-sm font-medium text-accent-ink hover:bg-accent-hover" %>
+  <% else %>
+    <span></span>
+  <% end %>
+</nav>

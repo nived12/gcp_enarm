@@ -49,6 +49,26 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include(I18n.t("review.index.empty.title"))
     end
 
+    it "pages rather than dumping every case on one screen" do
+      create_list(:clinical_case, Review::ClinicalCasesController::PER_PAGE + 3)
+      sign_in(reviewer)
+
+      get review_clinical_cases_path
+
+      expect(response.body).to include(I18n.t("review.pagination.next"))
+      expect(response.body).to include(I18n.t("review.pagination.page", page: 1, total: 2))
+    end
+
+    it "serves the second page" do
+      create_list(:clinical_case, Review::ClinicalCasesController::PER_PAGE + 3)
+      sign_in(reviewer)
+
+      get review_clinical_cases_path(page: 2)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t("review.pagination.previous"))
+    end
+
     it "narrows to one generation run when asked" do
       run = create(:generation_run)
       mine = create(:clinical_case, generation_run: run, stem: "Caso de la corrida elegida.")
@@ -58,6 +78,37 @@ RSpec.describe "Review::ClinicalCases", type: :request do
 
       expect(response.body).to include(mine.stem)
       expect(response.body).not_to include(clinical_case.stem.truncate(180))
+    end
+  end
+
+  describe "moving through the batch" do
+    it "offers the next case so a reviewer does not go back to the list each time" do
+      older = create(:clinical_case, created_at: 1.hour.ago, stem: "Caso anterior.")
+      sign_in(reviewer)
+
+      get review_clinical_case_path(clinical_case)
+
+      expect(response.body).to include(review_clinical_case_path(older))
+      expect(response.body).to include(I18n.t("review.show.next"))
+    end
+
+    it "offers the previous case from the second one on" do
+      newer = create(:clinical_case, created_at: 1.hour.from_now, stem: "Caso posterior.")
+      sign_in(reviewer)
+
+      get review_clinical_case_path(clinical_case)
+
+      expect(response.body).to include(review_clinical_case_path(newer))
+      expect(response.body).to include(I18n.t("review.show.previous"))
+    end
+
+    it "says where in the batch a case sits" do
+      create(:clinical_case, created_at: 1.hour.from_now)
+      sign_in(reviewer)
+
+      get review_clinical_case_path(clinical_case)
+
+      expect(response.body).to include(I18n.t("review.show.position", position: 2, total: 2))
     end
   end
 

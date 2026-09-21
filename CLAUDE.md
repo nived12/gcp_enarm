@@ -124,6 +124,15 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   Propshaft load path and ships the raw Tailwind source to the browser. Link
   `"application"` — the built bundle — and keep `app/assets/stylesheets` in
   `config.assets.excluded_paths`.
+- **A stray `public/assets` silently freezes every CSS and JS change.** Propshaft serves
+  a precompiled asset in preference to `app/assets/builds`, so one `rails assets:precompile`
+  run leaves a compiled copy that shadows the live build **forever** — the page renders
+  fresh HTML with a stale stylesheet, which reads as "my Tailwind classes do not work"
+  rather than as a caching problem. Symptom: new utilities are present in
+  `app/assets/builds/application.css` but missing from what the server serves, and the
+  digest in the `<link>` never changes. Fix: `rm -rf public/assets` **and restart** — the
+  running server caches the resolved path, so removing the directory alone does nothing.
+  `public/assets` is gitignored, so this never shows up in a diff.
 - **Use `bin/dev`, not `bin/rails server`.** The plain server runs no asset watcher, so
   CSS and JS changes silently do not appear.
 - **`rate_limit` captures its store at class-definition time.** The test environment gives

@@ -29,6 +29,9 @@ en:
 
   passwords:
     new:
+      position: "Case %{position} of %{total}"
+      previous: "← Previous case"
+      next: "Next case →"
       back: "Back to sign in"
       subtitle: "We'll email you a link to choose a new password."
       title: "Reset password"
@@ -70,6 +73,8 @@ en:
       today: "TODAY"
       greeting: "Hello, %{name}"
       fallback_name: "colleague"
+      showing: "Showing %{from}–%{to} of %{total}"
+      expired_flag: "Out of date"
       empty:
         title: "No questions yet"
         body: "The bank is built from the GPC catalog. Once the first ingestion finishes, your plan for the day appears here."
@@ -95,16 +100,27 @@ en:
       eyebrow: "Review"
       title: "Generated cases"
       subtitle: "Every case cites the recommendation it came from, with the quoted span marked inside the original text so you can judge whether the question uses it fairly."
+      showing: "Showing %{from}–%{to} of %{total}"
+      expired_flag: "Out of date"
       empty:
         title: "No generated cases yet"
         body: "Run generation and they will appear here for review."
+    pagination:
+      previous: "Previous"
+      next: "Next"
+      page: "Page %{page} of %{total}"
     runs:
+      title: "Generation detail"
       model: "Model"
       cases: "Cases"
       rejected: "Rejected"
       tokens: "Tokens"
     show:
+      position: "Case %{position} of %{total}"
+      previous: "← Previous case"
+      next: "Next case →"
       back: "Back to cases"
+      question_label: "Question %{number}"
       source: "Cited recommendation"
       undated: "undated"
       expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."

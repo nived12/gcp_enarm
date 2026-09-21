@@ -29,6 +29,9 @@ es:
 
   passwords:
     new:
+      position: "Caso %{position} de %{total}"
+      previous: "← Caso anterior"
+      next: "Siguiente caso →"
       back: "Volver a iniciar sesión"
       subtitle: "Te enviamos un enlace para elegir una contraseña nueva."
       title: "Restablecer contraseña"
@@ -70,6 +73,8 @@ es:
       today: "HOY"
       greeting: "Hola, %{name}"
       fallback_name: "colega"
+      showing: "Mostrando %{from}–%{to} de %{total}"
+      expired_flag: "Fuera de vigencia"
       empty:
         title: "Todavía no hay preguntas"
         body: "El banco se construye a partir del catálogo de GPC. En cuanto termine la primera carga, aquí aparecerá tu plan del día."
@@ -95,16 +100,27 @@ es:
       eyebrow: "Revisión"
       title: "Casos generados"
       subtitle: "Cada caso cita la recomendación de la que salió. Marca el fragmento citado dentro del texto original para que puedas juzgar si la pregunta lo usa con justicia."
+      showing: "Mostrando %{from}–%{to} de %{total}"
+      expired_flag: "Fuera de vigencia"
       empty:
         title: "Todavía no hay casos generados"
         body: "Corre la generación y aparecerán aquí para revisarlos."
+    pagination:
+      previous: "Anterior"
+      next: "Siguiente"
+      page: "Página %{page} de %{total}"
     runs:
+      title: "Detalle de generación"
       model: "Modelo"
       cases: "Casos"
       rejected: "Descartadas"
       tokens: "Tokens"
     show:
+      position: "Caso %{position} de %{total}"
+      previous: "← Caso anterior"
+      next: "Siguiente caso →"
       back: "Volver a los casos"
+      question_label: "Pregunta %{number}"
       source: "Recomendación citada"
       undated: "sin año"
       expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
