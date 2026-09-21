@@ -12,5 +12,10 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Reviewer-only. Generated cases are drafts until a doctor has read them.
+  namespace :review do
+    resources :clinical_cases, only: %i[index show]
+  end
+
   root "home#show"
 end

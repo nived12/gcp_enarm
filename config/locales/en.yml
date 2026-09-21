@@ -81,6 +81,33 @@ en:
       link: "reset my password"
       expiry: "This link expires in %{duration}."
 
+  difficulties:
+    low: "Low"
+    medium: "Medium"
+    high: "High"
+  review:
+    denied: "This section is for clinical review only."
+    expired: "%{year} guideline"
+    question_count:
+      one: "1 question"
+      other: "%{count} questions"
+    index:
+      eyebrow: "Review"
+      title: "Generated cases"
+      subtitle: "Every case cites the recommendation it came from, with the quoted span marked inside the original text so you can judge whether the question uses it fairly."
+      empty:
+        title: "No generated cases yet"
+        body: "Run generation and they will appear here for review."
+    runs:
+      model: "Model"
+      cases: "Cases"
+      rejected: "Rejected"
+      tokens: "Tokens"
+    show:
+      back: "Back to cases"
+      source: "Cited recommendation"
+      undated: "undated"
+      expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."
   activerecord:
     errors:
       models:

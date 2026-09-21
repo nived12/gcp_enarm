@@ -81,6 +81,33 @@ es:
       link: "restablecer mi contraseña"
       expiry: "El enlace expira en %{duration}."
 
+  difficulties:
+    low: "Baja"
+    medium: "Media"
+    high: "Alta"
+  review:
+    denied: "Esta sección es solo para revisión clínica."
+    expired: "Guía de %{year}"
+    question_count:
+      one: "1 pregunta"
+      other: "%{count} preguntas"
+    index:
+      eyebrow: "Revisión"
+      title: "Casos generados"
+      subtitle: "Cada caso cita la recomendación de la que salió. Marca el fragmento citado dentro del texto original para que puedas juzgar si la pregunta lo usa con justicia."
+      empty:
+        title: "Todavía no hay casos generados"
+        body: "Corre la generación y aparecerán aquí para revisarlos."
+    runs:
+      model: "Modelo"
+      cases: "Casos"
+      rejected: "Descartadas"
+      tokens: "Tokens"
+    show:
+      back: "Volver a los casos"
+      source: "Recomendación citada"
+      undated: "sin año"
+      expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
   activerecord:
     errors:
       models:

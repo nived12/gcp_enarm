@@ -1,0 +1,60 @@
+<section class="mb-8">
+  <p class="eyebrow"><%= t("review.index.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("review.index.title") %></h1>
+  <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("review.index.subtitle") %></p>
+</section>
+
+<% if @runs.any? %>
+  <div class="mb-8 overflow-hidden rounded-card border border-line">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-surface-sunk text-xs uppercase tracking-wide text-ink-muted">
+        <tr>
+          <th class="px-4 py-2 font-medium"><%= t("review.runs.model") %></th>
+          <th class="px-4 py-2 font-medium"><%= t("review.runs.cases") %></th>
+          <th class="px-4 py-2 font-medium"><%= t("review.runs.rejected") %></th>
+          <th class="px-4 py-2 font-medium"><%= t("review.runs.tokens") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @runs.each do |run| %>
+          <tr class="border-t border-line">
+            <td class="px-4 py-2 font-mono text-xs text-ink"><%= run.model %></td>
+            <td class="px-4 py-2 text-ink"><%= run.cases_created %></td>
+            <td class="px-4 py-2 text-ink-muted"><%= run.rejections %></td>
+            <td class="px-4 py-2 text-ink-muted"><%= number_with_delimiter(run.total_tokens) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<% if @cases.empty? %>
+  <div class="rounded-card border border-dashed border-line-strong p-6 text-center">
+    <p class="text-sm font-medium text-ink"><%= t("review.index.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
+      <%= t("review.index.empty.body") %>
+    </p>
+  </div>
+<% else %>
+  <ul class="space-y-3">
+    <% @cases.each do |clinical_case| %>
+      <li>
+        <%= link_to review_clinical_case_path(clinical_case),
+              class: "block rounded-card border border-line p-4 hover:border-accent" do %>
+          <div class="flex flex-wrap items-center gap-2">
+            <%= render "shared/difficulty_badge", difficulty: clinical_case.difficulty %>
+            <span class="text-xs text-ink-muted"><%= clinical_case.guideline&.catalog_key %></span>
+            <% if clinical_case.guideline&.expired? %>
+              <span class="text-xs text-incorrect"><%= t("review.expired", year: clinical_case.guideline.year) %></span>
+            <% end %>
+          </div>
+          <p class="mt-2 font-serif text-sm leading-relaxed text-ink"><%= truncate(clinical_case.stem, length: 180) %></p>
+          <p class="mt-2 text-xs text-ink-muted">
+            <%= t("review.question_count", count: clinical_case.questions.size) %>
+          </p>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
