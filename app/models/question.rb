@@ -28,9 +28,15 @@ class Question < ApplicationRecord
 
   private
 
+  # Compared with whitespace collapsed on both sides. The stored text keeps the line
+  # breaks that PDF and HTML extraction leave behind — "se deben evitar:\nPicos
+  # hiperóxicos" — and no model reproduces those when quoting; it writes a space.
+  # Measured: that alone accounted for every citation failure in the first provider
+  # comparison, across two different model families. Collapsing whitespace removes a
+  # formatting difference and nothing else, so a paraphrase still cannot pass.
   def quote_must_come_from_the_recommendation
     return if source_quote.blank? || recommendation.nil?
-    return if recommendation.text.to_s.include?(source_quote)
+    return if recommendation.text.to_s.squish.include?(source_quote.squish)
 
     errors.add(:source_quote, :not_in_recommendation)
   end

@@ -19,7 +19,9 @@ module Llm
     # that looks exactly like success. Disabling it costs nothing in output quality for
     # generation and cuts output tokens by 4.4x.
     #
-    # Gemini reports zero reasoning tokens on the same prompt and ignores the field.
+    # Only sent to providers that know the field. Gemini's compatibility layer answers
+    # 400 "Unknown name: thinking" rather than ignoring it, so the switch is a per-
+    # provider capability rather than something this client can send unconditionally.
     THINKING = { type: "disabled" }.freeze
 
     def initialize(role:, prompt:, max_tokens: DEFAULT_MAX_TOKENS, thinking: false)
@@ -77,7 +79,7 @@ module Llm
     def body
       payload = { model: provider.model, messages: [{ role: "user", content: prompt }],
                   max_tokens: max_tokens }
-      payload[:thinking] = THINKING unless thinking
+      payload[:thinking] = THINKING if provider.supports_thinking? && !thinking
       payload.to_json
     end
 

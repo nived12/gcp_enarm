@@ -19,15 +19,22 @@ module Llm
     PRESETS = {
       "gemini" => {
         base_url: "https://generativelanguage.googleapis.com/v1beta/openai/",
-        model: "gemini-3.1-flash-lite"
+        model: "gemini-3.1-flash-lite",
+        # Gemini's compatibility layer rejects an unknown field outright — sending
+        # `thinking` returns 400 "Unknown name". Flash-Lite reports zero reasoning
+        # tokens anyway, so there is nothing to switch off.
+        thinking: false
       },
       "deepseek" => {
         base_url: "https://api.deepseek.com",
-        model: "deepseek-flash"
+        model: "deepseek-flash",
+        thinking: true
       },
       "anthropic" => {
         base_url: "https://api.anthropic.com/v1",
-        model: "claude-haiku-4-5-20251001"
+        model: "claude-haiku-4-5-20251001",
+        # Anthropic's own API is not OpenAI-shaped and spells thinking differently.
+        thinking: false
       }
     }.freeze
 
@@ -61,6 +68,13 @@ module Llm
       @model = env("MODEL") || preset.fetch(:model)
       @base_url = env("BASE_URL") || preset.fetch(:base_url)
       @api_key = env("API_KEY")
+      @supports_thinking = preset.fetch(:thinking)
+    end
+
+    # Whether this service understands the `thinking` request field at all. Not every
+    # provider ignores what it does not know: Gemini answers 400.
+    def supports_thinking?
+      @supports_thinking
     end
 
     def configured?

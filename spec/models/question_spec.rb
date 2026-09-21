@@ -37,6 +37,29 @@ RSpec.describe Question do
       expect(question).not_to be_valid
     end
 
+    it "accepts a quote whose line break the model wrote as a space" do
+      broken = create(
+        :recommendation,
+        text: "Se deben evitar:\nPicos hiperóxicos mediante la reducción rápida de la FiO2"
+      )
+      question = build(
+        :question, recommendation: broken,
+        source_quote: "Se deben evitar: Picos hiperóxicos"
+      )
+
+      expect(question).to be_valid
+    end
+
+    it "still rejects a paraphrase, which collapsing whitespace does not rescue" do
+      broken = create(:recommendation, text: "Se deben evitar:\nPicos hiperóxicos")
+      question = build(
+        :question, recommendation: broken,
+        source_quote: "Se deben prevenir los picos de hiperoxia"
+      )
+
+      expect(question).not_to be_valid
+    end
+
     it "allows a question with no quote at all" do
       expect(build(:question, recommendation: recommendation, source_quote: nil)).to be_valid
     end

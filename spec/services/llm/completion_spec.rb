@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Llm::Completion do
   let(:endpoint) { "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions" }
+  let(:deepseek) { "https://api.deepseek.com/chat/completions" }
 
   def with_key
     ENV["LLM_API_KEY"] = "sk-test"
@@ -89,24 +90,39 @@ RSpec.describe Llm::Completion do
 
   describe "the thinking switch" do
     it "disables thinking by default, because it is billed as output and buys nothing here" do
+      ENV["LLM_VERIFIER_API_KEY"] = "sk-test"
+      stub_request(:post, deepseek).to_return(status: 200, body: completion("ok"))
+
+      described_class.call(role: :verifier, prompt: "hola")
+
+      expect(a_request(:post, deepseek).with { |r| body_of(r)["thinking"] == { "type" => "disabled" } })
+        .to have_been_made
+    ensure
+      ENV.delete("LLM_VERIFIER_API_KEY")
+    end
+
+    it "never sends the field to a provider that rejects unknown fields" do
+      ENV["LLM_PROVIDER"] = "gemini"
       with_key do
         stub_request(:post, endpoint).to_return(status: 200, body: completion("ok"))
 
         described_class.call(role: :generator, prompt: "hola")
 
-        expect(a_request(:post, endpoint).with { |r| body_of(r)["thinking"] == { "type" => "disabled" } })
-          .to have_been_made
+        expect(a_request(:post, endpoint).with { |r| !body_of(r).key?("thinking") }).to have_been_made
       end
+    ensure
+      ENV.delete("LLM_PROVIDER")
     end
 
     it "leaves the provider's default in place when thinking is asked for" do
-      with_key do
-        stub_request(:post, endpoint).to_return(status: 200, body: completion("ok"))
+      ENV["LLM_VERIFIER_API_KEY"] = "sk-test"
+      stub_request(:post, deepseek).to_return(status: 200, body: completion("ok"))
 
-        described_class.call(role: :generator, prompt: "hola", thinking: true)
+      described_class.call(role: :verifier, prompt: "hola", thinking: true)
 
-        expect(a_request(:post, endpoint).with { |r| !body_of(r).key?("thinking") }).to have_been_made
-      end
+      expect(a_request(:post, deepseek).with { |r| !body_of(r).key?("thinking") }).to have_been_made
+    ensure
+      ENV.delete("LLM_VERIFIER_API_KEY")
     end
 
     it "sends the model and the token budget it was given" do
