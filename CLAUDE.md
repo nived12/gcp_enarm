@@ -70,67 +70,33 @@ Mobile-first, 44px minimum tap targets, every list gets loading / empty / error 
 states. The home screen is: your average, today's plan, and a button that starts the quiz.
 Nothing else above the fold — including upgrade prompts.
 
-## The exam we are simulating
+## Rules the domain imposes on the code
 
-Score is a **percentage over 100**, not a weighted total — the "alta 3 / media 2 / baja 1,
-560 puntos" figure in every prep blog is from the retired 450-reactivo format and the
-current convocatoria does not mention difficulty at all. Difficulty *is* official and it
-breaks ties: CIFRHS grades each reactivo Alta/Media/Baja and the tie-break order is Alta →
-Media → Medicina Interna → Pediatría → Gineco-Obstetricia → Cirugía → total correct →
-ponderación. Sources and the consequences are in the plan under "How the ENARM is actually
-scored". Difficulty uses that vocabulary (`low`/`medium`/`high`), never a competitor's
-Interno/Residente/Adscrito.
+The reasoning behind each of these is in the plan; what follows is only what changes how
+you write code here.
 
-## The corpus is mostly expired, and that is load-bearing
-
-CENETEC was dissolved in 2025; its successor republished only guidelines still inside
-the 3–5 year validity the guidelines state for themselves, which is why the live catalog
-holds nothing older than 2020. As of 2026-09 the corpus is **56 current / 539 expired**,
-and **Cirugía General is 1 current of 36** — so expired guidelines cannot simply be
-dropped.
-
+**Most of the corpus has expired, and it cannot be dropped.** The live catalog holds
+nothing older than 2020, and Cirugía General is almost entirely among the expired ones.
 `Guideline::VALIDITY_YEARS`, `.current`, `.expired`, `.undated` and `#expired?` exist for
-this. An undated guideline is never expired: unknown is not the same as out of date.
-**Phase 2 must prefer current guidelines and show the year on every citation.** Details
-and the reasoning are in the plan under "Why the catalog shrank".
+this. An undated guideline is never expired — unknown is not out of date. **Prefer current
+guidelines when generating, and show the year on every citation.**
 
-`Gpc::RefreshCatalogJob` keeps it accurate by itself, quarterly, from
-`config/recurring.yml`. It costs nothing — Solid Queue runs inside Puma.
+**A vignette carries the whole patient, not just the answer.** A real ENARM item is
+150–200 words — comorbidities with durations, complete vitals with units, a systematic
+examination including normal findings — and asks about one part of it. Deciding what
+matters is the skill being tested, so a vignette where every fact points at the answer is
+easier than the exam it simulates. `Questions::CaseGenerator::DETAIL_LEVELS` carries
+`focused` and `full_workup`; mix them, because not every real item is long.
+The extra material is **realistic completeness, never misdirection** — never invent a
+finding that contradicts the diagnosis.
 
-## What a vignette has to carry
+**English is per case, never per question**, at `ENGLISH_SHARE`. A case and its questions
+must be one language, and the `quote` stays in Spanish whatever the case language: the
+substring gate checks it against a Spanish guideline, so an English quote fails every time.
 
-Checked against a doctor 2026-09-21. The first generated cases were ~45 words with
-**every fact pointing at the answer**, which reads as far easier than the real exam. A real
-ENARM vignette is 150–200 words carrying the whole patient — comorbidities with durations
-and treatment, complete vitals with units, a systematic examination including normal
-findings, labs where relevant — and then asks about one part of it. Deciding what matters
-is the skill being tested.
-
-`Questions::CaseGenerator::DETAIL_LEVELS` is `focused` (60–90 words, 2 questions) and
-`full_workup` (150–200 words, 3 questions), mixed across a run because not every real item
-is long either.
-
-The extra material is **realistic completeness, never misdirection**. Background history
-and normal findings belong in any chart; inventing findings that contradict the diagnosis
-would be a different and worse thing, and the prompt forbids it.
-
-**About 5–10% of the real exam is in English**, so `ENGLISH_SHARE` puts a slice of cases
-there. It is applied per *case*, never per question — a case and its questions must be one
-language — and the `quote` stays in Spanish, because the substring gate checks it against
-the Spanish guideline and an English quote would fail every time.
-
-## Clinical images are an open question, not a feature
-
-Nothing is built. `image_based` is an exam mode in the plan and there is no image source
-behind it. The constraint is licensing: this is a paid product, so Radiopaedia (CC BY-NC-SA)
-is unusable however good it is. **PTB-XL** (21,799 labelled 12-lead ECGs, CC BY 4.0) is
-usable; **NIH ChestX-ray14** probably is but its terms need checking at the primary source.
-CT, MRI and ultrasound have no licensed labelled source yet.
-
-The part that shapes the code: **image selection has to happen before generation**, because
-the vignette must lead into the image ("se decide realizar electrocardiograma") and the
-question must ask about it. It cannot be attached to a finished case. Details in the plan
-under "Clinical images".
+**Difficulty uses the exam's own vocabulary** — `low`/`medium`/`high`, rendered Baja /
+Media / Alta — never a competitor's Interno/Residente/Adscrito. Score is a plain
+percentage; do not weight it.
 
 ## Testing
 
