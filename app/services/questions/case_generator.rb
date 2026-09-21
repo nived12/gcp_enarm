@@ -232,6 +232,10 @@ module Questions
 
       return if built.empty?
 
+      # A rejected question must not leave a hole. Positions number what survived, not
+      # what the model sent, or a case reads "Pregunta 1, Pregunta 3" to a student.
+      built.each_with_index { |question, index| question.position = index + 1 }
+
       kase.difficulty = difficulty_for(built)
       kase.save!
       kase

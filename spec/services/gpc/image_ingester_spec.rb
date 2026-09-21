@@ -66,4 +66,26 @@ RSpec.describe Gpc::ImageIngester do
     expect(ingest.payload).to be_empty
     expect(ClinicalImage.count).to eq(0)
   end
+
+  # The filter separates medicine from the guideline's working papers and has been wrong
+  # twice already, so a re-run has to take rows away as well as add them.
+  it "removes a figure the filter no longer accepts" do
+    section = build_section
+    ingest
+    section.update!(body: '<h2>ESCALA GRADE</h2><img src="~a/escala_1.jpg">', heading: "ESCALA 1")
+
+    expect(ingest.payload).to include(removed: 1)
+    expect(ClinicalImage.count).to eq(0)
+  end
+
+  it "leaves a case that pointed at a removed figure without one, rather than broken" do
+    section = build_section
+    ingest
+    kase = create(:clinical_case, clinical_image: ClinicalImage.sole)
+    section.update!(body: "<p>ya no hay figura</p>")
+
+    ingest
+
+    expect(kase.reload.clinical_image).to be_nil
+  end
 end

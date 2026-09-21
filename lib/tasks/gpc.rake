@@ -93,6 +93,8 @@ namespace :gpc do
   task images: :environment do
     result = Gpc::ImageIngester.call
     puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
-    puts result.errors.full_messages.first(10) if result.errors.any?
+    # A partial run still reports its counts: one unreachable file is not a reason to
+    # say nothing about the 900 that arrived. Response#errors is nil on success.
+    puts result.errors.full_messages.first(10) if result.failure?
   end
 end

@@ -66,4 +66,36 @@ RSpec.describe Gpc::ImageParser do
   it "returns nothing for a section with no images" do
     expect(parse(heading: "CUADRO 1", body: "<p>Sólo texto</p>")).to be_empty
   end
+
+  # 590 of the 622 sections that publish a figure put its caption in an <h2>; the rest
+  # lead with it as plain text.
+  it "prefers the caption the site marked up as one" do
+    rows = parse(
+      heading: "CUADRO 1",
+      body: "<h2>CRITERIOS DIAGNÓSTICOS</h2><img src=\"~a/cuadro_1.jpg\"><p>Requerimientos: bolígrafo</p>"
+    )
+
+    expect(rows.sole[:caption]).to eq("CRITERIOS DIAGNÓSTICOS")
+  end
+
+  # One guideline publishes a whole PHQ-9 instruction sheet in the section body, and an
+  # unbounded caption goes straight into the generation prompt.
+  it "keeps a caption to caption length" do
+    rows = parse(heading: "CUADRO 1", body: "<img src=\"~a/cuadro_1.jpg\">#{"palabra " * 80}")
+
+    expect(rows.sole[:caption].length).to be <= described_class::CAPTION_LIMIT
+  end
+
+  # The filename is innocent — escala_1.jpg under "ESCALA 1" — so only what the figure
+  # calls itself gives it away. 72 of these were kept before the caption was consulted.
+  it "drops a grading scale that the filename could not give away" do
+    expect(parse(heading: "ESCALA 1", body: '<h2>ESCALA GRADE</h2><img src="~a/escala_1.jpg">')).to be_empty
+    expect(parse(heading: "CUADRO 3", body: '<h2>NIVELES DE EVIDENCIA</h2><img src="~a/cuadro_3.jpg">')).to be_empty
+  end
+
+  it "keeps a clinical scale, which is what those headings usually mean" do
+    rows = parse(heading: "ESCALA 2", body: '<h2>ESCALA DE GLASGOW</h2><img src="~a/escala_2.jpg">')
+
+    expect(rows.sole).to include(caption: "ESCALA DE GLASGOW", kind: "scale")
+  end
 end

@@ -81,6 +81,17 @@ RSpec.describe Questions::Verifier do
     expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
   end
 
+  # Ruby indexes from the end on a negative number, so this used to select the last
+  # option and read as a disagreement — on a live batch the verifier agreed in its note
+  # and was recorded as disputing the answer.
+  it "does not read a missing option number as a vote for the last option" do
+    build_question(correct_at: 1)
+    stub_verifier("questions" => [judgement(option: 0)])
+
+    expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
+    expect(clinical_case.reload.verification_notes).to be_present
+  end
+
   it "ignores a judgement about a question that does not exist" do
     build_question
     stub_verifier("questions" => [judgement, judgement(question: 9)])

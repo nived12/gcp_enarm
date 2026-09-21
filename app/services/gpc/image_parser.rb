@@ -17,6 +17,18 @@ module Gpc
     # guideline's working papers: correct, published, and of no use to a student.
     METHODOLOGY_FILE = /evidencia|grade|_sign|_nice|shekelle|oxford/
 
+    # The same working papers, caught by what the figure calls itself. Some guidelines
+    # publish the GRADE scale as escala_1.jpg — an innocent filename under an innocent
+    # "ESCALA 1" heading — so the filename cannot see it and the caption has to.
+    METHODOLOGY_CAPTION = /
+      ESCALA\s+(GRADE|NICE|SIGN|SHEKELLE|OXFORD) | NIVEL(ES)?\s+DE\s+EVIDENCIA |
+      GRADOS?\s+DE\s+RECOMENDACION | CUADRO\s+DE\s+EVIDENCIA
+    /x
+
+    # A caption is a caption. One guideline puts a whole PHQ-9 instruction sheet in the
+    # section body, and an unbounded caption ends up in the generation prompt.
+    CAPTION_LIMIT = 200
+
     # The site writes its own paths relative to the guideline view, so the leading "~"
     # has to come off before the path means anything.
     PATH_PREFIX = "~".freeze
@@ -28,6 +40,7 @@ module Gpc
 
     def call
       return success([]) unless heading.match?(FIGURE_HEADING)
+      return success([]) if methodology?
 
       success(images)
     end
@@ -58,15 +71,31 @@ module Gpc
       source.presence
     end
 
+    def methodology?
+      I18n.transliterate(caption.to_s).upcase.match?(METHODOLOGY_CAPTION)
+    end
+
     # What the guideline says the figure shows — "MARCADORES CLÍNICOS DE CONGESTIÓN".
     # The heading is only a number, so this is the whole of what a reader, or a prompt,
     # can know about the figure without looking at it.
+    #
+    # The site puts it in an <h2> in 590 of the 622 sections that publish a figure. The
+    # rest lead with it as plain text, where the heading is sometimes repeated in front
+    # of it and has to come off.
     def caption
-      @caption ||= begin
-        text = document.dup
-        text.css("img").remove
-        text.text.squish.delete_prefix(section.heading.squish).squish.presence
-      end
+      return @caption if defined?(@caption)
+
+      @caption = (heading_element || leading_text)&.truncate(CAPTION_LIMIT)
+    end
+
+    def heading_element
+      document.at_css("h2")&.text&.squish.presence
+    end
+
+    def leading_text
+      body = document.dup
+      body.css("img").remove
+      body.text.squish.delete_prefix(section.heading.squish).squish.presence
     end
 
     def document

@@ -114,13 +114,24 @@ module Questions
       question = questions[judgement["question"].to_i - 1]
       return if question.nil?
 
-      chosen = question.answer_options[judgement["option"].to_i - 1]
+      chosen = option_at(question, judgement["option"])
       note = ["#{question.position}.", judgement["note"]].compact_blank.join(" ")
 
       return ["unsupported", note] unless chosen&.correct?
       return ["ambiguous", note] unless judgement["decidable"]
 
       ["supported", nil]
+    end
+
+    # Ruby indexes from the end on a negative number, so a reply with no option number —
+    # or a zero — would silently select the LAST option and read as a disagreement. That
+    # happened on a live batch: the verifier agreed in its own note and was recorded as
+    # disputing the answer.
+    def option_at(question, number)
+      position = number.to_i
+      return unless position.positive?
+
+      question.answer_options[position - 1]
     end
 
     def record(usage)

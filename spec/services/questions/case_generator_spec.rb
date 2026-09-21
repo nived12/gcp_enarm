@@ -245,6 +245,16 @@ RSpec.describe Questions::CaseGenerator do
     expect(kase.specialty).to eq(topic.branch.specialty)
   end
 
+  # A case that reads "Pregunta 1, Pregunta 3" to a student is a bug the reviewer sees
+  # before the student does.
+  it "numbers the questions that survived, not the ones the model sent" do
+    stub_model(one_case(question, question(index: 99), question))
+
+    positions = described_class.call(guideline).payload[:cases].sole.questions.pluck(:position)
+
+    expect(positions).to eq([1, 2])
+  end
+
   describe "cases that carry a figure" do
     let!(:with_figure) do
       create(
