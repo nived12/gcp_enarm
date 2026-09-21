@@ -69,6 +69,15 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include(I18n.t("review.pagination.previous"))
     end
 
+    it "marks the cases that carry a figure, so a reviewer can find them" do
+      clinical_case.update!(clinical_image: create(:clinical_image, :stored, label: "CUADRO 2"))
+      sign_in(reviewer)
+
+      get review_clinical_cases_path
+
+      expect(response.body).to include(I18n.t("review.index.figure_flag", label: "CUADRO 2"))
+    end
+
     it "narrows to one generation run when asked" do
       run = create(:generation_run)
       mine = create(:clinical_case, generation_run: run, stem: "Caso de la corrida elegida.")

@@ -102,6 +102,7 @@ en:
       subtitle: "Every case cites the recommendation it came from, with the quoted span marked inside the original text so you can judge whether the question uses it fairly."
       showing: "Showing %{from}–%{to} of %{total}"
       expired_flag: "Out of date"
+      figure_flag: "With %{label}"
       empty:
         title: "No generated cases yet"
         body: "Run generation and they will appear here for review."

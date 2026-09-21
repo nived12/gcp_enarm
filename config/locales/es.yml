@@ -102,6 +102,7 @@ es:
       subtitle: "Cada caso cita la recomendación de la que salió. Marca el fragmento citado dentro del texto original para que puedas juzgar si la pregunta lo usa con justicia."
       showing: "Mostrando %{from}–%{to} de %{total}"
       expired_flag: "Fuera de vigencia"
+      figure_flag: "Con %{label}"
       empty:
         title: "Todavía no hay casos generados"
         body: "Corre la generación y aparecerán aquí para revisarlos."

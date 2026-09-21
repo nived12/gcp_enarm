@@ -39,6 +39,10 @@
             <% end %>
             <span aria-hidden="true">·</span>
             <span><%= t("review.question_count", count: clinical_case.questions.size) %></span>
+            <% if clinical_case.clinical_image %>
+              <span aria-hidden="true">·</span>
+              <span><%= t("review.index.figure_flag", label: clinical_case.clinical_image.label) %></span>
+            <% end %>
             <% if clinical_case.guideline&.expired? %>
               <span class="rounded-full bg-incorrect-soft px-2 py-0.5 text-incorrect">
                 <%= t("review.index.expired_flag") %>
