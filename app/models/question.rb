@@ -28,16 +28,25 @@ class Question < ApplicationRecord
 
   private
 
-  # Compared with whitespace collapsed on both sides. The stored text keeps the line
-  # breaks that PDF and HTML extraction leave behind — "se deben evitar:\nPicos
-  # hiperóxicos" — and no model reproduces those when quoting; it writes a space.
-  # Measured: that alone accounted for every citation failure in the first provider
-  # comparison, across two different model families. Collapsing whitespace removes a
-  # formatting difference and nothing else, so a paraphrase still cannot pass.
+  # Compared with whitespace collapsed and case ignored on both sides. Two differences
+  # show up constantly and neither is a fabrication:
+  #
+  #   * extraction keeps the line breaks the source had — "se deben evitar:\nPicos
+  #     hiperóxicos" — and a model quoting that writes a space;
+  #   * a model lowercases the first letter to fit the quote into its own sentence,
+  #     turning "Se recomienda" into "se recomienda".
+  #
+  # Measured across two unrelated model families, those two accounted for every
+  # citation rejection in the first provider comparison — the gate was refusing correct
+  # quotes. Neither normalisation changes a word, so a paraphrase still cannot pass.
   def quote_must_come_from_the_recommendation
     return if source_quote.blank? || recommendation.nil?
-    return if recommendation.text.to_s.squish.include?(source_quote.squish)
+    return if normalize(recommendation.text).include?(normalize(source_quote))
 
     errors.add(:source_quote, :not_in_recommendation)
+  end
+
+  def normalize(text)
+    text.to_s.squish.downcase
   end
 end

@@ -151,5 +151,23 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   the API, not just the docs: `reasoning_effort: "minimal"` is silently mapped to `"low"`
   and still thinks, so it is not a way to turn this off. Gemini Flash-Lite reports zero
   reasoning tokens on the same prompt and needs none of this.
+- **Gemini rejects unknown request fields; DeepSeek accepts them.** Sending `thinking`
+  to Gemini's OpenAI-compatible endpoint returns 400 "Unknown name: thinking" and the
+  request never runs. Provider capabilities are declared in `Llm::Provider::PRESETS`
+  and `Llm::Completion` asks before sending. Do not assume a provider ignores a field
+  it does not know — test it against that provider, not against the other one.
+- **The `source_quote` gate normalises whitespace and case, and must.** Extraction keeps
+  the source's line breaks ("se deben evitar:\nPicos hiperóxicos") and no model
+  reproduces them when quoting; models also lowercase a leading "Se" to fit the quote
+  into their own sentence. Measured across two unrelated model families, those two
+  accounted for **every** citation rejection in the first provider comparison — the gate
+  was refusing correct quotes, not catching hallucinations. Neither normalisation changes
+  a word, so a paraphrase still cannot pass.
+- **Tell the model not to elide.** Left to itself Gemini writes `[...]` inside a quote,
+  which is honest prose and fatal to a substring check. One prompt line removes it.
+- **Generation is non-deterministic, so a small sample cannot rank models.** The same
+  8-guideline comparison scored Gemini 97% and then 91% on consecutive runs. At 32
+  questions the confidence interval is about ±8 points: use these runs to find *defects*,
+  and a much larger sample before believing any ranking.
 - **Solid Queue, Cache and Cable share the primary database.** One Railway service, no
   Redis. Their tables are in `db/migrate`, not separate schemas.

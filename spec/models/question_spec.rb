@@ -50,6 +50,15 @@ RSpec.describe Question do
       expect(question).to be_valid
     end
 
+    it "accepts a quote the model lowercased to fit its own sentence" do
+      question = build(
+        :question, recommendation: recommendation,
+        source_quote: "se recomienda realizar electrocardiograma"
+      )
+
+      expect(question).to be_valid
+    end
+
     it "still rejects a paraphrase, which collapsing whitespace does not rescue" do
       broken = create(:recommendation, text: "Se deben evitar:\nPicos hiperóxicos")
       question = build(
