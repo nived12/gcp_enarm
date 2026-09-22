@@ -85,7 +85,7 @@ guidelines when generating, and show the year on every citation.**
 150–200 words — comorbidities with durations, complete vitals with units, a systematic
 examination including normal findings — and asks about one part of it. Deciding what
 matters is the skill being tested, so a vignette where every fact points at the answer is
-easier than the exam it simulates. `Questions::CaseGenerator::DETAIL_LEVELS` carries
+easier than the exam it simulates. `Questions::Prompt::DETAIL_LEVELS` carries
 `focused` and `full_workup`; mix them, because not every real item is long.
 The extra material is **realistic completeness, never misdirection** — never invent a
 finding that contradicts the diagnosis.
@@ -180,7 +180,8 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   per guideline said 1.5% of strips were unparseable; all 3,076 said 22%.
 - **Most recommendations come from archived PDFs, and those are laid out, not marked
   up.** `Gpc::ArchiveRecommendationParser` reads the evidence table by column position
-  and statement shape. When a token could be statement or grading, the statement wins:
+  and statement shape, in four steps under `Gpc::ArchiveTable` (region, layout, rows,
+  grading label). When a token could be statement or grading, the statement wins:
   a lost citation is cosmetic, a lost word makes every quote of that sentence fail the
   gate. Rows extraction damaged are **dropped, never repaired** — the characters
   underneath are gone. Judge any change by running it over all 595 documents and by the
