@@ -58,39 +58,11 @@ namespace :gpc do
 
   desc "Re-read stored section bodies through the current parser, without touching the site"
   task reparse: :environment do
-    sections = GuidelineSection.graded.original
-    before = Recommendation.count
+    result = Gpc::Reparser.call.payload
 
-    # A section whose statements come out the same is left alone: its recommendations
-    # may already be cited by questions, and deleting them would take the questions'
-    # provenance with them.
-    sections.includes(:recommendations).find_each do |section|
-      parsed = Gpc::RecommendationParser.call(section.body).payload
-      stored = section.recommendations.map { |r| r.slice(*parsed.first.to_h.keys).symbolize_keys }
-      next if parsed == stored
-
-      ActiveRecord::Base.transaction do
-        section.recommendations.destroy_all
-        parsed.each { |attributes| section.recommendations.create!(attributes) }
-      end
-    rescue ActiveRecord::InvalidForeignKey
-      puts "#{section.guideline.catalog_key} #{section.external_id}: " \
-           "hay preguntas que citan lo que el parser ya no produce"
-    end
-
-    Recommendation.joins(:guideline_section).merge(GuidelineSection.original.where.not(kind: GuidelineSection::GRADED_KINDS)).destroy_all
-
-    archived = Hash.new(0)
-    GuidelineSection.kind_archived_document.includes(:guideline).find_each do |document|
-      result = Gpc::ArchiveSectionBuilder.call(document)
-      next puts(result.errors.full_messages.to_sentence) if result.failure?
-
-      archived[:guidelines] += 1 if result.payload[:recommendations].positive?
-      archived[:recommendations] += result.payload[:recommendations]
-    end
-
-    puts "#{sections.count} secciones · #{before} → #{Recommendation.count} recomendaciones"
-    puts "archivo: #{archived[:recommendations]} recomendaciones de #{archived[:guidelines]} guías"
+    result[:conflicts].each { |conflict| puts conflict }
+    puts "#{result[:sections]} secciones · #{result[:before]} → #{result[:after]} recomendaciones"
+    puts "archivo: #{result[:archived_recommendations]} recomendaciones de #{result[:archived_guidelines]} guías"
   end
 
   desc "Enqueue a full read of every live-site guideline's sections"
