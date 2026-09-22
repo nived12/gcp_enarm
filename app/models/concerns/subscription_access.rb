@@ -1,6 +1,9 @@
-# Access gating: a granted entitlement, an active trial, or a live Pay subscription.
-# Ported from vittio's concern of the same name — `subscription_access_result` returns
-# { allowed:, reason:, message: } so controllers can render a 403 or a flash unchanged.
+# Access gating: granted premium, an active trial, or the free daily allowance.
+# `subscription_access_result` returns { allowed:, reason:, message: } so controllers can
+# render a 403 or a flash unchanged — the shape ported from vittio.
+#
+# A placeholder until billing. Phase 6 sells prepaid windows recorded as Entitlement rows,
+# not subscriptions, and replaces paid_subscription? with a question to those rows.
 module SubscriptionAccess
   extend ActiveSupport::Concern
 
@@ -48,8 +51,7 @@ module SubscriptionAccess
 
   private
 
-  # Pay is wired in Phase 6; until then nobody has a paid subscription and the
-  # granted-premium path carries the whole product.
+  # Nobody has paid until Phase 6; the granted-premium path carries the whole product.
   def paid_subscription?
     false
   end
