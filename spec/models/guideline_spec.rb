@@ -16,6 +16,43 @@ RSpec.describe Guideline do
     end
   end
 
+  describe ".generatable" do
+    def with_statement(guideline)
+      section = create(:guideline_section, guideline: guideline, kind: "recommendation")
+      create(:recommendation, guideline_section: section)
+      guideline
+    end
+
+    it "keeps a physician's guideline with something actionable in it" do
+      guideline = with_statement(create(:guideline))
+      create(:guideline, catalog_key: "IMSS-900-22")
+
+      expect(described_class.generatable).to eq([guideline])
+    end
+
+    it "leaves out nursing guidelines" do
+      with_statement(create(:guideline, title: "Intervenciones de Enfermería en el adulto mayor"))
+
+      expect(described_class.generatable).to be_empty
+    end
+
+    # S- and SS- are the same institution, as are the two editions of SS-103.
+    it "leaves out an edition a newer one of the same number has replaced" do
+      older = with_statement(create(:guideline, catalog_key: "S-103-08", institution: "health_ministry", year: 2008))
+      newer = with_statement(create(:guideline, catalog_key: "SS-103-21", institution: "health_ministry", year: 2021))
+
+      expect(described_class.generatable).to eq([newer])
+      expect(described_class.latest_editions).not_to include(older)
+    end
+
+    it "keeps the older edition while the newer one has no statements of its own" do
+      older = with_statement(create(:guideline, catalog_key: "IMSS-076-08", year: 2008))
+      create(:guideline, catalog_key: "IMSS-076-21", year: 2021)
+
+      expect(described_class.generatable).to eq([older])
+    end
+  end
+
   describe ".institution_from_catalog_key" do
     it "maps each published prefix to its institution" do
       expect(described_class.institution_from_catalog_key("IMSS-028-22")).to eq("imss")

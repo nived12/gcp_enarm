@@ -15,7 +15,7 @@ RSpec.describe Questions::CaseGenerator do
       ApplicationService::Response.new(
         success: true, errors: nil,
         payload: { content: payload.is_a?(String) ? payload : payload.to_json,
-                   input_tokens: 600, output_tokens: 1_200, reasoning_tokens: 0 }
+                   input_tokens: 600, output_tokens: 1_200, reasoning_tokens: 0, cost_usd: 0.00195 }
       )
     )
   end
@@ -162,7 +162,7 @@ RSpec.describe Questions::CaseGenerator do
       described_class.call(guideline, run: run)
 
       expect(run.reload).to have_attributes(
-        input_tokens: 600, output_tokens: 1_200,
+        input_tokens: 600, output_tokens: 1_200, cost_usd: 0.00195,
         cases_created: 1, rejections: 1, attempts: 2
       )
     end
@@ -172,6 +172,31 @@ RSpec.describe Questions::CaseGenerator do
 
       expect(described_class.call(guideline)).to be_success
     end
+  end
+
+  # §9.1 of the convocatoria: the three cross-cutting contexts are where a case happens.
+  it "sets the case where the exam sets it" do
+    stub_model(one_case(question))
+
+    described_class.call(guideline)
+
+    expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+      expect(prompt).to include("medicina\nfamiliar en el primer nivel, un servicio de urgencias")
+      expect(prompt).to include("No sitúes el caso en una sala")
+    end
+  end
+
+  it "writes from the window of statements it is handed" do
+    later = create(:recommendation, guideline_section: section, text: "Se recomienda iniciar aspirina 300 mg.")
+    stub_model(one_case(question(quote: "iniciar aspirina 300 mg")))
+
+    result = described_class.call(guideline, recommendations: [later])
+
+    expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+      expect(prompt).to include("1. Se recomienda iniciar aspirina 300 mg.")
+      expect(prompt).not_to include("electrocardiograma")
+    end
+    expect(result.payload[:cases].sole.questions.sole.recommendation).to eq(later)
   end
 
   describe "how much of the patient the vignette carries" do
@@ -275,7 +300,7 @@ RSpec.describe Questions::CaseGenerator do
         captured = arguments[:prompt]
         ApplicationService::Response.new(
           success: true, errors: nil,
-          payload: { content: one_case(question).to_json, input_tokens: 1, output_tokens: 1,
+          payload: { content: one_case(question).to_json, input_tokens: 1, output_tokens: 1, cost_usd: 0,
                      reasoning_tokens: 0 }
         )
       end

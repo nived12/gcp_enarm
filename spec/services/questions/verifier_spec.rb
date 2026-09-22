@@ -25,7 +25,7 @@ RSpec.describe Questions::Verifier do
       ApplicationService::Response.new(
         success: true, errors: nil,
         payload: { content: payload.is_a?(String) ? payload : payload.to_json,
-                   input_tokens: 400, output_tokens: 120, reasoning_tokens: 0 }
+                   input_tokens: 400, output_tokens: 120, reasoning_tokens: 0, cost_usd: 0.000264 }
       )
     )
   end
@@ -145,7 +145,7 @@ RSpec.describe Questions::Verifier do
 
     described_class.call(clinical_case, run: run)
 
-    expect(run.reload).to have_attributes(input_tokens: 400, output_tokens: 120, attempts: 1)
+    expect(run.reload).to have_attributes(input_tokens: 400, output_tokens: 120, cost_usd: 0.000264, attempts: 1)
   end
 
   describe "the prompt" do

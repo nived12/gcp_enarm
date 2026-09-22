@@ -31,18 +31,35 @@ module Questions
     # read a batch and said otherwise.
     IMAGE_SHARE = 0.15
 
+    # The convocatoria (§9.1) examines "competencias cognitivas contextualizadas en casos
+    # clínicos enfocados en Salud Pública, Urgencias y Medicina Familiar" — the three
+    # contexts are where a case happens, the four troncales are what it is about. The
+    # model picks the setting that fits the recommendation; a fixed rotation would put a
+    # neonatal resuscitation in a family-medicine consult.
+    SETTING_INSTRUCTIONS = <<~TEXT.strip
+      Sitúa cada caso en uno de los tres contextos del examen: la consulta de medicina
+      familiar en el primer nivel, un servicio de urgencias, o una situación de salud
+      pública (tamizaje, vacunación, brote, vigilancia epidemiológica, prevención en la
+      comunidad). Elige el que encaje con la recomendación, y si escribes dos casos, que no
+      ocurran en el mismo contexto cuando el tema lo permita. No sitúes el caso en una sala
+      de hospitalización genérica.
+    TEXT
+
     # Seeded from the strength of the evidence behind the case: a strong recommendation
     # makes a more clear-cut item than a weak one. Recalibrated from real answer data
     # later, which is what CIFRHS itself does.
     STRONG_GRADES = /\A(A|1\+{1,2}|I{1,2}[ab]?|alta|fuerte)\b/i
     WEAK_GRADES = /\A(D|4|IV|muy baja|baja|d[ée]bil)\b/i
 
-    def initialize(guideline, run: nil, limit: RECOMMENDATIONS_PER_CALL,
+    # `recommendations` lets a runner walk a guideline window by window; left out, the
+    # call takes the guideline's first `limit` actionable statements.
+    def initialize(guideline, run: nil, limit: RECOMMENDATIONS_PER_CALL, recommendations: nil,
                    detail: :focused, locale: "es", with_image: false)
       super()
       @guideline = guideline
       @run = run
       @limit = limit
+      @recommendations = recommendations&.to_a
       @detail = DETAIL_LEVELS.include?(detail) ? detail : :focused
       @locale = locale
       @with_image = with_image
@@ -93,6 +110,8 @@ module Questions
         #{questions_per_case} preguntas de opción múltiple.
 
         #{vignette_instructions}
+
+        #{SETTING_INSTRUCTIONS}
 
         Cada pregunta:
         - Exactamente CUATRO opciones: una correcta y tres distractores plausibles, del tipo
@@ -298,6 +317,7 @@ module Questions
 
       run.increment!(:input_tokens, usage[:input_tokens])
       run.increment!(:output_tokens, usage[:output_tokens])
+      run.increment!(:cost_usd, usage[:cost_usd])
       run.increment!(:cases_created, cases.size)
       run.increment!(:attempts, cases.size + @rejected.to_i)
       run.increment!(:rejections, @rejected.to_i)

@@ -1,50 +1,28 @@
 namespace :questions do
-  desc "Generate clinical cases from current guidelines: rake questions:generate[count]"
-  task :generate, [:count] => :environment do |_task, args|
-    count = (args[:count] || 10).to_i
+  desc "Generate clinical cases: rake questions:generate[calls,budget_usd,source] (source: live_site|web_archive)"
+  task :generate, %i[calls budget source] => :environment do |_task, args|
+    calls = (args[:calls] || 10).to_i
+    budget = args[:budget].presence&.to_f
     provider = Llm::Provider.for(:generator)
     abort("Falta la clave del generador. Revisa .env") unless provider.configured?
+
+    guidelines = Guideline.generatable
+    guidelines = guidelines.where(source: args[:source]) if args[:source].present?
 
     run = GenerationRun.create!(
       purpose: "generation", provider: provider.name,
       model: provider.model, started_at: Time.current
     )
 
-    guidelines = Guideline.current
-                          .joins(guideline_sections: :recommendations)
-                          .where(guideline_sections: { kind: GuidelineSection::ACTIONABLE_KINDS })
-                          .distinct.limit(count)
+    result = Questions::GenerationRunner.call(
+      run: run, calls: calls, budget_usd: budget, guidelines: guidelines, on_progress: ->(line) { puts line }
+    )
+    run.update!(status: result.success? ? "completed" : "failed", finished_at: Time.current)
+    abort(result.errors.full_messages.to_sentence) if result.failure?
 
-    # A fixed rotation rather than a random draw, so a run is reproducible. Long
-    # vignettes alternate with short ones, and English lands on a schedule.
-    #
-    # ENGLISH_SHARE is right for the full corpus and wrong for a small batch: at 8% the
-    # first English case falls on the 13th, so a 12-guideline sample gets none and nobody
-    # reviewing it ever sees one. Below that threshold the last case is forced to English
-    # instead — the sample is deliberately over-representative, which is what a sample is
-    # for.
-    english_every = (1 / Questions::CaseGenerator::ENGLISH_SHARE).round
-    image_every = (1 / Questions::CaseGenerator::IMAGE_SHARE).round
-    forced_english = count < english_every ? count - 1 : nil
-
-    guidelines.each_with_index do |guideline, index|
-      detail = index.even? ? :full_workup : :focused
-      scheduled = english_every.positive? && index.positive? && (index % english_every).zero?
-      locale = index == forced_english || scheduled ? "en" : "es"
-
-      # Unlike English, an over-representation of figures in a small batch is wanted:
-      # the point of a review batch is that a doctor sees one of everything.
-      with_image = (index % image_every).zero?
-
-      result = Questions::CaseGenerator.call(
-        guideline, run: run, detail: detail, locale: locale, with_image: with_image
-      )
-      state = result.success? ? "#{result.payload[:cases].size} casos" : result.errors.full_messages.first
-      puts "#{guideline.catalog_key} [#{detail}/#{locale}#{with_image ? "/figura" : ""}] #{state}"
-    end
-
-    run.update!(status: "completed", finished_at: Time.current)
-    puts "\ncasos=#{run.cases_created} descartadas=#{run.rejections} tokens=#{run.total_tokens}"
+    run.reload
+    puts "\ncasos=#{run.cases_created} descartadas=#{run.rejections} tokens=#{run.total_tokens} " \
+         "costo=$#{format("%.4f", run.cost_usd)}#{" (tope alcanzado)" if result.payload[:stopped_at_budget]}"
   end
 
   desc "Write the generated bank to one portable file: rake questions:export[path]"

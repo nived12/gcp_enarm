@@ -43,6 +43,34 @@ class Guideline < ApplicationRecord
 
   scope :with_specialty_label, ->(label) { where("specialty_labels @> ?", [label].to_json) }
 
+  # The ENARM examines physicians. A guideline of nursing interventions teaches nursing,
+  # and cases written from it ask what a nurse does next.
+  scope :for_physicians, -> { where.not("guidelines.title ~* ?", "enfermer[ií]a") }
+
+  # CENETEC republishes an updated guideline under its old number with a new year —
+  # IMSS-076-08 became IMSS-076-21 — so an edition is superseded once a newer one of the
+  # same institution and number has statements of its own. Generating from both would
+  # teach the 2008 answer next to the 2021 one.
+  scope :latest_editions, lambda {
+    where(<<~SQL.squish)
+      NOT EXISTS (
+        SELECT 1 FROM guidelines newer
+        JOIN guideline_sections ON guideline_sections.guideline_id = newer.id
+        JOIN recommendations ON recommendations.guideline_section_id = guideline_sections.id
+        WHERE newer.institution = guidelines.institution
+          AND split_part(upper(newer.catalog_key), '-', 2) = split_part(upper(guidelines.catalog_key), '-', 2)
+          AND newer.year > guidelines.year
+      )
+    SQL
+  }
+
+  # What a generation run draws from: a physician's guideline, in its latest edition,
+  # with something actionable in it.
+  scope :generatable, lambda {
+    for_physicians.latest_editions
+                  .where(id: GuidelineSection.actionable.joins(:recommendations).select(:guideline_id))
+  }
+
   # IMSS-028-22 → imss. The prefix is the only place the publishing institution
   # appears in the catalog, so it is derived rather than scraped.
   # CENETEC spelled the Secretaría de Salud "S-" before roughly 2016 and "SS-" after,

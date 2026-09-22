@@ -38,6 +38,15 @@ module Llm
       }
     }.freeze
 
+    # USD per million tokens, input and output, read from each provider's pricing page
+    # on 2026-09-22. DeepSeek halves both outside its peak hours; the peak price is kept,
+    # so a spending cap errs towards stopping early. A model not listed here has no
+    # known price, and a run on it is not capped by cost.
+    PRICES = {
+      "gemini-3.1-flash-lite" => [0.25, 1.50],
+      "deepseek-flash" => [0.30, 1.20]
+    }.freeze
+
     ROLES = {
       generator: { provider: "gemini", prefix: "LLM" },
       verifier: { provider: "deepseek", prefix: "LLM_VERIFIER" }
@@ -83,6 +92,15 @@ module Llm
 
     def to_s
       "#{name}/#{model}"
+    end
+
+    def priced?
+      PRICES.key?(model)
+    end
+
+    def cost_for(input_tokens:, output_tokens:)
+      input_price, output_price = PRICES.fetch(model, [0, 0])
+      ((input_tokens * input_price) + (output_tokens * output_price)) / 1_000_000.0
     end
 
     private

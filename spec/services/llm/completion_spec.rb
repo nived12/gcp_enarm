@@ -45,6 +45,15 @@ RSpec.describe Llm::Completion do
     end
   end
 
+  # 100 in at $0.25/M and 250 out at $1.50/M.
+  it "prices the call from the model's published rates" do
+    with_key do
+      stub_request(:post, endpoint).to_return(status: 200, body: completion("ok"))
+
+      expect(described_class.call(role: :generator, prompt: "hola").payload[:cost_usd]).to eq(0.0004)
+    end
+  end
+
   it "reads reasoning tokens when the provider reports them" do
     with_key do
       usage = { completion_tokens: 5_682, completion_tokens_details: { reasoning_tokens: 4_638 } }

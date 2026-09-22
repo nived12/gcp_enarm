@@ -94,6 +94,26 @@ RSpec.describe Llm::Provider do
     end
   end
 
+  describe "#cost_for" do
+    it "prices tokens at the model's published rate" do
+      with_env("LLM_VERIFIER_PROVIDER" => nil, "LLM_VERIFIER_MODEL" => nil) do
+        verifier = described_class.for(:verifier)
+
+        expect(verifier).to be_priced
+        expect(verifier.cost_for(input_tokens: 1_000_000, output_tokens: 1_000_000)).to eq(1.5)
+      end
+    end
+
+    it "prices a model it has no rate for at nothing, and says so" do
+      with_env("LLM_MODEL" => "gemini-9-experimental") do
+        provider = described_class.for(:generator)
+
+        expect(provider).not_to be_priced
+        expect(provider.cost_for(input_tokens: 1_000, output_tokens: 1_000)).to eq(0)
+      end
+    end
+  end
+
   describe "#to_s" do
     it "names the service and the model, for a run's log" do
       with_env("LLM_PROVIDER" => nil, "LLM_MODEL" => nil) do

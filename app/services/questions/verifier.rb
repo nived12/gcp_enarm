@@ -139,6 +139,7 @@ module Questions
 
       run.increment!(:input_tokens, usage[:input_tokens])
       run.increment!(:output_tokens, usage[:output_tokens])
+      run.increment!(:cost_usd, usage[:cost_usd])
       run.increment!(:attempts, 1)
     end
   end

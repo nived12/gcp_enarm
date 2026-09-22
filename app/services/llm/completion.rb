@@ -98,7 +98,8 @@ module Llm
         )
       end
 
-      success(content: content, finish_reason: choice["finish_reason"], **usage)
+      cost = provider.cost_for(input_tokens: usage[:input_tokens].to_i, output_tokens: usage[:output_tokens].to_i)
+      success(content: content, finish_reason: choice["finish_reason"], cost_usd: cost, **usage)
     end
 
     def usage_from(response)
