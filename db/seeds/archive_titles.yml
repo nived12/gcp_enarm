@@ -1,0 +1,23 @@
+# Titles of archived guidelines that Gpc::DocumentTitle gets wrong, read by hand off
+# each PDF's own cover. The heuristic picks a running header, an author list or half a
+# line on these templates; a wrong title costs a guideline its topic link, because
+# Gpc::TopicLinker reads only the title.
+#
+# Checked 2026-09-22. Add a key only after reading the cover; the heuristic stays the
+# default for everything else.
+---
+IMSS-085-08: Diagnóstico y tratamiento del síndrome de hombro doloroso en primer nivel de atención
+IMSS-141-18: Diagnóstico y tratamiento de hemofilia hereditaria en menores de 16 años
+IMSS-167-09: Diagnóstico y tratamiento del adenocarcinoma gástrico en pacientes adultos
+IMSS-184-09: Diagnóstico y tratamiento del tumor maligno del testículo en todas las edades
+IMSS-193-08: "Diagnóstico y tratamiento de las fracturas de antebrazo: diáfisis de cúbito y radio"
+IMSS-245-09: Tratamiento antirretroviral del paciente adulto con infección por el VIH
+IMSS-345-16: Prevención, diagnóstico y tratamiento de la enfermedad hemorrágica del recién nacido
+IMSS-453-11: Evaluación y manejo inicial del niño gran quemado
+IMSS-469-11: Prevención, diagnóstico y tratamiento de la rubéola en primer nivel de atención
+IMSS-472-11: Prevención, diagnóstico y tratamiento de infección urinaria asociada a sonda vesical en la mujer
+ISSSTE-339-08: Triage hospitalario de primer contacto en los servicios de urgencias adultos para el segundo y tercer nivel
+ISSSTE-526-11: Extracción de cuerpos extraños de la vía aérea en niños de 2 a 12 años en el tercer nivel de atención
+SS-026-20: Prevención, diagnóstico, tratamiento y referencia de la paciente con amenaza de aborto en el primer y segundo nivel de atención
+SS-384-20: Prevención, diagnóstico y tratamiento de la influenza estacional
+SS-488-19: Diagnóstico de muerte encefálica y manejo del potencial donante de órganos

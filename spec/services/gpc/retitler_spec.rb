@@ -21,6 +21,17 @@ RSpec.describe Gpc::Retitler do
     expect(guideline.reload.title).to eq("Tratamiento quirúrgico de la obesidad en el adulto")
   end
 
+  # A cover the heuristic misreads is read once by hand, and that reading wins.
+  it "prefers a title read off the cover by hand" do
+    guideline = archived(title: "Médico Traumatólogo Ortopedista", body: pages, catalog_key: "IMSS-085-08")
+
+    described_class.call
+
+    expect(guideline.reload.title).to eq(
+      "Diagnóstico y tratamiento del síndrome de hombro doloroso en primer nivel de atención"
+    )
+  end
+
   it "leaves a guideline whose title is already right alone" do
     archived(title: "Tratamiento quirúrgico de la obesidad en el adulto", body: pages)
 

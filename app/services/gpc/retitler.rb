@@ -13,7 +13,8 @@ module Gpc
         section = guideline.guideline_sections.find(&:kind_archived_document?)
         next counts[:no_text] += 1 if section.nil?
 
-        counts[outcome(guideline, DocumentTitle.call(section.body).payload)] += 1
+        title = ArchiveTitles.for(guideline.catalog_key) || DocumentTitle.call(section.body).payload
+        counts[outcome(guideline, title)] += 1
       end
 
       success(counts)

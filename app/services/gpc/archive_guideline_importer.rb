@@ -66,7 +66,7 @@ module Gpc
     def upsert_guideline(document)
       # A PDF whose running header did not extract still has its catalog key, which is
       # how a student cites it anyway.
-      title = document[:title].presence || entry[:catalog_key]
+      title = ArchiveTitles.for(entry[:catalog_key]) || document[:title].presence || entry[:catalog_key]
       attributes = entry.merge(title: title, content_hash: Digest::SHA256.hexdigest(document[:text]))
 
       guideline = Guideline.find_or_initialize_by(catalog_key: entry[:catalog_key])
