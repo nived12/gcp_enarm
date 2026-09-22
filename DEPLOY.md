@@ -125,6 +125,10 @@ statement under the same position. Nothing would be missing, so only the text ca
 and `Question`'s citation gate is exactly that test. The case fails to save rather than
 arriving mis-cited.
 
+Parsing the archive is also why the order says `gpc:reparse` before anything that
+generates or imports questions: an archived guideline has no recommendations until the
+reparse builds them, and sections parsed from a PDF are not in the corpus file at all.
+
 The file is small. The 24-case dev bank is 20 KB gzipped, so the full corpus run lands
 around a megabyte — keep every one of them.
 
@@ -150,12 +154,13 @@ stay distinct facts, and only the second should ever invalidate generated questi
 
 | Task | What it is for |
 |---|---|
-| `gpc:reparse` | Re-read stored section text through the current parser. Use after any parser change — it does not touch the network. |
+| `gpc:reparse` | Re-read stored section text through the current parser, **including the archived PDFs' evidence tables** — that is where 90% of the recommendations come from, and the only step that creates them. Use after any parser change; it does not touch the network. It leaves unchanged sections alone and keeps any recommendation whose text survived, so it is safe after generation. A guideline where a *cited* statement would disappear is skipped and named; nothing is half-rebuilt. |
 | `gpc:images` | Rebuild the figure library from stored section text and download what is missing. Safe to re-run; it skips files it already has. |
 | `gpc:retitle` | Re-derive archived titles from stored text. Same idea, for the PDF title heuristic. |
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
 | `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. |
 | `taxonomy:seed` | Rebuild the topic tree after editing `db/seeds/taxonomy.yml`. Runs automatically on deploy. |
+| `questions:generate[calls,budget,source]` | Generate cases. Breadth-first over every generatable guideline, and it resumes where the last run stopped, so it is safe to run in instalments. `budget` is a cap in USD, priced from the provider's published rate (peak rate for DeepSeek, so it stops early rather than late); `source` is `live_site` or `web_archive`. Example: `bin/rails "questions:generate[200,1.00]"`. |
 | `questions:verify` | Run the second-opinion pass over unverified cases. A case only becomes publishable once another model family has agreed with its answer. |
 | `llm:status` | Show which model each role resolved to and whether its key is set. Run it before any paid generation. |
 

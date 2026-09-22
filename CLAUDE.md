@@ -178,6 +178,23 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   `GuidelineSection#graded?` sections are read for recommendations.
 - **Sample before writing a parser, then check the whole corpus after.** Three sections
   per guideline said 1.5% of strips were unparseable; all 3,076 said 22%.
+- **Most recommendations come from archived PDFs, and those are laid out, not marked
+  up.** `Gpc::ArchiveRecommendationParser` reads the evidence table by column position
+  and statement shape. When a token could be statement or grading, the statement wins:
+  a lost citation is cosmetic, a lost word makes every quote of that sentence fail the
+  gate. Rows extraction damaged are **dropped, never repaired** — the characters
+  underneath are gone. Judge any change by running it over all 595 documents and by the
+  rejection reasons of a live batch; the first live batch found three defects no
+  fixture showed.
+- **Sections parsed from a PDF are derived.** They point at their document through
+  `source_section`, are never exported, and are rebuilt by `gpc:reparse`. Questions cite
+  their recommendations, so a rebuild keeps every row whose text survived and refuses to
+  delete one a question cites — never `destroy_all` a section's recommendations.
+- **Generate through `Questions::GenerationRunner`, from `Guideline.generatable`.** That
+  scope drops nursing guidelines (the ENARM examines physicians) and editions a newer one
+  of the same number replaced. The spending cap prices calls from
+  `Llm::Provider::PRICES`; changing the model means updating its price there, or the cap
+  refuses to run.
 - **`deepseek-flash` thinks before answering, and the thinking is billed as output.**
   Measured live 2026-09-20 on a real generation prompt: 5,682 output tokens, of which
   **4,638 were reasoning** and 1,044 were the answer. With `max_tokens: 4000` it spent the
