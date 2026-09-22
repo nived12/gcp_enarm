@@ -61,6 +61,26 @@ RSpec.describe Questions::GenerationRunner do
     expect(result.payload).to include(stopped_at_budget: true, cost_usd: 0.004)
   end
 
+  it "stops after a run of failures, since those are the provider's and the next call would fail too" do
+    guideline_with(80)
+    allow(Questions::CaseGenerator).to receive(:call, &answer(success: false))
+
+    result = generate
+
+    expect(calls.size).to eq(described_class::FAILURES_IN_A_ROW)
+    expect(result.payload).to include(failed: 5, stopped_after_failures: true, stopped_at_budget: false)
+  end
+
+  it "counts only failures in a row, so a model's odd bad answer does not stop the run" do
+    guideline_with(80)
+    outcomes = [false, false, false, false, true] * 2
+    allow(Questions::CaseGenerator).to receive(:call) { |*args, **kw| answer(success: outcomes.shift).call(*args, **kw) }
+
+    result = generate
+
+    expect(result.payload).to include(calls: 10, failed: 8, stopped_after_failures: false)
+  end
+
   it "refuses a budget it cannot measure" do
     ENV["LLM_MODEL"] = "gemini-9-experimental"
     guideline_with(3)

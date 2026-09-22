@@ -23,6 +23,8 @@ namespace :questions do
     run.reload
     puts "\ncasos=#{run.cases_created} descartadas=#{run.rejections} tokens=#{run.total_tokens} " \
          "costo=$#{format("%.4f", run.cost_usd)}#{" (tope alcanzado)" if result.payload[:stopped_at_budget]}"
+    puts "Detenida tras #{Questions::GenerationRunner::FAILURES_IN_A_ROW} fallas seguidas." \
+         if result.payload[:stopped_after_failures]
   end
 
   desc "Write the generated bank to one portable file: rake questions:export[path]"

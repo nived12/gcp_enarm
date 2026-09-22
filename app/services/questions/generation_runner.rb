@@ -8,8 +8,14 @@
 # A window is made of statements no question cites yet, so running it again continues
 # where the last run stopped instead of paying for the same cases twice. A statement the
 # model was shown and did not use comes round again in a later window.
+#
+# It also stops after a run of failed calls. One failure is the model's; several in a row
+# are the provider — a rate limit, an outage, an exhausted key — and every call after
+# that would fail the same way.
 module Questions
   class GenerationRunner < ApplicationService
+    FAILURES_IN_A_ROW = 5
+
     def initialize(run:, calls:, budget_usd: nil, guidelines: Guideline.generatable, on_progress: nil)
       super()
       @run = run
@@ -28,13 +34,20 @@ module Questions
       counts = { calls: 0, cases: 0, rejected: 0, failed: 0 }
       planned = windows.first(calls)
       @planned = planned.size
+      @failures_in_a_row = 0
       stopped = planned.each_with_index do |(guideline, recommendations), index|
-        break true if spent?
+        break :budget if spent?
+        break :failures if @failures_in_a_row >= FAILURES_IN_A_ROW
 
         generate(guideline, recommendations, index, counts)
       end
 
-      success(counts.merge(stopped_at_budget: stopped == true, cost_usd: run.reload.cost_usd.to_f))
+      success(
+        counts.merge(
+          stopped_at_budget: stopped == :budget, stopped_after_failures: stopped == :failures,
+          cost_usd: run.reload.cost_usd.to_f
+        )
+      )
     end
 
     private
@@ -53,8 +66,10 @@ module Questions
       if result.success?
         counts[:cases] += result.payload[:cases].size
         counts[:rejected] += result.payload[:rejected]
+        @failures_in_a_row = 0
       else
         counts[:failed] += 1
+        @failures_in_a_row += 1
       end
       report(guideline, options, result)
     end
