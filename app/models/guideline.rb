@@ -93,6 +93,13 @@ class Guideline < ApplicationRecord
     Date.new(year + VALIDITY_YEARS, 12, 31) if year
   end
 
+  # The topic a case is filed under when the title names several: the one that accounts
+  # for most of it. "Síndrome nefrítico agudo en edad pediátrica" is pediatric nephrology
+  # before it is adult nephrology.
+  def main_topic
+    topics.reorder("guideline_topics.relevance DESC", "topics.id").first
+  end
+
   def expired?
     return false if year.nil?
 

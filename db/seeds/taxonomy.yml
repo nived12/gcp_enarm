@@ -18,17 +18,17 @@
         - name: Infarto agudo de miocardio
           aliases: [IAM, síndrome coronario agudo, SICA, elevación del segmento ST, infarto del miocardio]
         - name: Cardiopatía isquémica crónica
-          aliases: [angina estable, insuficiencia coronaria]
+          aliases: [angina estable, insuficiencia coronaria, aneurisma ventricular]
         - name: Insuficiencia cardiaca
           aliases: [falla cardiaca, insuficiencia cardiaca aguda, insuficiencia cardiaca crónica]
         - name: Arritmias y fibrilación auricular
-          aliases: [fibrilación auricular, taquiarritmia, bradiarritmia]
+          aliases: [fibrilación auricular, taquiarritmia, bradiarritmia, síndrome del seno enfermo]
         - name: Hipertensión arterial sistémica
           aliases: [HAS, hipertensión arterial]
         - name: Valvulopatías
-          aliases: [estenosis aórtica, insuficiencia mitral]
+          aliases: [estenosis aórtica, insuficiencia mitral, válvula mitral, válvula tricúspide]
         - name: Endocarditis y pericarditis
-          aliases: [endocarditis infecciosa, derrame pericárdico]
+          aliases: [endocarditis infecciosa, derrame pericárdico, pericarditis, miocarditis aguda]
         - name: Rehabilitación cardiovascular
           aliases: [rehabilitación cardiaca]
     - name: Neumología
@@ -38,7 +38,7 @@
         - name: Asma
           aliases: [exacerbación de asma, crisis asmática]
         - name: Neumonía adquirida en la comunidad
-          aliases: [NAC, neumonía bacteriana]
+          aliases: [NAC, neumonía bacteriana, neumonía viral]
         - name: Neumonía asociada a la atención de la salud
           aliases: [neumonía nosocomial, neumonía asociada a ventilación mecánica]
         - name: Tuberculosis
@@ -51,22 +51,29 @@
           aliases: [cáncer pulmonar, carcinoma broncogénico]
         - name: Apnea obstructiva del sueño
           aliases: [SAOS, apnea del sueño]
+        - name: Hipertensión pulmonar y cor pulmonale
+          aliases: [cor pulmonale, hipertensión arterial pulmonar]
+        - name: Enfermedades pulmonares ocupacionales
+          aliases: [neumoconiosis, silicosis]
     - name: Gastroenterología
       topics:
         - name: Enfermedad por reflujo y úlcera péptica
-          aliases: [ERGE, reflujo gastroesofágico, úlcera gástrica, Helicobacter pylori]
+          aliases: [ERGE, reflujo gastroesofágico, úlcera gástrica, Helicobacter pylori, gastritis aguda]
         - name: Hemorragia de tubo digestivo
           aliases: [sangrado de tubo digestivo, hemorragia digestiva]
         - name: Hepatitis virales
           aliases: [hepatitis B, hepatitis C, virus de la hepatitis]
         - name: Cirrosis y sus complicaciones
-          aliases: [hipertensión portal, ascitis, encefalopatía hepática]
+          aliases: [hipertensión portal, ascitis, encefalopatía hepática, insuficiencia hepática crónica]
         - name: Pancreatitis
           aliases: [pancreatitis aguda, pancreatitis crónica]
         - name: Enfermedad inflamatoria intestinal
           aliases: [colitis ulcerativa, enfermedad de Crohn]
         - name: Diarrea aguda y crónica
-          aliases: [síndrome diarreico, enfermedad diarreica]
+          aliases: [síndrome diarreico, enfermedad diarreica, diarrea aguda]
+        - name: Trastornos funcionales digestivos
+          aliases: [intestino irritable, dispepsia funcional]
+        - name: Hepatitis autoinmune
     - name: Nefrología
       topics:
         - name: Lesión renal aguda
@@ -94,15 +101,15 @@
         - name: Enfermedad tiroidea
           aliases: [hipotiroidismo, hipertiroidismo, nódulo tiroideo, tiroides]
         - name: Obesidad y síndrome metabólico
-          aliases: [sobrepeso, obesidad exógena]
+          aliases: [sobrepeso, obesidad exógena, obesidad mórbida, tratamiento quirúrgico de la obesidad, paciente obeso]
         - name: Patología suprarrenal
-          aliases: [insuficiencia suprarrenal, síndrome de Cushing]
+          aliases: [insuficiencia suprarrenal, síndrome de Cushing, hiperplasia suprarrenal congénita, deficiencia de 21 hidroxilasa]
     - name: Infectología
       topics:
         - name: Infección de vías urinarias
-          aliases: [IVU, cistitis, pielonefritis, infección del tracto urinario]
+          aliases: [IVU, cistitis, pielonefritis, infección del tracto urinario, sonda vesical]
         - name: Infecciones de piel y tejidos blandos
-          aliases: [celulitis, erisipela, absceso]
+          aliases: [celulitis, erisipela, absceso, fascitis necrosante]
         - name: VIH y sida
           aliases: [VIH, infección por VIH, antirretroviral]
         - name: Arbovirosis
@@ -115,6 +122,14 @@
           aliases: [sepsis, choque séptico]
         - name: Infecciones asociadas a la atención de la salud
           aliases: [infección nosocomial, infección asociada a catéter, catéter central]
+        - name: Influenza
+          aliases: [influenza estacional]
+        - name: Fiebre tifoidea
+          aliases: [salmonelosis]
+        - name: Micosis invasivas
+          aliases: [candidiasis invasiva, aspergilosis]
+        - name: Infecciones de transmisión sexual
+          aliases: [transmisión sexual, sífilis, úlceras genitales]
     - name: Hematología
       topics:
         - name: Anemias
@@ -124,9 +139,11 @@
         - name: Linfomas
           aliases: [linfoma de Hodgkin, linfoma no Hodgkin]
         - name: Trastornos de la coagulación
-          aliases: [hemofilia, trombocitopenia, coagulación intravascular diseminada]
+          aliases: [hemofilia, trombocitopenia, coagulación intravascular diseminada, enfermedad de Von Willebrand]
         - name: Enfermedad tromboembólica venosa
           aliases: [trombosis venosa profunda, TVP, anticoagulación]
+        - name: Trasplante de células hematopoyéticas
+          aliases: [trasplante de médula ósea]
     - name: Reumatología
       topics:
         - name: Artritis reumatoide
@@ -134,35 +151,43 @@
         - name: Lupus eritematoso sistémico
           aliases: [LES, lupus]
         - name: Osteoartritis
-          aliases: [artrosis, gonartrosis, coxartrosis]
+          aliases: [artrosis, gonartrosis, coxartrosis, artroplastia total de rodilla]
         - name: Gota e hiperuricemia
           aliases: [gota, ácido úrico]
         - name: Osteoporosis
           aliases: [densidad mineral ósea, fractura por fragilidad]
+        - name: Vasculitis
+          aliases: [arteritis de Takayasu, granulomatosis de Wegener, arteritis de células gigantes]
+        - name: Fibromialgia
     - name: Neurología
       topics:
         - name: Enfermedad vascular cerebral
           aliases: [EVC, evento vascular cerebral, infarto cerebral, ictus]
         - name: Epilepsia y crisis convulsivas
-          aliases: [epilepsia, crisis epiléptica, estado epiléptico]
+          aliases: [epilepsia, crisis epiléptica, estado epiléptico, crisis convulsiva]
         - name: Cefaleas
           aliases: [migraña, cefalea tensional]
         - name: Demencias
-          aliases: [enfermedad de Alzheimer, deterioro cognitivo, demencia]
+          aliases: [enfermedad de Alzheimer, deterioro cognitivo, demencia, deterioro cognoscitivo]
         - name: Enfermedad de Parkinson
           aliases: [parkinsonismo]
         - name: Neuropatías periféricas
           aliases: [polineuropatía, síndrome de Guillain-Barré]
+        - name: Miastenia gravis
     - name: Dermatología
       topics:
         - name: Dermatitis
           aliases: [dermatitis atópica, dermatitis por contacto, eccema]
         - name: Infecciones cutáneas
-          aliases: [tiña, escabiasis, impétigo, micosis superficial]
+          aliases: [tiña, escabiasis, impétigo, micosis superficial, escabiosis, verrugas vulgares]
         - name: Psoriasis
           aliases: [psoriasis en placas]
         - name: Cáncer de piel
-          aliases: [melanoma, carcinoma basocelular]
+          aliases: [melanoma, carcinoma basocelular, queratosis actínica]
+        - name: Vitíligo y alopecia
+          aliases: [vitíligo, alopecia androgenética]
+        - name: Enfermedades ampollosas
+          aliases: [pénfigo vulgar, penfigoide]
     - name: Oncología
       topics:
         - name: Cáncer de mama
@@ -172,23 +197,30 @@
         - name: Cáncer colorrectal
           aliases: [cáncer de colon, cáncer de recto]
         - name: Cáncer gástrico
-          aliases: [cáncer de estómago]
+          aliases: [cáncer de estómago, adenocarcinoma gástrico]
         - name: Cáncer de testículo
-          aliases: [tumor testicular]
+          aliases: [tumor testicular, tumor maligno del testículo]
+        - name: Cáncer de cabeza y cuello
+          aliases: [cavidad oral, carcinoma epidermoide de laringe, cáncer de laringe]
+        - name: Cáncer de vejiga
+        - name: Tumores del sistema nervioso central
+          aliases: [tumor cerebral]
+        - name: Seguridad en quimioterapia
+          aliases: [agentes antineoplásicos]
         - name: Cuidados paliativos
-          aliases: [dolor oncológico, final de la vida]
+          aliases: [dolor oncológico, final de la vida, psicooncológico]
     - name: Geriatría
       topics:
         - name: Valoración geriátrica integral
           aliases: [valoración del adulto mayor, persona adulta mayor]
         - name: Síndromes geriátricos
-          aliases: [caídas, fragilidad, delirium, incontinencia]
+          aliases: [caídas, fragilidad, delirium, incontinencia, hipotensión ortostática, colapso del cuidador, úlceras por presión]
         - name: Polifarmacia y prescripción razonada
           aliases: [prescripción razonada, polifarmacia, deprescripción]
         - name: Nutrición del adulto mayor
           aliases: [desnutrición del adulto mayor, evaluación nutricional]
         - name: Fractura de cadera
-          aliases: [fractura de cadera en el adulto mayor]
+          aliases: [fractura de cadera en el adulto mayor, extremo proximal de fémur]
     - name: Psiquiatría
       topics:
         - name: Trastorno depresivo mayor
@@ -201,6 +233,11 @@
           aliases: [insomnio, trastorno del sueño]
         - name: Intoxicación etílica y abstinencia alcohólica
           aliases: [alcoholismo, síndrome de abstinencia alcohólica, intoxicación etílica]
+        - name: Trastorno bipolar
+    - name: Nutrición clínica
+      topics:
+        - name: Nutrición enteral y parenteral
+          aliases: [nutrición parenteral, nutrición enteral, terapia nutricional, tratamiento nutricional del paciente adulto]
 
 - name: Pediatría
   kind: core
@@ -211,15 +248,17 @@
         - name: Recién nacido sano
           aliases: [recién nacido de término, egreso hospitalario del recién nacido, tamiz neonatal]
         - name: Reanimación neonatal
-          aliases: [asfixia perinatal, reanimación del recién nacido]
+          aliases: [asfixia perinatal, reanimación del recién nacido, asfixia neonatal, encefalopatía hipóxico-isquémica]
         - name: Síndrome de dificultad respiratoria del recién nacido
-          aliases: [SDR, enfermedad de membrana hialina, dificultad respiratoria neonatal]
+          aliases: [SDR, enfermedad de membrana hialina, dificultad respiratoria neonatal, taquipnea transitoria]
         - name: Ictericia neonatal
           aliases: [hiperbilirrubinemia neonatal, ictericia del recién nacido]
         - name: Sepsis neonatal
           aliases: [infección neonatal]
         - name: Prematurez
-          aliases: [recién nacido prematuro, pretérmino]
+          aliases: [recién nacido prematuro, pretérmino, displasia broncopulmonar]
+        - name: Trastornos hematológicos del recién nacido
+          aliases: [enfermedad hemolítica, isoinmunización, enfermedad hemorrágica del recién nacido, policitemia neonatal]
     - name: Crecimiento y desarrollo
       topics:
         - name: Vigilancia del crecimiento
@@ -233,15 +272,17 @@
     - name: Infectología pediátrica
       topics:
         - name: Otitis media aguda
-          aliases: [otitis media, otitis]
+          aliases: [otitis media, otitis, mastoiditis]
         - name: Faringoamigdalitis
-          aliases: [faringitis estreptocócica, amigdalitis]
+          aliases: [faringitis estreptocócica, amigdalitis, mononucleosis infecciosa]
         - name: Neumonía en pediatría
           aliases: [neumonía adquirida en la comunidad en pediatría, neumonía infantil]
         - name: Infección de vías urinarias en pediatría
           aliases: [IVU pediátrica, infección urinaria en niños]
         - name: Exantemas de la infancia
           aliases: [sarampión, rubéola, escarlatina, exantema súbito]
+        - name: Infecciones congénitas y perinatales
+          aliases: [citomegalovirus, toxoplasmosis]
         - name: Gastroenteritis y deshidratación
           aliases: [enfermedad diarreica aguda, deshidratación, plan de hidratación]
     - name: Neumología pediátrica
@@ -251,11 +292,11 @@
         - name: Bronquiolitis
           aliases: [virus sincicial respiratorio]
         - name: Laringotraqueítis
-          aliases: [crup, croup]
+          aliases: [crup, croup, epiglotitis]
     - name: Cardiología pediátrica
       topics:
         - name: Cardiopatías congénitas
-          aliases: [comunicación interventricular, persistencia del conducto arterioso, cardiopatía congénita]
+          aliases: [comunicación interventricular, persistencia del conducto arterioso, cardiopatía congénita, síndrome de Eisenmenger, tetralogía de Fallot]
         - name: Fiebre reumática
           aliases: [cardiopatía reumática]
         - name: Enfermedad de Kawasaki
@@ -265,11 +306,13 @@
         - name: Reflujo gastroesofágico del lactante
           aliases: [reflujo del lactante]
         - name: Estreñimiento en pediatría
-          aliases: [constipación infantil]
+          aliases: [constipación infantil, estreñimiento funcional]
         - name: Desnutrición infantil
-          aliases: [desnutrición, marasmo, kwashiorkor]
+          aliases: [desnutrición, marasmo, kwashiorkor, pelagra, raquitismo]
         - name: Sobrepeso y obesidad en pediatría
           aliases: [obesidad infantil, sobrepeso infantil]
+        - name: Alergia alimentaria
+          aliases: [alergia a la proteína de leche de vaca]
     - name: Nefrología pediátrica
       topics:
         - name: Lesión renal aguda en pediatría
@@ -277,7 +320,7 @@
         - name: Enfermedad renal crónica en pediatría
           aliases: [ERC pediátrica]
         - name: Síndrome nefrótico pediátrico
-          aliases: [síndrome nefrótico en niños]
+          aliases: [síndrome nefrótico en niños, síndrome nefrítico en edad pediátrica]
     - name: Endocrinología pediátrica
       topics:
         - name: Diabetes mellitus tipo 1
@@ -294,10 +337,11 @@
           aliases: [autismo, TEA]
         - name: Crisis convulsivas febriles
           aliases: [convulsión febril]
+        - name: Parálisis cerebral infantil
     - name: Urgencias pediátricas
       topics:
         - name: Cuerpo extraño en vía aérea y digestiva
-          aliases: [inhalación de cuerpo extraño, ingestión de cuerpo extraño, broncoaspiración]
+          aliases: [inhalación de cuerpo extraño, ingestión de cuerpo extraño, broncoaspiración, cuerpos extraños de la vía aérea]
         - name: Intoxicaciones en pediatría
           aliases: [intoxicación infantil]
         - name: Maltrato infantil
@@ -307,9 +351,16 @@
         - name: Tamiz metabólico neonatal
           aliases: [tamiz neonatal ampliado]
         - name: Errores innatos del metabolismo
-          aliases: [mucopolisacaridosis, enfermedad de Pompe, enfermedad lisosomal]
+          aliases: [mucopolisacaridosis, enfermedad de Pompe, enfermedad lisosomal, galactosemia, fenilcetonuria, enfermedad de Fabry]
         - name: Síndrome de Down
           aliases: [trisomía 21]
+        - name: Síndrome de Turner
+        - name: Defectos del tubo neural
+          aliases: [anencefalia, espina, bífida]
+    - name: Oncología pediátrica
+      topics:
+        - name: Tumores sólidos de la infancia
+          aliases: [retinoblastoma, osteosarcoma, histiocitosis, tumores renales, tumor de Wilms, neuroblastoma]
 
 - name: Gineco-Obstetricia
   kind: core
@@ -318,7 +369,7 @@
     - name: Obstetricia
       topics:
         - name: Control prenatal
-          aliases: [atención prenatal, cuidados en el embarazo, vigilancia del embarazo]
+          aliases: [atención prenatal, cuidados en el embarazo, vigilancia del embarazo, vacunación en la embarazada]
         - name: Trabajo de parto y parto
           aliases: [atención del parto, parto eutócico]
         - name: Puerperio
@@ -340,7 +391,15 @@
         - name: Infección urinaria y bacteriuria en el embarazo
           aliases: [bacteriuria asintomática, infección de vías urinarias en el embarazo]
         - name: Aborto y embarazo ectópico
-          aliases: [aborto espontáneo, embarazo ectópico]
+          aliases: [aborto espontáneo, embarazo ectópico, embarazo tubario, amenaza de aborto]
+        - name: Restricción del crecimiento intrauterino
+          aliases: [muerte fetal]
+        - name: Embarazo múltiple
+          aliases: [embarazo gemelar]
+        - name: Emergencias obstétricas
+          aliases: [urgencia obstétrica]
+        - name: Cardiopatía y embarazo
+          aliases: [cardiopatía en el embarazo]
         - name: Depresión prenatal y posparto
           aliases: [depresión perinatal, depresión posparto]
     - name: Ginecología
@@ -360,11 +419,13 @@
     - name: Oncología ginecológica
       topics:
         - name: Cáncer cervicouterino
-          aliases: [lesiones precursoras de cáncer de cuello uterino, virus del papiloma humano, displasia cervical]
+          aliases: [lesiones precursoras de cáncer de cuello uterino, virus del papiloma humano, displasia cervical, cáncer de cuello del útero]
         - name: Cáncer de ovario
           aliases: [tumor maligno de ovario]
         - name: Cáncer de endometrio
           aliases: [hiperplasia endometrial]
+        - name: Enfermedad trofoblástica gestacional
+          aliases: [mola hidatiforme]
     - name: Planificación familiar
       topics:
         - name: Métodos anticonceptivos
@@ -374,7 +435,7 @@
     - name: Climaterio
       topics:
         - name: Climaterio y menopausia
-          aliases: [menopausia, terapia hormonal de reemplazo]
+          aliases: [menopausia, terapia hormonal de reemplazo, postmenopausia]
 
 - name: Cirugía General
   kind: core
@@ -392,6 +453,8 @@
           aliases: [diverticulitis]
         - name: Perforación de víscera hueca
           aliases: [peritonitis, abdomen agudo perforativo]
+        - name: Isquemia mesentérica
+          aliases: [isquemia intestinal, infarto intestinal]
         - name: Patología anorrectal
           aliases: [hemorroides, fisura anal, fístula anal, absceso perianal]
     - name: Pared abdominal
@@ -399,7 +462,7 @@
         - name: Hernia inguinal
           aliases: [hernioplastía inguinal, hernia crural]
         - name: Hernia umbilical e incisional
-          aliases: [eventración, hernia ventral]
+          aliases: [eventración, hernia ventral, hernia umbilical]
     - name: Trauma
       topics:
         - name: Atención inicial al politraumatizado
@@ -407,15 +470,15 @@
         - name: Trauma abdominal
           aliases: [trauma abdominal cerrado, trauma abdominal penetrante]
         - name: Trauma torácico
-          aliases: [neumotórax, hemotórax, tórax inestable]
+          aliases: [neumotórax, hemotórax, tórax inestable, traumatismo de tórax]
         - name: Traumatismo craneoencefálico
           aliases: [TCE, trauma craneal]
         - name: Quemaduras
-          aliases: [paciente quemado, superficie corporal quemada]
+          aliases: [paciente quemado, superficie corporal quemada, gran quemado]
     - name: Cirugía vascular
       topics:
         - name: Insuficiencia venosa crónica
-          aliases: [várices, úlcera venosa]
+          aliases: [várices, úlcera venosa, venas varicosas]
         - name: Enfermedad arterial periférica
           aliases: [isquemia arterial, claudicación intermitente]
         - name: Pie diabético
@@ -427,7 +490,7 @@
         - name: Litiasis urinaria
           aliases: [urolitiasis, cólico renoureteral, cálculo renal]
         - name: Hiperplasia prostática benigna
-          aliases: [crecimiento prostático, HPB]
+          aliases: [crecimiento prostático, HPB, tracto urinario inferior]
         - name: Escroto agudo
           aliases: [torsión testicular, epididimitis]
         - name: Retención aguda de orina
@@ -435,15 +498,19 @@
     - name: Ortopedia y traumatología
       topics:
         - name: Fracturas frecuentes
-          aliases: [fractura de radio distal, fractura de tobillo, fractura expuesta]
+          aliases: [fractura de radio distal, fractura de tobillo, fractura expuesta, fractura de tibia, fracturas del pie, epífisis inferior del radio, fracturas de antebrazo, lesiones traumáticas de mano]
         - name: Luxaciones
           aliases: [luxación de hombro, luxación de cadera]
         - name: Lumbalgia y patología de columna
-          aliases: [lumbalgia, hernia de disco, ciática]
+          aliases: [lumbalgia, hernia de disco, ciática, dolor lumbar, fracturas de vértebras]
         - name: Síndrome compartimental
           aliases: [compartimental agudo]
         - name: Osteomielitis y artritis séptica
           aliases: [osteomielitis, artritis séptica]
+        - name: Lesiones de rodilla y hombro
+          aliases: [lesiones ligamentarias, meniscos, inestabilidad anterior de hombro, hombro doloroso]
+        - name: Tumores de partes blandas
+          aliases: [tumores benignos de tejidos blandos]
     - name: Otorrinolaringología
       topics:
         - name: Vértigo
@@ -451,25 +518,37 @@
         - name: Hipoacusia
           aliases: [sordera, pérdida auditiva, tamiz auditivo]
         - name: Rinosinusitis
-          aliases: [sinusitis, rinitis alérgica]
+          aliases: [sinusitis, rinitis alérgica, pólipos nasales]
         - name: Epistaxis
           aliases: [sangrado nasal]
+        - name: Patología bucal
+          aliases: [estomatitis aftosa, problemas bucales, pulpitis, infecciones odontogénicas]
     - name: Oftalmología
       topics:
         - name: Ojo rojo
-          aliases: [conjuntivitis, queratitis, uveítis]
+          aliases: [conjuntivitis, queratitis, uveítis, tracoma, iridociclitis]
         - name: Glaucoma
           aliases: [presión intraocular]
         - name: Catarata
           aliases: [cirugía de catarata]
         - name: Retinopatía diabética e hipertensiva
           aliases: [retinopatía diabética, fondo de ojo]
+        # "queratocono" alone stems to "querato", which is also queratosis actínica; the
+        # title's own wording reaches only the keratoconus guideline.
+        - name: Párpados y superficie ocular
+          aliases: [orzuelo, chalazión, blefaritis, ojo seco, diagnóstico y manejo del queratocono]
+        - name: Retina, vítreo y nervio óptico
+          aliases: [hemorragia vítrea, desprendimiento de retina, edema macular, toxicidad ocular, neuritis óptica]
+        - name: Trauma e infecciones oculares
+          aliases: [contusión ocular, endoftalmitis]
     - name: Neurocirugía
       topics:
         - name: Hipertensión intracraneal
           aliases: [edema cerebral, presión intracraneal]
         - name: Hematomas intracraneales
           aliases: [hematoma epidural, hematoma subdural, hemorragia subaracnoidea]
+        - name: Aneurisma cerebral
+          aliases: [aneurisma intracraneal]
     - name: Anestesia y cuidados perioperatorios
       topics:
         - name: Valoración preoperatoria
@@ -480,6 +559,8 @@
           aliases: [infección del sitio quirúrgico, antibiótico profiláctico]
         - name: Tromboprofilaxis perioperatoria
           aliases: [profilaxis de trombosis, heparina profiláctica]
+        - name: Complicaciones de la herida quirúrgica
+          aliases: [dehiscencia, infección en herida quirúrgica]
     - name: Cirugía de mama y endocrina
       topics:
         - name: Nódulo mamario
@@ -496,6 +577,9 @@
           aliases: [intususcepción]
         - name: Criptorquidia e hidrocele
           aliases: [testículo no descendido, hidrocele]
+        - name: Malformación anorrectal
+          aliases: [malformación ano rectal]
+        - name: Hipospadias
 
 - name: Salud Pública
   kind: cross_cutting
@@ -531,6 +615,8 @@
           aliases: [determinantes sociales, marginación]
         - name: Programas nacionales de salud
           aliases: [programa de acción específico]
+        - name: Alimentación saludable
+          aliases: [grupos de alimentos, patrones de alimentación]
     - name: Normatividad y ética
       topics:
         - name: Normas Oficiales Mexicanas
@@ -576,6 +662,8 @@
           aliases: [organofosforados, carbamatos]
         - name: Mordeduras y picaduras
           aliases: [mordedura de serpiente, picadura de alacrán, aracnoidismo]
+        - name: Golpe de calor
+          aliases: [enfermedad por calor]
         - name: Intoxicación por monóxido de carbono
           aliases: [monóxido de carbono]
     - name: Urgencias neurológicas
@@ -584,6 +672,12 @@
           aliases: [crisis convulsiva prolongada]
         - name: Alteración del estado de alerta
           aliases: [coma, estupor, escala de Glasgow]
+        - name: Muerte encefálica y donación de órganos
+          aliases: [muerte encefálica, donante de órganos]
+    - name: Triage y organización de urgencias
+      topics:
+        - name: Triage
+          aliases: [triaje, clasificación de urgencias]
 
 - name: Medicina Familiar
   kind: cross_cutting

@@ -53,6 +53,21 @@ RSpec.describe Guideline do
     end
   end
 
+  describe "#main_topic" do
+    it "is the topic that accounts for most of the title" do
+      guideline = create(:guideline)
+      adult = create(:guideline_topic, guideline: guideline, relevance: 0.33).topic
+      pediatric = create(:guideline_topic, guideline: guideline, relevance: 0.5).topic
+
+      expect(guideline.main_topic).to eq(pediatric)
+      expect(guideline.topics).to include(adult)
+    end
+
+    it "is nil for a guideline no topic names" do
+      expect(create(:guideline).main_topic).to be_nil
+    end
+  end
+
   describe ".institution_from_catalog_key" do
     it "maps each published prefix to its institution" do
       expect(described_class.institution_from_catalog_key("IMSS-028-22")).to eq("imss")

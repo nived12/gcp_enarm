@@ -121,6 +121,14 @@ RSpec.describe Gpc::TopicLinker do
     expect { described_class.call }.not_to change(GuidelineTopic, :count)
   end
 
+  it "takes back a link once the alias that made it is corrected" do
+    heat = topic("Golpe de calor", ["hipertermia"])
+    link_for("Diagnóstico y tratamiento de la hipertensión arterial")
+    heat.update!(aliases: ["enfermedad por calor"])
+
+    expect { described_class.call }.to change(GuidelineTopic, :count).from(1).to(0)
+  end
+
   it "skips a guideline whose title never extracted" do
     topic("Endometriosis")
     create(:guideline, title: "-")

@@ -64,6 +64,9 @@ module Gpc
       matches.each do |topic, relevance|
         GuidelineTopic.find_or_initialize_by(guideline: guideline, topic: topic).update!(relevance: relevance)
       end
+      # Nothing else writes these links, so one the taxonomy no longer supports is a
+      # mistake a corrected alias should take back, not a curation to preserve.
+      guideline.guideline_topics.where.not(topic_id: matches.map { |topic, _| topic.id }).delete_all
 
       matches.size
     end

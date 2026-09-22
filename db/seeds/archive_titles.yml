@@ -4,12 +4,14 @@
 # Gpc::TopicLinker reads only the title.
 #
 # Checked 2026-09-22. Add a key only after reading the cover; the heuristic stays the
-# default for everything else.
+# default for everything else. IMSS-190-18 is here for a typo on the cover itself
+# ("Geriática"), which no alias can match.
 ---
 IMSS-085-08: Diagnóstico y tratamiento del síndrome de hombro doloroso en primer nivel de atención
 IMSS-141-18: Diagnóstico y tratamiento de hemofilia hereditaria en menores de 16 años
 IMSS-167-09: Diagnóstico y tratamiento del adenocarcinoma gástrico en pacientes adultos
 IMSS-184-09: Diagnóstico y tratamiento del tumor maligno del testículo en todas las edades
+IMSS-190-18: Valoración geriátrica integral en unidades de atención médica
 IMSS-193-08: "Diagnóstico y tratamiento de las fracturas de antebrazo: diáfisis de cúbito y radio"
 IMSS-245-09: Tratamiento antirretroviral del paciente adulto con infección por el VIH
 IMSS-345-16: Prevención, diagnóstico y tratamiento de la enfermedad hemorrágica del recién nacido

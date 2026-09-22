@@ -244,7 +244,7 @@ module Questions
 
       kase = ClinicalCase.new(
         stem: attributes["stem"], guideline: guideline, generation_run: run,
-        topic: guideline.topics.first, specialty: specialty, source: "gpc_generated",
+        topic: topic, specialty: specialty, source: "gpc_generated",
         locale: locale
       )
       built = questions.filter_map.with_index(1) { |q, position| build_question(kase, q, position) }
@@ -297,8 +297,12 @@ module Questions
       question.valid?
     end
 
+    def topic
+      @topic ||= guideline.main_topic
+    end
+
     def specialty
-      @specialty ||= guideline.topics.first&.branch&.specialty
+      @specialty ||= topic&.branch&.specialty
     end
 
     # Only ever called with questions that passed usable?, which requires a recommendation,
