@@ -39,7 +39,7 @@ parser said on the day the file was written.
    else about a provider has a default in `app/models/llm/provider.rb`. Check with
    `railway run bin/rails llm:status`, which prints the model each role resolved to and
    names any key that is missing.
-4. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 230.
+4. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
 
 At this point the app runs and has its taxonomy, and no guidelines.
 

@@ -77,9 +77,7 @@ class Guideline < ApplicationRecord
   # e.g. S-102-08 and SS-102-22 are the same institution and, there, the same guideline.
   CATALOG_KEY_PREFIX_ALIASES = { "s" => "ss" }.freeze
 
-  # Nil when the year never parsed. Unknown is not the same as expired, and a question
-  # generated from it should say so rather than imply currency.
-  # Where a student can go and read the guideline for herself.
+  # Where a student can go and read the guideline.
   #
   # The live site opens the guideline's own page; an archived one opens the Wayback
   # capture rather than the `id_/` raw-bytes form the importer used, because that form
@@ -89,6 +87,8 @@ class Guideline < ApplicationRecord
     source_web_archive? ? catalog_url : document_url
   end
 
+  # Nil when the year never parsed. Unknown is not the same as expired, and a question
+  # generated from it should say so rather than imply currency.
   def expires_on
     Date.new(year + VALIDITY_YEARS, 12, 31) if year
   end

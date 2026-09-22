@@ -53,7 +53,7 @@ namespace :gpc do
     abort(result.errors.full_messages.to_sentence) unless result.success?
 
     puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
-    puts "Ahora corre gpc:reparse, gpc:taxonomy y gpc:link para reconstruir lo derivado."
+    puts "Ahora corre gpc:reparse, taxonomy:seed y gpc:link para reconstruir lo derivado."
   end
 
   desc "Re-read stored section bodies through the current parser, without touching the site"
