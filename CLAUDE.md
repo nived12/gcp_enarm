@@ -90,6 +90,18 @@ easier than the exam it simulates. `Questions::CaseGenerator::DETAIL_LEVELS` car
 The extra material is **realistic completeness, never misdirection** — never invent a
 finding that contradicts the diagnosis.
 
+**A vignette is set where the exam sets it.** The convocatoria frames every case in Salud
+Pública, Urgencias or Medicina Familiar, drawing its content from the four troncales. A
+generated case opens in one of those settings — a consultorio familiar, urgencias, a
+public-health situation — not in a generic ward.
+
+**The exam gives about one minute per item.** Anything that simulates exam conditions uses
+that pacing, not a comfortable one; running out of time is one of the things being tested.
+
+**`Answer#error_reason` is the student's own account of why they missed it**, not an
+inference. Never derive it, never guess it from timing — an empty value means they did not
+say, and weak-spot targeting has to treat that as unknown rather than as `did_not_know`.
+
 **English is per case, never per question**, at `ENGLISH_SHARE`. A case and its questions
 must be one language, and the `quote` stays in Spanish whatever the case language: the
 substring gate checks it against a Spanish guideline, so an English quote fails every time.
