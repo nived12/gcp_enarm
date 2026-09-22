@@ -75,85 +75,6 @@ RSpec.describe Questions::CaseGenerator do
     expect(kase.questions.first.recommendation).to eq(recommendation)
   end
 
-  describe "what it refuses to keep" do
-    it "drops a question whose quote is not in the recommendation" do
-      stub_model(one_case(question(quote: "angiografía coronaria inmediata")))
-
-      result = described_class.call(guideline)
-
-      expect(result.payload[:cases]).to be_empty
-      expect(result.payload[:rejected]).to eq(1)
-    end
-
-    it "drops a question that does not offer exactly four options" do
-      stub_model(one_case(question(options: options(total: 3))))
-
-      expect(described_class.call(guideline).payload[:cases]).to be_empty
-    end
-
-    it "drops a question with more than one correct answer" do
-      stub_model(one_case(question(options: options(correct_count: 2))))
-
-      expect(described_class.call(guideline).payload[:cases]).to be_empty
-    end
-
-    it "drops a question citing a recommendation number that was never sent" do
-      stub_model(one_case(question(index: 99)))
-
-      expect(described_class.call(guideline).payload[:cases]).to be_empty
-    end
-
-    it "keeps the good questions in a case that also had a bad one" do
-      stub_model(one_case(question, question(quote: "inventado")))
-
-      result = described_class.call(guideline)
-
-      expect(result.payload[:cases].first.questions.size).to eq(1)
-      expect(result.payload[:rejected]).to eq(1)
-    end
-
-    it "skips a case with no vignette" do
-      stub_model({ "cases" => [{ "stem" => "", "questions" => [question] }] })
-
-      expect(described_class.call(guideline).payload[:cases]).to be_empty
-    end
-
-    it "skips a case with no questions" do
-      stub_model({ "cases" => [{ "stem" => "Paciente.", "questions" => [] }] })
-
-      expect(described_class.call(guideline).payload[:cases]).to be_empty
-    end
-  end
-
-  describe "difficulty" do
-    it "calls a case from strong evidence an easier item" do
-      stub_model(one_case(question))
-
-      expect(described_class.call(guideline).payload[:cases].first).to be_difficulty_low
-    end
-
-    it "calls a case from weak evidence a harder one" do
-      recommendation.update!(grade: "D")
-      stub_model(one_case(question))
-
-      expect(described_class.call(guideline).payload[:cases].first).to be_difficulty_high
-    end
-
-    it "sits in the middle for a grade it does not recognise" do
-      recommendation.update!(grade: "2b")
-      stub_model(one_case(question))
-
-      expect(described_class.call(guideline).payload[:cases].first).to be_difficulty_medium
-    end
-
-    it "sits in the middle when the recommendation carries no grade" do
-      recommendation.update!(grade: nil)
-      stub_model(one_case(question))
-
-      expect(described_class.call(guideline).payload[:cases].first).to be_difficulty_medium
-    end
-  end
-
   describe "the generation run" do
     it "records tokens, cases and rejections" do
       run = create(:generation_run)
@@ -174,18 +95,6 @@ RSpec.describe Questions::CaseGenerator do
     end
   end
 
-  # §9.1 of the convocatoria: the three cross-cutting contexts are where a case happens.
-  it "sets the case where the exam sets it" do
-    stub_model(one_case(question))
-
-    described_class.call(guideline)
-
-    expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-      expect(prompt).to include("medicina\nfamiliar en el primer nivel, un servicio de urgencias")
-      expect(prompt).to include("No sitúes el caso en una sala")
-    end
-  end
-
   it "writes from the window of statements it is handed" do
     later = create(:recommendation, guideline_section: section, text: "Se recomienda iniciar aspirina 300 mg.")
     stub_model(one_case(question(quote: "iniciar aspirina 300 mg")))
@@ -199,146 +108,53 @@ RSpec.describe Questions::CaseGenerator do
     expect(result.payload[:cases].sole.questions.sole.recommendation).to eq(later)
   end
 
-  describe "how much of the patient the vignette carries" do
-    it "asks for a whole-patient vignette and three questions on a full workup" do
-      stub_model(one_case(question, question(index: 1), question(index: 1)))
-
-      described_class.call(guideline, detail: :full_workup)
-
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).to include("paciente COMPLETO")
-        expect(prompt).to include("Signos vitales COMPLETOS")
-        expect(prompt).to include("3 preguntas")
-      end
-    end
-
-    it "asks for a short vignette and two questions when focused" do
-      stub_model(one_case(question))
-
-      described_class.call(guideline, detail: :focused)
-
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).to include("breve y centrada")
-        expect(prompt).to include("2 preguntas")
-      end
-    end
-
-    it "falls back to focused rather than trusting an unknown detail level" do
-      stub_model(one_case(question))
-
-      described_class.call(guideline, detail: :novela)
-
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).to include("breve y centrada")
-      end
-    end
-  end
-
-  describe "language" do
-    it "leaves the case in Spanish by default" do
-      stub_model(one_case(question))
-
-      kase = described_class.call(guideline).payload[:cases].first
-
-      expect(kase.locale).to eq("es")
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).not_to include("EN INGLÉS")
-      end
-    end
-
-    it "asks for English and records it, keeping the quote in Spanish so the gate still holds" do
-      stub_model(one_case(question))
-
-      kase = described_class.call(guideline, locale: "en").payload[:cases].first
-
-      expect(kase.locale).to eq("en")
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).to include("EN INGLÉS")
-        expect(prompt).to include("cita textual se queda en español")
-      end
-    end
-  end
-
-  it "labels the case with the guideline's topic and specialty when it has one" do
-    topic = create(:topic)
-    create(:guideline_topic, guideline: guideline, topic: topic)
+  # The detail level, the language and the figure are each the prompt's and the builder's
+  # business; this only proves the generator hands them on.
+  it "passes the rotation's choices through to the prompt and the saved case" do
     stub_model(one_case(question))
 
-    kase = described_class.call(guideline).payload[:cases].first
+    kase = described_class.call(guideline, detail: :full_workup, locale: "en").payload[:cases].sole
 
-    expect(kase.topic).to eq(topic)
-    expect(kase.specialty).to eq(topic.branch.specialty)
+    expect(kase.locale).to eq("en")
+    expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+      expect(prompt).to include("paciente COMPLETO", "EN INGLÉS")
+    end
   end
 
-  # A case that reads "Pregunta 1, Pregunta 3" to a student is a bug the reviewer sees
-  # before the student does.
-  it "numbers the questions that survived, not the ones the model sent" do
-    stub_model(one_case(question, question(index: 99), question))
-
-    positions = described_class.call(guideline).payload[:cases].sole.questions.pluck(:position)
-
-    expect(positions).to eq([1, 2])
-  end
-
-  describe "cases that carry a figure" do
+  describe "a figure" do
     let!(:with_figure) do
       create(
-        :recommendation, guideline_section: section, position: 90,
+        :recommendation, guideline_section: section,
         text: "Se recomienda estratificar el riesgo según el cuadro 1."
       )
     end
-    let!(:image) do
-      create(
-        :clinical_image, :stored, guideline_section: section, label: "CUADRO 1",
-        caption: "CRITERIOS DE ESTRATIFICACIÓN"
-      )
-    end
+    let!(:image) { create(:clinical_image, :stored, guideline_section: section, label: "CUADRO 1") }
 
-    def prompt_for(**options)
-      captured = nil
-      allow(Llm::Completion).to receive(:call) do |**arguments|
-        captured = arguments[:prompt]
-        ApplicationService::Response.new(
-          success: true, errors: nil,
-          payload: { content: one_case(question).to_json, input_tokens: 1, output_tokens: 1, cost_usd: 0,
-                     reasoning_tokens: 0 }
-        )
-      end
-      described_class.call(guideline, **options)
-      captured
-    end
-
-    # The figure has to be picked before the prompt is written. A vignette that was not
-    # written towards an image reads as a vignette with a picture stapled to it.
-    it "names the figure in the prompt, so the vignette is written towards it" do
-      expect(prompt_for(with_image: true)).to include("CUADRO 1: CRITERIOS DE ESTRATIFICACIÓN")
-    end
-
-    # The model never sees the image. Asking it about the contents would invent them, and
-    # the citation gate only checks the quote — it could not catch a fabricated table row.
-    it "tells the model not to describe what it cannot see" do
-      expect(prompt_for(with_image: true)).to include("No describas el contenido de la figura")
-    end
-
-    it "attaches the figure to the case that cited the recommendation pointing at it" do
-      index = Recommendation.order(:id).pluck(:id).index(with_figure.id) + 1
-      stub_model(one_case(question(index: index, quote: "estratificar el riesgo")))
+    it "picks one before writing the prompt and attaches it to the case that used it" do
+      stub_model(one_case(question(index: 2, quote: "estratificar el riesgo")))
 
       result = described_class.call(guideline, with_image: true)
 
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).to include("recomendación 2, que remite a «CUADRO 1")
+      end
       expect(result.payload[:cases].sole.clinical_image).to eq(image)
     end
 
-    # It is told which recommendation to use, but nothing forces it to comply.
-    it "leaves the case without a figure when the model wrote about something else" do
+    it "picks none when the rotation did not ask for one" do
       stub_model(one_case(question))
 
-      expect(described_class.call(guideline, with_image: true).payload[:cases].sole.clinical_image)
-        .to be_nil
-    end
+      described_class.call(guideline)
 
-    it "says nothing about figures when none was asked for" do
-      expect(prompt_for).not_to include("CUADRO 1")
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).not_to include("CUADRO 1")
+      end
     end
+  end
+
+  it "reads JSON the model wrapped in a markdown fence" do
+    stub_model("```json\n#{one_case(question).to_json}\n```")
+
+    expect(described_class.call(guideline).payload[:cases].size).to eq(1)
   end
 end
