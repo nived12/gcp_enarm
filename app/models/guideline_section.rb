@@ -1,7 +1,10 @@
 # One entry in a guideline's table of contents, with the HTML the site returns for it.
 #
 # An archived guideline has no table of contents — it is a PDF — so it gets a single
-# section of kind archived_document holding the whole extracted text.
+# section of kind archived_document holding the whole extracted text. The graded
+# statements parsed out of that text become sections of their own, one per numbered
+# heading and kind, each pointing back at the document through source_section. Those
+# are derived: never exported, rebuilt by Gpc::ArchiveSectionBuilder.
 #
 # The four graded kinds below are the ones worth generating from; everything else —
 # cuadros, algoritmos, bibliografía, the AGREE II appraisal — is stored so the
@@ -10,6 +13,9 @@ class GuidelineSection < ApplicationRecord
   belongs_to :guideline
   has_many :recommendations, -> { order(:position) }, dependent: :destroy, inverse_of: :guideline_section
   has_many :clinical_images, -> { order(:position) }, dependent: :destroy, inverse_of: :guideline_section
+  belongs_to :source_section, class_name: "GuidelineSection", optional: true, inverse_of: :derived_sections
+  has_many :derived_sections, class_name: "GuidelineSection", foreign_key: :source_section_id,
+    dependent: :destroy, inverse_of: :source_section
 
   enum :kind,
     { evidence: "evidence", recommendation: "recommendation",
@@ -34,6 +40,7 @@ class GuidelineSection < ApplicationRecord
 
   scope :actionable, -> { where(kind: ACTIONABLE_KINDS) }
   scope :graded, -> { where(kind: GRADED_KINDS) }
+  scope :original, -> { where(source_section_id: nil) }
 
   # The site's menu labels every section in Spanish and repeats the same handful of
   # words across all 53 guidelines, so the kind is read off the label rather than

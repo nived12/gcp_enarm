@@ -1,0 +1,224 @@
+ejemplo siguiente:
+
+Evidencia / Recomendación                                            Nivel / Grado
+
+E. La valoración del riesgo para el desarrollo de                      2++
+UPP, a través de la escala de Braden tiene una                     (GIB, 2007)
+capacidad predictiva superior al juicio clínico
+del personal de salud
+
+
+En el caso de no contar con GPC como documento de referencia, las evidencias y recomendaciones
+fueron elaboradas a través del análisis de la información obtenida de revisiones sistemáticas,
+metaanálisis, ensayos clínicos y estudios observacionales. La escala utilizada para la gradación de la
+evidencia y recomendaciones de estos estudios fue la escala Shekelle modificada.
+
+Cuando la evidencia y recomendación fueron gradadas por el grupo elaborador, se colocó en
+corchetes la escala utilizada después del número o letra del nivel de evidencia y recomendación, y
+posteriormente el nombre del primer autor y el año como a continuación:
+
+
+Evidencia / Recomendación                                            Nivel / Grado
+
+
+E. El zanamivir disminuyó la incidencia de las                           Ia
+complicaciones en 30% y el uso general de                          [E: Shekelle]
+antibióticos en 20% en niños con influenza                       Matheson, 2007
+confirmada
+
+Los sistemas para clasificar la calidad de la evidencia y la fuerza de las recomendaciones se describen
+en el Anexo 6.
+
+
+                                                                                                  9
+                                                                            Diagnóstico de Apendicitis Aguda
+
+
+        Tabla de referencia de símbolos empleados en esta Guía:
+
+
+                                           E                 Evidencia
+
+
+                                           R                  Recomendación
+
+
+                                        /R                   Buena Práctica
+
+
+        4.1 Prevención Secundaria
+        4.1.1 Deteccion
+        4.1.1.1 Pruebas de detección específica
+
+
+Evidencia / Recomendación                                        Nivel / Grado
+
+                  Se han    propuesto 3 criterios clínicos para
+                  identificar a las mujeres en edad reproductiva,
+      E           no embarazadas con bajo riesgo de apendicitis
+                  (reportan 99% de sensibilidad)                                      II-b
+                  Bajo riesgo:
+                         Sin antecedentes de migración del                    (Shekelle,1999)
+                          dolor
+                         Presencia     de     hipersensibilidad                Morishita, 2006
+                          abdominal bilateral
+                  Ausencia de nausea y vómito.
+
+                  En mujeres en edad reproductiva, no gestantes                        C
+                  con bajo riesgo de apendicitis buscar otras
+      R           causas que expliquen el cuadro clínico, efectuar             (Shekelle,1999)
+                  exploración ginecológica, no esta indicado TAC
+                  ni USG por sospecha de apendicitis.                           Morishita, 2006
+
+
+                                                                                                   10
+                                                                             Diagnóstico de Apendicitis Aguda
+
+
+        4.2 Diagnostico
+        4.2.1 Diagnóstico Clínico
+        4.2.1.1 Diagnóstico Clínico Y Paraclínico En El Adulto Joven
+
+Evidencia / Recomendación                                         Nivel / Grado
+                  El cuadro clínico clásico de apendicitis inicia
+                  con dolor abdominal agudo, tipo cólico,
+      E           localizado   en   región   periumbilical, con
+                  incremento rápido de intensidad, antes de 24                          III
+                  horas migra a cuadrante inferior derecho
+                  (CID), después del inicio del dolor puede                      (Shekelle,1999)
+                  existir náusea y vómitos no muy numerosos
+                  (generalmente en 2 ocasiones). Puede haber                      Humes, 2008
+                  fiebre de 38° C o más. El dolor se incrementa al
+                  caminar y al toser.
+
+
+                  A la exploración física se encuentran datos de
+      E           irritación peritoneal (hipersensibilidad en                           III
+                  cuadrante inferior derecho (CID), defensa y
+                  rigidez muscular involuntaria, punto de                        (Shekelle,1999)
+                  McBurney, signo de Rovsing, signo de Psoas,
+                  signo del Obturador, signo de Summer, signo                     Humes, 2008
+                  de Von Blumberg, signo de talopercusión, signo                    Old, 2005
+                  de Dunphy).
+
+
+      E           En estudios de laboratorio la fórmula blanca                          III
+                  reporta leucocitosis con neutrofilia y en                      (Shekelle,1999)
+                  ocasiones bandemia.                                             Humes, 2008
+
+
+                  De    las  manifestaciones   clínicas  y   de
+      E           laboratorio, las que tienen mayor sensibilidad
+                  para    el    diagnóstico    de    apendicitis
+                  (manifestaciones cardinales) son:
+                      1. Dolor característico ( migración de la
+                          región   periumbilical   al  CID    o                         III
+                          localización inicial en CID
+                      2. Manifestaciones       de      irritación                (Shekelle,1999)
+                          peritoneal (hipersensibilidad en CID,
+                          rebote positivo en CID, defensa y                       Humes, 2008
+                          rigidez de músculos abdominales)
+                      3. Datos     de   respuesta   inflamatoria
+                          (leucocitosis con mayor predominio de
+
+                          neutrófilos)
+
+                                                                                                     11
+                                                                       Diagnóstico de Apendicitis Aguda
+
+
+            Todo paciente con cuadro clínico clásico (dolor
+            abdominal agudo, cólico, localizado en región
+R           periumbilical, con incremento rápido de
+            intensidad antes de 24 horas, irradiado a CID,
+
+            con o sin náusea, vómito, fiebre de 38o C o                           D
+            más, hipersensibilidad en CID, defensa y rigidez
+            muscular       involuntaria,      McBurney),                  (Shekelle,1999)
+            independientemente de su sexo, edad o si
+            existe gestación debe ser referido de medicina                  Humes, 2008
+            familiar a urgencias para valoración por cirugía
+            general en forma inmediata (no es necesario
+            solicitar exámenes de laboratorio ni de
+            gabinete)
+
+            Todo paciente sin cuadro clásico pero con las
+R           primeras 2 manifestaciones cardinales (dolor
+            abdominal agudo, cólico, localizado en región
+            periumbilical, con incremento rápido de
+            intensidad antes de 24 horas, irradiado a CID y                       D
+            datos      de       irritación     peritoneal)
+            independientemente de su sexo, edad o si                      (Shekelle,1999)
+            existe gestación debe ser valorado por cirugía
+            general en forma inmediata (no es necesario                     Humes, 2008
+            solicitar exámenes de laboratorio ni de
+            gabinete para el envío de medicina familiar a
+            urgencias)
+
+
+            En adultos jóvenes masculinos si presentan por
+R           lo menos 2 de los 3 manifestaciones cardinales                        I
+            (dolor   característico, manifestaciones   de
+            irritación peritoneal, datos de respuesta                     (Shekelle,1999)
+            inflamatoria) se debe valorar por cirugía de
+            forma inmediata                                                   Old, 2005
+
+            Aunque 70 a 90% de los pacientes con
+            apendicitis   aguda    tienen   una    cuenta                        II-b
+E           leucocitaria elevada, la leucocitosis en sí misma
+            se    presenta   en    varias   enfermedades                  (Shekelle,1999)
+            abdominales agudas por lo que su especificidad
+            para el diagnóstico de apendicitis aguda es                     Humes, 2008
+            pobre.                                                         Paulson, 2003
+
+            Aproximadamente 10% de los pacientes con                             II-b
+            dolor abdominal que son valorados en los
+E           servicios de urgencias corresponden a infección               (Shekelle,1999)
+            de vías urinarias. El proceso inflamatorio
+
+            generado por la apendicitis puede ocasionar                     Humes, 2008
+            piuria, hematuria o bacteriuria en 40% de los                  Paulson, 2003
+                                                                                               12
+                                                                     Diagnóstico de Apendicitis Aguda
+
+
+            pacientes, sin embargo, una cuenta de
+            eritrocitos mayor a 30 células por campo de
+            alto poder o de leucocitos mayor de 20 células
+            por campo de alto poder apoya el diagnóstico
+            de infección de vías urinarias
+            En todos los pacientes que presenten SOLO
+            una de las 2 primeras manifestaciones
+R           cardinales: a) dolor (que migre de la región                        B
+            periumbilical a CID o con localización inicial en
+            CID) o                                                       (Shekelle,1999)
+            b) manifestaciones de irritación peritoneal
+            (hipersensibilidad en CID, rebote positivo en                 Humes, 2008
+            CID,   defensa   y   rigidez  de   músculos                   Paulson, 2003
+
+            abdominales); deberá solicitar formula blanca,
+            examen general de orina y si es del género
+            femenino prueba inmunológica de embarazo.
+                                                                                B
+R
+            En todos los casos hacer revaloración clínica                (Shekelle,1999)
+            completa con los resultados de los exámenes
+            de laboratorio solicitados (observación activa)               Humes, 2008
+                                                                          Paulson, 2003
+
+
+                                                                                B
+R           Si la prueba inmunológica de embarazo es
+            positiva o si la paciente se sabe embarazada                 (Shekelle,1999)
+            solicitar interconsulta a ginecobstetricia.
+                                                                          Humes, 2008
+                                                                          Paulson, 2003
+
+/R        Ante la duda diagnóstica en una mujer embarazada,
+            solicitar valoración conjunta por cirugía general          Punto de Buena Práctica
+            y ginecoobstetricia.
+
+
+5. Definiciones Operativas
+
+Apendicitis: inflamación del apéndice.

@@ -97,6 +97,24 @@ RSpec.describe "question bank export and import" do
     expect(ClinicalCase.sole.generation_run.export_key).to eq(key)
   end
 
+  # An authored case has no run, no guideline and no citation; it still travels.
+  it "carries a case that points at nothing" do
+    kase = create(
+      :clinical_case, guideline: nil, topic: nil, specialty: nil, generation_run: nil,
+      source: "authored", stem: "Paciente de 30 años con fiebre."
+    )
+    create(:question, clinical_case: kase, recommendation: nil, source_quote: nil)
+    export
+    clear_generated
+
+    expect(import).to be_success
+    expect(ClinicalCase.sole).to have_attributes(
+      guideline: nil, generation_run: nil,
+      stem: "Paciente de 30 años con fiebre."
+    )
+    expect(Question.sole.recommendation).to be_nil
+  end
+
   describe "when a reference does not resolve on the far side" do
     it "refuses a case whose guideline this database does not have" do
       build_bank

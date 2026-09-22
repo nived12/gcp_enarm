@@ -3,7 +3,7 @@
 # Only guidelines and their sections are exported, because they are the only part that
 # is expensive to obtain: ~3,800 requests to a small government server plus ~700 PDFs
 # from a rate-limited archive, over a couple of hours. Everything downstream —
-# recommendations, the taxonomy, the guideline/topic links — is derived from these by
+# recommendations, the sections parsed out of archived PDFs, the taxonomy, the guideline/topic links — is derived from these by
 # code that runs in seconds, so it is rebuilt on the far side instead of shipped.
 #
 # That is not only smaller. It means the recommendations in an environment always match
@@ -47,15 +47,18 @@ module Gpc
 
     attr_reader :path
 
+    # Sections parsed out of an archived PDF are derived like recommendations are, and
+    # rebuilt by gpc:reparse on the far side.
     def write_sections(file, guideline)
-      guideline.guideline_sections.order(:position).find_each(batch_size: BATCH_SIZE) do |section|
+      sections = guideline.guideline_sections.original
+      sections.order(:position).find_each(batch_size: BATCH_SIZE) do |section|
         # Sections point at their guideline by catalog_key, never by id: the two
         # databases number their rows independently and only the key is meaningful.
         attributes = section.slice(*SECTION_ATTRIBUTES).merge("catalog_key" => guideline.catalog_key)
         file.puts(line("section", attributes))
       end
 
-      guideline.guideline_sections.size
+      sections.size
     end
 
     def line(record, attributes)

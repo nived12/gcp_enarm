@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_21_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -144,11 +144,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_140000) do
     t.string "kind", null: false
     t.integer "position", null: false
     t.string "question_label"
+    t.bigint "source_section_id"
     t.datetime "updated_at", null: false
     t.index ["guideline_id", "external_id"], name: "index_guideline_sections_on_guideline_id_and_external_id", unique: true
     t.index ["guideline_id", "position"], name: "index_guideline_sections_on_guideline_id_and_position"
     t.index ["guideline_id"], name: "index_guideline_sections_on_guideline_id"
     t.index ["kind"], name: "index_guideline_sections_on_kind"
+    t.index ["source_section_id"], name: "index_guideline_sections_on_source_section_id"
   end
 
   create_table "guideline_topics", force: :cascade do |t|
@@ -443,6 +445,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_21_140000) do
   add_foreign_key "clinical_cases", "specialties"
   add_foreign_key "clinical_cases", "topics"
   add_foreign_key "clinical_images", "guideline_sections"
+  add_foreign_key "guideline_sections", "guideline_sections", column: "source_section_id"
   add_foreign_key "guideline_sections", "guidelines"
   add_foreign_key "guideline_topics", "guidelines"
   add_foreign_key "guideline_topics", "topics"

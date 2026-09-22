@@ -52,6 +52,17 @@ RSpec.describe Gpc::ImageIngester do
   end
 
   # One missing file is not a reason to abandon 900 others.
+  # A small government server, so downloads are paced.
+  it "waits between downloads" do
+    build_section
+    ingester = described_class.new(GuidelineSection.all, interval: 2)
+    allow(ingester).to receive(:sleep)
+
+    ingester.call
+
+    expect(ingester).to have_received(:sleep).with(2)
+  end
+
   it "counts a failed download and carries on" do
     stub_request(:get, url).to_return(status: 500)
     build_section

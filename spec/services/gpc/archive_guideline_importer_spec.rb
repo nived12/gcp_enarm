@@ -31,7 +31,7 @@ RSpec.describe Gpc::ArchiveGuidelineImporter do
     it "stores the extracted text as the guideline's one section" do
       described_class.call(entry)
 
-      section = Guideline.sole.guideline_sections.sole
+      section = Guideline.sole.guideline_sections.kind_archived_document.sole
 
       expect(section).to have_attributes(kind: "archived_document", external_id: "20211208182334")
       expect(section.body).to include("riesgo quirurgico")
@@ -101,6 +101,18 @@ RSpec.describe Gpc::ArchiveGuidelineImporter do
       stub_pdf
 
       expect(described_class.call(entry.merge(institution: nil))).not_to be_success
+    end
+
+    # The text is kept: it is what the next reparse reads, once the conflict is resolved.
+    it "reports sections it could not rebuild, keeping the document" do
+      stub_pdf
+      builder = Gpc::ArchiveSectionBuilder.new(build(:guideline_section))
+      allow(Gpc::ArchiveSectionBuilder).to receive(:call).and_return(builder.failure("hay preguntas que citan"))
+
+      response = described_class.call(entry)
+
+      expect(response.errors.full_messages).to include("hay preguntas que citan")
+      expect(GuidelineSection.kind_archived_document.count).to eq(1)
     end
   end
 end

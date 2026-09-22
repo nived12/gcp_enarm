@@ -39,6 +39,15 @@ RSpec.describe "corpus export and import" do
     expect(GuidelineSection.count).to eq(2)
   end
 
+  # They are rebuilt from the document by gpc:reparse, the same way recommendations are.
+  it "leaves out sections parsed from an archived document" do
+    _, archived = build_corpus
+    document = archived.guideline_sections.sole
+    create(:guideline_section, guideline: archived, source_section: document, external_id: "20180101/general-evidence")
+
+    expect(export.payload).to include(sections: 2)
+  end
+
   it "restores the fields a question will be cited from" do
     build_corpus
     export

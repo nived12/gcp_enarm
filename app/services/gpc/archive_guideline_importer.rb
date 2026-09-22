@@ -19,9 +19,13 @@ module Gpc
       return failure if has_errors?
 
       guideline = upsert_guideline(document)
-      upsert_section(guideline, document)
+      built = ArchiveSectionBuilder.call(upsert_section(guideline, document))
+      return failure(built.errors.full_messages.to_sentence) if built.failure?
 
-      success(catalog_key: entry[:catalog_key], title: guideline.title, pages: document[:page_count])
+      success(
+        catalog_key: entry[:catalog_key], title: guideline.title, pages: document[:page_count],
+        recommendations: built.payload[:recommendations]
+      )
     rescue ActiveRecord::RecordInvalid => e
       failure("No se pudo guardar #{entry[:catalog_key]}: #{e.record.errors.full_messages.to_sentence}")
     end
@@ -44,7 +48,7 @@ module Gpc
     # is then free rather than another ~1 MB download, which is what makes a run that the
     # archive interrupted restartable instead of restarted.
     def already_imported?
-      GuidelineSection.joins(:guideline)
+      GuidelineSection.kind_archived_document.joins(:guideline)
                       .where(guidelines: { catalog_key: entry[:catalog_key] }, external_id: entry[:external_id])
                       .exists?
     end
@@ -78,6 +82,7 @@ module Gpc
         body: document[:text], content_hash: Digest::SHA256.hexdigest(document[:text])
       )
       section.save!
+      section
     end
   end
 end
