@@ -58,7 +58,7 @@ RSpec.describe Questions::GenerationRunner do
     result = generate(budget_usd: 0.003)
 
     expect(calls.size).to eq(2)
-    expect(result.payload).to include(stopped_at_budget: 1, cost_usd: 0.004)
+    expect(result.payload).to include(stopped_at_budget: true, cost_usd: 0.004)
   end
 
   it "refuses a budget it cannot measure" do
@@ -81,7 +81,7 @@ RSpec.describe Questions::GenerationRunner do
 
     result = generate(on_progress: ->(line) { lines << line })
 
-    expect(result.payload).to include(calls: 2, cases: 2, rejected: 1, failed: 1)
+    expect(result.payload).to include(calls: 2, cases: 2, rejected: 1, failed: 1, stopped_at_budget: false)
     expect(lines).to eq(["IMSS-003-22 [full_workup/es/figura] 2 casos", "IMSS-004-22 [focused/en] sin JSON"])
   end
 

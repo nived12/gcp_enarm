@@ -8,7 +8,8 @@
 #
 # Sections are keyed by their heading, not by their order, so a parser change that
 # adds a row in chapter 4.1 leaves every question citing chapter 4.3 still pointing at
-# its recommendation. A section whose statements did not change is not touched at all.
+# its recommendation. A section whose statements did not change is not touched at all,
+# and within one that did, a statement whose text did not change keeps its row.
 module Gpc
   class ArchiveSectionBuilder < ApplicationService
     # Spanish because they are the source's own words: kind is read back from them by
@@ -91,10 +92,23 @@ module Gpc
         chapter: first[:chapter], question_label: (first[:heading] if first[:heading] != first[:chapter]),
         body: statements.pluck(:text).join("\n\n"), content_hash: digest
       )
-      section.recommendations.destroy_all
-      statements.each.with_index(1) do |statement, index|
-        section.recommendations.create!(statement.slice(*RECOMMENDATION_ATTRIBUTES).merge(position: index))
+      reconcile(section, statements)
+    end
+
+    # A statement whose text survived the reparse keeps its row, so the questions that
+    # cite it keep their citation; only rows whose text is gone are deleted, and one a
+    # question cites stops the rebuild. Positions are parked below zero first because
+    # (section, position) is unique and the survivors may swap places.
+    def reconcile(section, statements)
+      pool = section.recommendations.group_by(&:text)
+      section.recommendations.update_all("position = -position")
+
+      kept = statements.each.with_index(1).map do |statement, index|
+        attributes = statement.slice(*RECOMMENDATION_ATTRIBUTES).merge(position: index)
+        survivor = pool.fetch(statement[:text], []).shift
+        survivor ? survivor.tap { |row| row.update!(attributes) } : section.recommendations.create!(attributes)
       end
+      section.recommendations.where.not(id: kept).destroy_all
     end
   end
 end

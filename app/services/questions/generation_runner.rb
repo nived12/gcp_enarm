@@ -25,16 +25,16 @@ module Questions
         return failure("No conozco el precio de #{provider}; corre sin tope o agrega su precio a Llm::Provider")
       end
 
-      counts = Hash.new(0)
+      counts = { calls: 0, cases: 0, rejected: 0, failed: 0 }
       planned = windows.first(calls)
       @planned = planned.size
-      planned.each_with_index do |(guideline, recommendations), index|
-        break counts[:stopped_at_budget] = 1 if spent?
+      stopped = planned.each_with_index do |(guideline, recommendations), index|
+        break true if spent?
 
         generate(guideline, recommendations, index, counts)
       end
 
-      success(counts.merge(cost_usd: run.reload.cost_usd.to_f))
+      success(counts.merge(stopped_at_budget: stopped == true, cost_usd: run.reload.cost_usd.to_f))
     end
 
     private

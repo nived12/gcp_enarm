@@ -33,11 +33,12 @@ RSpec.describe Gpc::ArchiveRecommendationParser do
 
   def parse(*lines) = described_class.call([header, "", *lines].join("\n")).payload
 
-  # Fewer than three marker letters reads as a template whose markers were images, so a
-  # row under test is followed by two ordinary ones.
+  # Fewer than three E or R letters reads as a template whose markers were images, so a
+  # row under test is followed by three ordinary ones.
   def filler
     ["", line(marker: "E", text: "Un estudio de cohorte describió lo mismo.", grading: "III"),
-     "", line(marker: "E", text: "Otro estudio de cohorte describió lo mismo.", grading: "III")]
+     "", line(marker: "E", text: "Otro estudio de cohorte describió lo mismo.", grading: "III"),
+     "", line(marker: "E", text: "Un tercer estudio de cohorte describió lo mismo.", grading: "III")]
   end
 
   describe "a guideline laid out in the usual template" do
@@ -246,9 +247,81 @@ RSpec.describe Gpc::ArchiveRecommendationParser do
       )
 
       expect(rows.map { |r| r[:text] }).to eq(
-        ["Un estudio de cohorte describió lo mismo.",
-                                                       "Otro estudio de cohorte describió lo mismo."]
+        ["Un estudio de cohorte describió lo mismo.", "Otro estudio de cohorte describió lo mismo.",
+         "Un tercer estudio de cohorte describió lo mismo."]
       )
+    end
+  end
+
+  # Some templates do not justify, so no column is where most lines end.
+  it "reads a table whose statements are set ragged" do
+    ragged = ->(marker, text, grading = "") { "  #{marker.ljust(8)}  #{text}".ljust(74) + grading }
+    rows = parse(
+      ragged.call("R", "Se recomienda iniciar metformina al diagnóstico", "A"),
+      ragged.call("", "en todo adulto con diabetes tipo 2."),
+      "", "  E",
+      ragged.call("", "Un ensayo mostró menor mortalidad en el grupo tratado.", "1++"),
+      "", ragged.call("E", "Un estudio de cohorte describió lo mismo en mujeres.", "2+"),
+      "", ragged.call("R", "Se sugiere vigilar la función renal cada año.", "B")
+    )
+
+    expect(rows.map { |r| r[:grade] }).to eq(%w[A 1++ 2+ B])
+    expect(rows.first[:text])
+      .to eq("Se recomienda iniciar metformina al diagnóstico en todo adulto con diabetes tipo 2.")
+  end
+
+  describe "what extraction mangles" do
+    it "reads a lone Wingdings tick in the marker column as good practice" do
+      row = parse(line(marker: "\u{F0FC}", text: "Explicar el procedimiento a la familia."), *filler).first
+
+      expect(row).to include(kind: "good_practice", text: "Explicar el procedimiento a la familia.")
+    end
+
+    it "drops a marker icon it cannot name instead of reading it as text" do
+      rows = parse(
+        line(text: "Se sugiere vigilancia anual del paciente estable.", grading: "PBP"),
+        line(marker: "\u{F0E0}", text: "Sin cambios en el tratamiento."),
+        "",
+        line(text: "Un ensayo mostró menor mortalidad con metformina.", grading: "1++")
+      )
+
+      expect(rows.first[:text])
+        .to eq("Se sugiere vigilancia anual del paciente estable. Sin cambios en el tratamiento.")
+    end
+
+    it "keeps a list bullet that sits right against its item" do
+      row = parse(
+        line(marker: "R", text: "La consulta prenatal debe incluir:", grading: "A"),
+        "          \u{F0B7}  Medir altura y peso",
+        "          \u{F0B7}  Solicitar biometría hemática",
+        *filler
+      ).first
+
+      expect(row[:text])
+        .to eq("La consulta prenatal debe incluir:\n• Medir altura y peso\n• Solicitar biometría hemática")
+    end
+
+    # Only the letters decide: a template can draw E and R as images and still print
+    # the tick as a glyph.
+    it "reads by grade when only the good-practice ticks came through as text" do
+      rows = parse(
+        line(text: "Se recomienda iniciar metformina al diagnóstico.", grading: "A"),
+        "", line(marker: "\u{F0FC}", text: "Explicar el procedimiento a la familia.", grading: "PBP"),
+        "", line(marker: "\u{F0FC}", text: "Revisar la técnica de inyección en cada cita.", grading: "PBP"),
+        "", line(marker: "\u{F0FC}", text: "Registrar el peso en cada consulta de control.", grading: "PBP")
+      )
+
+      expect(rows.map { |r| r[:kind] }).to eq(%w[recommendation good_practice good_practice good_practice])
+    end
+
+    it "drops a statement whose line lost its spaces" do
+      rows = parse(
+        line(marker: "R", text: "Larehidrataciónvíaintravenosa serecomiendaenpacientes", grading: "A"),
+        *filler
+      )
+
+      expect(rows.map { |r| r[:text] }.join).not_to include("Larehidratación")
+      expect(rows.size).to eq(3)
     end
   end
 

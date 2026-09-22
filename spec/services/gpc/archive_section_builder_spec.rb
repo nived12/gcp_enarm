@@ -59,6 +59,19 @@ RSpec.describe Gpc::ArchiveSectionBuilder do
     expect(evidence.reload.recommendations.count).to eq(6)
   end
 
+  it "keeps the row of a statement whose text survived, so its question keeps its citation" do
+    build
+    evidence = section("4-2-1-1-diagnostico-clinico-y-paraclinico-en-el-adulto-joven-evidence")
+    cited = evidence.recommendations.find_by!(position: 4)
+    question = create(:question, recommendation: cited)
+    document.update!(body: table.sub(/^ +E +En estudios de laboratorio.*?bandemia\..*?\n/m, ""))
+
+    expect(build).to be_success
+    expect(evidence.recommendations.count).to eq(5)
+    expect(question.reload.recommendation).to eq(cited)
+    expect(cited.reload.position).to eq(3)
+  end
+
   it "refuses to drop a recommendation a question cites, and changes nothing" do
     build
     cited = section("4-2-1-1-diagnostico-clinico-y-paraclinico-en-el-adulto-joven-good_practice").recommendations.sole

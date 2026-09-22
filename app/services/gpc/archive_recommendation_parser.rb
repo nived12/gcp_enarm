@@ -35,12 +35,15 @@ module Gpc
 
     MARKER_KINDS = { "E" => "evidence", "R" => "recommendation" }.freeze
     # The good-practice tick is a Wingdings glyph that extracts as a private-use
-    # character, or as nothing at all, in front of "/R".
-    GOOD_PRACTICE_MARKER = %r{\A[^\p{Alnum}\s]{0,2}\s?/\s?R\z|\A(?:PBP|[✓√✔])\z}
+    # character — U+F0FC on its own, or another in front of "/R" — or as nothing at all.
+    GOOD_PRACTICE_MARKER = %r{\A[^\p{Alnum}\s]{0,2}\s?/\s?R\z|\A(?:PBP|[✓√✔\u{F0FC}])\z}
 
     # Justified text opens gaps of up to five spaces; the gutter before the grading
     # column is wider.
     GUTTER = 6
+
+    SYMBOLS_ONLY = /\A[^\p{Alnum}]+\z/
+    RUN_TOGETHER = /\p{L}{24,}/
 
     # Fewer marker letters than this and the markers were images.
     MIN_MARKERS = 3
@@ -81,7 +84,7 @@ module Gpc
     LIST_ITEM = /\A(?:[•·\-–]|\d{1,2}[.)]\s|[a-z][.)]\s)/
     PRIVATE_USE = /[\u{E000}-\u{F8FF}]/
 
-    Line = Struct.new(:index, :marker, :text, :grading, keyword_init: true)
+    Line = Struct.new(:index, :marker, :text, :grading, :garbled, keyword_init: true)
 
     def initialize(text)
       super()
@@ -106,13 +109,14 @@ module Gpc
       @text_edge = text_edge(region)
 
       parsed = zones(region).flat_map { |heading, lines| rows(lines).filter_map { |row| statement(row, heading) } }
-      intact = parsed.reject { |statement| damaged?(statement[:text]) }
+      intact = parsed.reject { |statement| damaged?(statement) }
       intact.size < parsed.size * (1 - DAMAGE_LIMIT) ? [] : intact
     end
 
     # A statement that opens lower-case is the tail of one the row cut went through.
-    def damaged?(text)
-      text.length < SHORTEST_STATEMENT || text.match?(/\A\p{Ll}/) ||
+    def damaged?(statement)
+      text = statement[:text]
+      statement[:garbled] || text.length < SHORTEST_STATEMENT || text.match?(/\A\p{Ll}/) ||
         text.match?(BLED_CITATION) || text.match?(WELDED)
     end
 
@@ -176,7 +180,10 @@ module Gpc
         segments = segments(line)
         segments[1].first if segments.size > 1 && marker_kind(segments.first.last)
       end
-      @anchored_on_grade = starts.size < MIN_MARKERS
+      # A template can draw E and R as images and still print the good-practice tick as
+      # a glyph, so only the letters decide which way the table is read.
+      letters = region.count { |line| MARKER_KINDS.key?(segments(line).first&.last) }
+      @anchored_on_grade = letters < MIN_MARKERS
       if @anchored_on_grade
         starts = region.filter_map { |line| segments(line).first.first if statement_line?(line) }
       end
@@ -247,15 +254,35 @@ module Gpc
       return Line.new(index: index) if raw.blank? || raw.match?(TABLE_HEADER)
 
       segments = segments(raw)
-      marker = marker_kind(segments.first.last) if !@anchored_on_grade && segments.first.first < @text_column - 1
-      segments = segments.drop(1) if marker
+      in_marker_column = segments.first.first < @text_column - 1
+      marker = marker_kind(segments.first.last) if !@anchored_on_grade && in_marker_column
+      segments = segments.drop(1) if marker || (in_marker_column && icon?(segments))
+      return Line.new(index: index, marker: marker) if segments.empty?
 
       trailing = grading_segments(segments)
       segments, trailing = split_glued_citation(segments - trailing, trailing)
       text = segments.map(&:last).join(" ")
       grading = trailing.map(&:last).join(" ").presence
       marker ||= kind_from_grade(grading) if @anchored_on_grade && grading
-      Line.new(index: index, marker: marker, text: text.presence, grading: grading)
+      Line.new(index: index, marker: marker, text: text.presence, grading: grading, garbled: garbled?(text))
+    end
+
+    # A marker drawn as an icon we cannot name is still not statement text. A list
+    # bullet is a glyph too, but it sits right against its item; a marker stands a
+    # gutter away from the statement.
+    def icon?(segments)
+      (column, token), following = segments
+      return false unless token.match?(SYMBOLS_ONLY)
+
+      following.nil? || following.first - column - token.length >= GUTTER
+    end
+
+    # pdf-reader sometimes drops the spaces of a justified line:
+    # "Larehidrataciónvíaintravenosa serecomiendaenpacientes". Measured across the
+    # archive, the longest real words run to 23 letters (colangiopancreatografía) and
+    # text that lost its spaces starts at about 21.
+    def garbled?(text)
+      text.match?(RUN_TOGETHER)
     end
 
     # A long line can close the gutter to a single space, which the two-space split
@@ -431,6 +458,7 @@ module Gpc
       text = statement_text(row)
       label = row.filter_map(&:grading).join(" ").squish
       return if text.blank?
+      return { text: text, garbled: true } if row.any?(&:garbled)
 
       label = "PBP" if label.blank? && kind == "good_practice"
       return if label.blank?
