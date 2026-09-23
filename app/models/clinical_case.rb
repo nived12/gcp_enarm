@@ -13,6 +13,7 @@ class ClinicalCase < ApplicationRecord
   belongs_to :clinical_image, optional: true
 
   has_many :questions, -> { order(:position) }, dependent: :destroy, inverse_of: :clinical_case
+  has_many :question_reports, through: :questions
 
   # CIFRHS's own vocabulary, rendered Baja / Media / Alta. Never a competitor's invented
   # Interno / Residente / Adscrito: difficulty is what actually breaks ties on the real
@@ -43,6 +44,17 @@ class ClinicalCase < ApplicationRecord
   WITHDRAWN = %w[flagged retired].freeze
 
   scope :publishable, -> { verdict_supported.where.not(status: WITHDRAWN) }
+
+  scope :with_open_reports, -> { where(id: QuestionReport.status_open.joins(:question).select(:clinical_case_id)) }
+
+  # What still needs a person: withdrawn pending a decision, not supported by the second
+  # opinion (or not read by it yet), or reported by a student. Retired is a decision
+  # already taken, so it leaves the queue.
+  scope :in_review_queue, lambda {
+    where.not(status: "retired").and(
+      status_flagged.or(where(verification_verdict: [nil, "unsupported", "ambiguous"])).or(with_open_reports)
+    )
+  }
 
   # A case may only go live once a second model family has agreed its correct answer is
   # actually supported by the quote it cites. Unverified and unsupported both stay back:

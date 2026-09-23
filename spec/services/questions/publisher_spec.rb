@@ -34,4 +34,12 @@ RSpec.describe Questions::Publisher do
     expect(described_class.call.payload).to include(withdrawn: 1, live: 0)
     expect(kase.reload).to be_status_draft
   end
+
+  it "touches only the cases it is given when narrowed" do
+    chosen = create(:clinical_case, verification_verdict: "supported")
+    other = create(:clinical_case, verification_verdict: "supported")
+
+    expect(described_class.call(cases: ClinicalCase.where(id: chosen.id)).payload).to include(published: 1)
+    expect([chosen.reload.status, other.reload.status]).to eq(%w[published draft])
+  end
 end

@@ -1,0 +1,47 @@
+<%= render "admin/header", section: :clinical_cases, subtitle: t("admin.clinical_cases.subtitle") %>
+
+<nav class="mt-8 flex flex-wrap gap-2 text-sm" aria-label="<%= t("admin.clinical_cases.filter_label") %>">
+  <% [[nil, @total], *@counts.to_a].each do |name, count| %>
+    <% active = queue == name %>
+    <%= link_to admin_clinical_cases_path(queue: name), aria: { current: active ? "page" : nil },
+          class: "inline-flex min-h-11 items-center rounded-full border px-4 #{active ? "border-accent text-ink" : "border-line text-ink-muted hover:border-accent"}" do %>
+      <%= t("admin.clinical_cases.queues.#{name || "all"}") %> · <%= count %>
+    <% end %>
+  <% end %>
+</nav>
+
+<% if @cases.empty? %>
+  <div class="mt-10 rounded-card border border-dashed border-line-strong p-8 text-center">
+    <p class="font-medium text-ink"><%= t("admin.clinical_cases.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm leading-relaxed text-ink-muted"><%= t("admin.clinical_cases.empty.body") %></p>
+  </div>
+<% else %>
+  <ul class="mt-8 space-y-4">
+    <% @cases.each do |clinical_case| %>
+      <% reports = @report_counts.fetch(clinical_case.id, 0) %>
+      <li id="<%= dom_id(clinical_case) %>" class="rounded-card border border-line bg-surface px-5 py-5 sm:px-6">
+        <%= link_to review_clinical_case_path(clinical_case), class: "group block" do %>
+          <p class="text-sm font-medium text-ink group-hover:text-accent">
+            <span class="numeric text-ink-faint">#<%= clinical_case.id %></span>
+            <%= clinical_case.topic&.name || clinical_case.guideline&.title %>
+          </p>
+          <p class="mt-3 line-clamp-2 font-serif leading-relaxed text-ink-muted"><%= clinical_case.stem %></p>
+        <% end %>
+
+        <p class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-faint">
+          <%= render "review/clinical_cases/verdict_badge", clinical_case: clinical_case %>
+          <%= render "admin/clinical_cases/status_badge", clinical_case: clinical_case %>
+          <% if reports.positive? %>
+            <%= link_to t("admin.clinical_cases.open_reports", count: reports), admin_question_reports_path(case_id: clinical_case.id),
+                  class: "rounded-full bg-incorrect-soft px-2 py-0.5 text-incorrect hover:underline" %>
+          <% end %>
+          <span><%= clinical_case.guideline&.catalog_key %></span>
+        </p>
+
+        <div class="mt-4"><%= render "admin/clinical_cases/actions", clinical_case: clinical_case %></div>
+      </li>
+    <% end %>
+  </ul>
+
+  <%= render "admin/pagination", pagy: @pagy, path_for: ->(page) { admin_clinical_cases_path(queue: queue, page: page) } %>
+<% end %>

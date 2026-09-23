@@ -9,6 +9,12 @@ class ExamQuestion < ApplicationRecord
 
   validates :position, presence: true, uniqueness: { scope: :exam_id }
 
+  # Whether its answer, explanation and citation are on screen: after each answer one at a
+  # time, and only once the exam is over on the single page.
+  def revealed?
+    exam.status_completed? || (exam.feedback_after_each? && answer.present?)
+  end
+
   def next_in_exam
     exam.exam_questions.find_by(position: position + 1)
   end

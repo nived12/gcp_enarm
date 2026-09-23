@@ -1,0 +1,65 @@
+<%= render "admin/header", section: :users %>
+
+<%= link_to t("admin.users.back"), admin_users_path, class: "mt-4 inline-flex min-h-11 items-center text-sm text-ink-muted hover:text-accent" %>
+
+<section class="mt-4 card px-6 py-5">
+  <p class="break-all text-lg font-medium text-ink"><%= @user.email %></p>
+  <% if @user.name.present? %>
+    <p class="mt-1 text-sm text-ink-muted"><%= @user.name %></p>
+  <% end %>
+
+  <dl class="mt-5 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+    <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.role") %></dt>
+      <dd class="mt-1 text-ink"><%= t("admin.users.roles.#{@user.role}") %></dd>
+    </div>
+    <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.access") %></dt>
+      <dd class="mt-1 text-ink">
+        <%= if @user.granted_premium? then t("admin.users.access.granted")
+            elsif @user.active_trial? then t("admin.users.access.trial")
+            else t("admin.users.access.free", limit: SubscriptionAccess.free_daily_questions) end %>
+      </dd>
+    </div>
+    <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.granted_premium_until") %></dt>
+      <dd class="mt-1 text-ink"><%= @user.granted_premium_until ? l(@user.granted_premium_until.to_date, format: :long) : "—" %></dd>
+    </div>
+    <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.trial_ends_at") %></dt>
+      <dd class="mt-1 text-ink"><%= @user.trial_ends_at ? l(@user.trial_ends_at.to_date, format: :long) : "—" %></dd>
+    </div>
+    <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.created_at") %></dt>
+      <dd class="mt-1 text-ink"><%= l(@user.created_at.to_date, format: :long) %></dd>
+    </div>
+    <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.activity") %></dt>
+      <dd class="mt-1 text-ink"><%= t("admin.users.activity", exams: @user.exams.count, reports: @user.question_reports.count) %></dd>
+    </div>
+  </dl>
+</section>
+
+<section class="mt-6">
+  <p class="eyebrow"><%= t("admin.users.entitlements.title") %></p>
+  <%= render "billing/entitlements", entitlements: @user.entitlements.recent %>
+</section>
+
+<%= form_with model: @user, url: admin_user_path(@user), method: :patch, class: "mt-8" do |form| %>
+  <% if @user == Current.user %>
+    <p class="text-sm text-ink-muted"><%= t("admin.users.own_role") %></p>
+  <% else %>
+    <%= render "shared/pill_radios", legend: t("admin.users.fields.role"), name: "user[role]",
+          options: User.roles.keys.map { |role| [t("admin.users.roles.#{role}"), role] },
+          selected: @user.role, id_prefix: "user_role" %>
+  <% end %>
+
+  <div class="mt-6">
+    <%= form.label :granted_premium_until, t("admin.users.fields.granted_premium_until"), class: "mb-1.5 block text-sm font-medium text-ink" %>
+    <%= form.date_field :granted_premium_until, value: @user.granted_premium_until&.to_date,
+          aria: { describedby: "granted_premium_hint" }, class: "input sm:max-w-xs" %>
+    <p id="granted_premium_hint" class="mt-2 text-xs text-ink-faint"><%= t("admin.users.granted_premium_hint") %></p>
+  </div>
+
+  <%= form.button t("admin.users.save"), class: "btn btn--primary mt-6 w-full sm:w-auto" %>
+<% end %>

@@ -1,0 +1,23 @@
+<%# What a person can do about a case. Flagging only withdraws it, so any reviewer may;
+    retiring and restoring are the admin's. Restoring hands the case to the publisher,
+    which puts it back in front of students only if the second opinion supported it. %>
+<% admin = Current.user.role_admin? %>
+<% withdrawn = ClinicalCase::WITHDRAWN.include?(clinical_case.status) %>
+<div class="flex flex-wrap gap-2">
+  <% unless withdrawn %>
+    <%= button_to t("admin.clinical_cases.actions.flag"), admin_clinical_case_path(clinical_case),
+          method: :patch, params: { transition: "flag" },
+          class: "min-h-11 rounded-full border border-line-strong px-4 text-sm text-ink hover:border-accent hover:text-accent" %>
+  <% end %>
+  <% if admin && !clinical_case.status_retired? %>
+    <%= button_to t("admin.clinical_cases.actions.retire"), admin_clinical_case_path(clinical_case),
+          method: :patch, params: { transition: "retire" },
+          form: { data: { turbo_confirm: t("admin.clinical_cases.actions.confirm_retire") } },
+          class: "min-h-11 rounded-full border border-incorrect px-4 text-sm text-incorrect hover:bg-incorrect-soft" %>
+  <% end %>
+  <% if admin && withdrawn %>
+    <%= button_to t("admin.clinical_cases.actions.restore"), admin_clinical_case_path(clinical_case),
+          method: :patch, params: { transition: "restore" },
+          class: "min-h-11 rounded-full border border-line-strong px-4 text-sm text-ink hover:border-accent hover:text-accent" %>
+  <% end %>
+</div>

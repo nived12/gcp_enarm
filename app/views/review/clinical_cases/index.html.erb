@@ -39,6 +39,9 @@
             <% if clinical_case.status_retired? %>
               <span class="rounded-full border border-line-strong px-2 py-0.5 text-ink"><%= t("review.retired") %></span>
             <% end %>
+            <% if (reports = @report_counts.fetch(clinical_case.id, 0)).positive? %>
+              <span class="rounded-full bg-incorrect-soft px-2 py-0.5 text-incorrect"><%= t("admin.clinical_cases.open_reports", count: reports) %></span>
+            <% end %>
             <span><%= t("difficulties.#{clinical_case.difficulty}") %></span>
             <span aria-hidden="true">·</span>
             <span><%= clinical_case.guideline&.catalog_key %></span>

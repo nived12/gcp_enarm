@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     # Addressed by position, the number the student sees ("Pregunta 3 de 10").
     resources :questions, only: :show, controller: "exam_questions", param: :position do
       resource :answer, only: %i[create update]
+      resource :report, only: :create, controller: "question_reports"
     end
   end
 
@@ -40,6 +41,17 @@ Rails.application.routes.draw do
 
   # The student's own average, streak and coverage of the bank.
   resource :stats, only: :show
+
+  # Staff only, authorised in Admin::BaseController: reviewers see the queue and the
+  # reports, admins everything.
+  namespace :admin do
+    root "dashboard#show"
+    resources :clinical_cases, only: %i[index update]
+    resources :question_reports, only: %i[index update]
+    resource :costs, only: :show
+    resource :ingestion, only: :show, controller: "ingestion"
+    resources :users, only: %i[index show update]
+  end
 
   root "home#show"
 end

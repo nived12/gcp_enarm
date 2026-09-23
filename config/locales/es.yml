@@ -14,6 +14,7 @@ es:
     tagline: "Cada pregunta, respaldada por una Guía de Práctica Clínica"
 
   navigation:
+    admin: "Administración"
     skip_to_content: "Ir al contenido"
     home: "Inicio"
     simulator: "Simulador"
@@ -333,6 +334,192 @@ es:
         ambiguous: "Otro modelo no pudo decidir al menos una pregunta con la recomendación citada. Revisa si la pregunta pide más de lo que la recomendación dice."
         unsupported: "Otro modelo eligió una opción distinta en al menos una pregunta. Revisa la respuesta marcada como correcta."
         unverified: "Este caso todavía no pasa por la segunda opinión."
+  question_reports:
+    reasons:
+      incorrect_answer: "La respuesta marcada como correcta está mal"
+      ambiguous: "La pregunta es ambigua"
+      outdated_guideline: "La guía ya cambió"
+      wrong_explanation: "La explicación o el porqué de una opción está mal"
+      typo: "Errata"
+      other: "Otro"
+    panel:
+      summary: "Sugerir cambios"
+      intro: "¿Algo no cuadra en esta pregunta? Cuéntanos y la revisaremos con la guía en la mano."
+      reason: "¿Qué encontraste?"
+      comment: "Comentario (opcional)"
+      comment_placeholder: "Por ejemplo: la edición 2021 de la guía recomienda otra cosa."
+      comment_hint: "Si eliges «Otro», dinos brevemente qué cambiarías."
+      submit: "Enviar sugerencia"
+      thanks: "Gracias por avisarnos. Revisaremos esta pregunta y la corregiremos si hace falta."
+      pending: "Ya nos enviaste una sugerencia sobre esta pregunta. La estamos revisando."
+      errors:
+        reason: "Elige qué encontraste."
+        comment_blank: "Cuéntanos brevemente qué cambiarías."
+        comment_too_long: "El comentario puede tener hasta %{count} caracteres."
+  admin:
+    eyebrow: "Administración"
+    nav:
+      label: "Secciones de administración"
+      dashboard: "Resumen"
+      clinical_cases: "Cola de revisión"
+      question_reports: "Sugerencias"
+      costs: "Costos"
+      ingestion: "Ingesta"
+      users: "Usuarios"
+    pagination:
+      label: "Páginas"
+      previous: "Anterior"
+      next: "Siguiente"
+      page: "Página %{page} de %{total}"
+    statuses:
+      draft: "Borrador"
+      published: "Publicado"
+      flagged: "Señalado"
+      retired: "Retirado"
+    dashboard:
+      title: "Resumen"
+      subtitle: "Lo que espera a una persona: sugerencias de estudiantes y casos que la segunda opinión no respaldó."
+      open_reports:
+        one: "sugerencia abierta"
+        other: "sugerencias abiertas"
+      queue:
+        one: "caso por revisar"
+        other: "casos por revisar"
+      spend: "gastados en modelos de lenguaje"
+    clinical_cases:
+      title: "Cola de revisión"
+      subtitle: "Casos señalados, sin respaldo de la segunda opinión o con sugerencias abiertas. Ábrelos en la pantalla de revisión para leerlos completos."
+      filter_label: "Filtrar la cola"
+      queues:
+        all: "En cola"
+        reported: "Con sugerencias"
+        flagged: "Señalados"
+        disputed: "Sin respaldo"
+        unverified: "Sin verificar"
+        retired: "Retirados"
+      empty:
+        title: "Nada por revisar aquí"
+        body: "Cuando un caso pierda el respaldo o alguien envíe una sugerencia, aparecerá en esta lista."
+      open_reports:
+        one: "1 sugerencia abierta"
+        other: "%{count} sugerencias abiertas"
+      triage_reports: "Atender las sugerencias"
+      flagged_notice: "Caso señalado: no llega a estudiantes hasta que alguien lo restaure."
+      actions:
+        flag: "Señalar"
+        retire: "Retirar"
+        restore: "Restaurar"
+        confirm_retire: "¿Retirar este caso? Deja de llegar a estudiantes."
+      done:
+        flag: "Caso señalado. Estado: %{status}."
+        retire: "Caso retirado. Estado: %{status}."
+        restore: "Caso restaurado. Estado: %{status}."
+    question_reports:
+      title: "Sugerencias"
+      subtitle: "Lo que estudiantes enviaron desde «Sugerir cambios». Revisa el caso, actúa sobre él y cierra la sugerencia con una nota."
+      status_filter: "Filtrar por estado"
+      reason_filter: "Filtrar por motivo"
+      statuses:
+        open: "Abiertas"
+        resolved: "Resueltas"
+        dismissed: "Descartadas"
+        all: "Todas"
+      any_reason: "Cualquier motivo"
+      for_case: "Solo del caso #%{id}"
+      all_cases: "Ver todos los casos"
+      empty:
+        title: "Ninguna sugerencia aquí"
+        body: "Cambia el filtro para ver otras, o vuelve cuando llegue la siguiente."
+      question: "Pregunta %{position}:"
+      open_case: "Abrir el caso #%{id} en revisión"
+      note: "Nota de cierre"
+      note_placeholder: "Qué se hizo, o por qué no hace falta cambiar nada."
+      resolve: "Resolver"
+      dismiss: "Descartar"
+      closed_by: "Cerrada por %{who} el %{date}."
+      someone: "una cuenta eliminada"
+      done:
+        resolved: "Sugerencia resuelta."
+        dismissed: "Sugerencia descartada."
+      not_closed: "No se pudo cerrar la sugerencia."
+    costs:
+      title: "Costos"
+      subtitle: "Cada corrida de generación, verificación o comparación de modelos, con los tokens y el costo que registró."
+      empty:
+        title: "Todavía no hay corridas"
+        body: "Las corridas de generación registran su costo y aparecerán aquí."
+      total: "Total"
+      total_detail: "%{runs} corridas · %{tokens} tokens"
+      by_purpose: "Por propósito"
+      by_model: "Por propósito, proveedor y modelo"
+      purposes:
+        generation: "Generación"
+        verification: "Verificación"
+        bake_off: "Comparación de modelos"
+        rationales: "Porqués de las opciones"
+      columns:
+        purpose: "Propósito"
+        model: "Proveedor · modelo"
+        runs: "Corridas"
+        input_tokens: "Tokens de entrada"
+        output_tokens: "Tokens de salida"
+        cost: "Costo"
+    ingestion:
+      title: "Ingesta"
+      subtitle: "Qué guías entraron, cuántas dieron recomendaciones citables y cómo se reparte el banco de casos."
+      guidelines: "Guías"
+      counts:
+        total: "Guías ingeridas"
+        with_statements: "Con recomendaciones"
+        generatable: "Aptas para generar"
+        current: "Vigentes"
+        expired: "Fuera de vigencia"
+        undated: "Sin año"
+        recommendations: "Recomendaciones"
+      by_source: "Por origen"
+      sources:
+        live_site: "Catálogo en línea"
+        web_archive: "Archivo web"
+      with_statements: "%{count} de %{total} con recomendaciones"
+      bank: "Banco de casos"
+      columns:
+        specialty: "Especialidad"
+        cases: "Casos"
+        published: "Publicados"
+      unfiled: "Sin especialidad"
+    users:
+      title: "Usuarios"
+      subtitle: "Busca una cuenta por correo para atender una solicitud de soporte."
+      search: "Buscar"
+      search_placeholder: "correo@ejemplo.com"
+      empty:
+        title: "Ninguna cuenta coincide"
+        body: "Revisa el correo o busca solo una parte de él."
+      roles:
+        student: "Estudiante"
+        reviewer: "Revisión clínica"
+        admin: "Administración"
+      premium_until: "acceso otorgado hasta el %{date}"
+      back: "← Volver a la búsqueda"
+      fields:
+        role: "Rol"
+        access: "Acceso"
+        granted_premium_until: "Acceso otorgado hasta"
+        trial_ends_at: "Fin de la prueba"
+        created_at: "Cuenta creada"
+        activity: "Actividad"
+      access:
+        granted: "Acceso completo otorgado"
+        trial: "En periodo de prueba"
+        free: "Gratuito: %{limit} preguntas al día"
+      activity: "%{exams} exámenes · %{reports} sugerencias"
+      entitlements:
+        title: "Pagos y periodos de acceso"
+      own_role: "No puedes cambiar el rol de tu propia cuenta."
+      granted_premium_hint: "Incluye el día elegido. Déjalo vacío para quitar el acceso otorgado."
+      save: "Guardar cambios"
+      saved: "Cambios guardados."
+      invalid_date: "La fecha no es válida."
   activerecord:
     errors:
       models:

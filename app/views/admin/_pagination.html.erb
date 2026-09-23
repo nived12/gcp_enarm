@@ -1,0 +1,18 @@
+<%# pagy, and a page => path lambda, so every list keeps its filters while paging. %>
+<% if pagy.last > 1 %>
+  <nav class="mt-8 flex items-center justify-between gap-4 border-t border-line pt-6" aria-label="<%= t("admin.pagination.label") %>">
+    <% if pagy.previous %>
+      <%= link_to t("admin.pagination.previous"), path_for.call(pagy.previous),
+            class: "inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm text-ink hover:border-accent" %>
+    <% else %>
+      <span></span>
+    <% end %>
+    <span class="text-sm text-ink-faint"><%= t("admin.pagination.page", page: pagy.page, total: pagy.last) %></span>
+    <% if pagy.next %>
+      <%= link_to t("admin.pagination.next"), path_for.call(pagy.next),
+            class: "inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm text-ink hover:border-accent" %>
+    <% else %>
+      <span></span>
+    <% end %>
+  </nav>
+<% end %>

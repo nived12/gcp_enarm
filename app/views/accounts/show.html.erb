@@ -25,31 +25,7 @@
 <section class="mt-10">
   <h2 class="text-lg font-semibold tracking-tight text-ink"><%= t("billing.account.history.title") %></h2>
 
-  <% if @entitlements.none? %>
-    <div class="mt-4 rounded-card border border-dashed border-line-strong p-6 text-center">
-      <p class="text-sm font-medium text-ink"><%= t("billing.account.history.empty.title") %></p>
-      <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("billing.account.history.empty.body") %></p>
-    </div>
-  <% else %>
-    <ul class="mt-4 space-y-2">
-      <% @entitlements.each do |entitlement| %>
-        <li class="card flex items-start gap-4 px-5 py-4 text-sm">
-          <span class="min-w-0 flex-1">
-            <span class="block font-medium text-ink"><%= t("billing.plans.#{entitlement.plan}.name") %></span>
-            <span class="mt-0.5 block text-xs leading-relaxed text-ink-faint">
-              <%= t("billing.account.history.window",
-                    from: l(entitlement.starts_at.to_date, format: :long),
-                    to: l(entitlement.expires_at.to_date, format: :long)) %>
-            </span>
-            <span class="mt-0.5 block text-xs text-ink-faint">
-              <%= t("billing.account.history.purchased_on", date: l(entitlement.created_at.to_date, format: :long)) %>
-            </span>
-          </span>
-          <span class="numeric shrink-0 text-ink"><%= money(entitlement.amount) %> <span class="text-ink-faint"><%= entitlement.currency %></span></span>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+  <%= render "billing/entitlements", entitlements: @entitlements %>
 </section>
 
 <p class="mt-10 text-sm text-ink-muted">

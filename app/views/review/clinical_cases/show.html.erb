@@ -30,6 +30,7 @@
   <% if @case.status_retired? %>
     <p class="mt-6 rounded-card border border-line-strong px-4 py-3 text-sm text-ink"><%= t("review.show.retired_notice") %></p>
   <% end %>
+  <%= render "admin/clinical_cases/review_panel", clinical_case: @case, open_reports: @open_reports %>
 
   <%# Before the vignette, so a reviewer knows what the second model found before reading
       — its notes name the question they are about. %>
