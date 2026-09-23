@@ -4,6 +4,7 @@
 # Buying while a window is still open extends it: the new window starts where the
 # latest one ends, so nobody loses days by renewing early. Granted premium is not a
 # window and is ignored here — it can be withdrawn, and paid days must not hide behind it.
+# So is a refunded window: its days were given back, and nothing may queue behind them.
 module Billing
   class EntitlementGranter < ApplicationService
     def initialize(user:, plan:, source:, external_id:, amount:, currency:, raw_payload: {})
@@ -31,7 +32,7 @@ module Billing
     attr_reader :user, :plan, :source, :external_id, :amount, :currency, :raw_payload
 
     def create_entitlement
-      starts_at = [ Time.current, user.entitlements.maximum(:expires_at) ].compact.max
+      starts_at = [ Time.current, user.entitlements.in_force.maximum(:expires_at) ].compact.max
       user.entitlements.create!(
         plan: plan.code, source: source, external_id: external_id,
         starts_at: starts_at, expires_at: starts_at + plan.months.months,

@@ -12,7 +12,7 @@ Escríbenos a **[CORREO DE CONTACTO]** desde el correo de tu cuenta, indicando l
 
 - Hacemos el reembolso por Stripe al mismo medio de pago en un plazo de 5 días hábiles desde tu solicitud. Tu banco puede tardar unos días más en reflejarlo.
 - Si pagaste en efectivo, te pediremos los datos necesarios para devolverte el dinero.
-- Al reembolsarse, el periodo de acceso correspondiente termina y tu cuenta vuelve al plan gratuito. Tus exámenes y estadísticas se conservan.
+- Al reembolsarse, ese periodo deja de darte acceso en ese momento. Si ya habías comprado otro periodo para después, empieza de inmediato y conservas todos sus días; si no, tu cuenta vuelve al plan gratuito. Tus exámenes y estadísticas se conservan.
 
 ## Después de 7 días
 

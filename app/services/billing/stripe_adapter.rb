@@ -8,6 +8,7 @@ module Billing
   class StripeAdapter
     CHECKOUT_COMPLETED = "checkout.session.completed".freeze
     ASYNC_PAYMENT_SUCCEEDED = "checkout.session.async_payment_succeeded".freeze
+    CHARGE_REFUNDED = "charge.refunded".freeze
 
     def self.checkout_available?
       secret_key.present?
@@ -55,6 +56,17 @@ module Billing
       { user_id: session.client_reference_id, plan_code: session.metadata[:plan_code], external_id: session.id,
         amount: BigDecimal(session.amount_total.to_s) / 100, currency: session.currency.to_s.upcase,
         raw_payload: session.to_hash }
+    end
+
+    # A refunded charge, reduced to what a refund needs. Stripe sends `charge.refunded`
+    # for partial refunds too; `refunded` turns true only once the whole charge is back,
+    # and `amount_refunded` is the running total across every refund of the charge.
+    def refund_from(event)
+      return unless event.type == CHARGE_REFUNDED
+
+      charge = event.data.object
+      { payment_intent: charge.payment_intent, refunded_amount: BigDecimal(charge.amount_refunded.to_s) / 100,
+        full: charge.refunded == true }
     end
 
     private

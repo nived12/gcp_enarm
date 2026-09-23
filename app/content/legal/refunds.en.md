@@ -12,7 +12,7 @@ Write to **[CONTACT EMAIL]** from your account's email address with the date of 
 
 - We refund through Stripe to the same payment method within 5 business days of your request. Your bank may take a few more days to show it.
 - If you paid in cash, we will ask you for the details needed to return the money.
-- Once refunded, that access window ends and your account returns to the free plan. Your exams and statistics are kept.
+- Once refunded, that window stops granting access right away. If you had already bought another window to follow it, that one starts immediately and keeps all its days; otherwise your account returns to the free plan. Your exams and statistics are kept.
 
 ## After 7 days
 

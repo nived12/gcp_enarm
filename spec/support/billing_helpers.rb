@@ -24,6 +24,18 @@ module BillingHelpers
       metadata: { user_id: user&.id&.to_s, plan_code: plan_code } }
   end
 
+  # A Charge as `charge.refunded` carries it. Stripe sends the event for partial refunds
+  # too; `refunded` is true only once the whole amount is back.
+  def refunded_charge_payload(payment_intent: "pi_test_1", amount: 44_900, amount_refunded: amount,
+                              refunded: amount_refunded == amount)
+    { id: "ch_test_1", object: "charge", amount: amount, amount_refunded: amount_refunded, currency: "mxn",
+      payment_intent: payment_intent, refunded: refunded }
+  end
+
+  def charge_refunded_json(id: "evt_refund_1", **charge)
+    stripe_event_json(type: "charge.refunded", id: id, session: refunded_charge_payload(**charge))
+  end
+
   def stripe_event_json(type: "checkout.session.completed", id: "evt_test_1", session: {})
     { id: id, object: "event", type: type, api_version: "2025-01-01", created: Time.current.to_i,
       data: { object: session } }.to_json

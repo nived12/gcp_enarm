@@ -42,7 +42,7 @@ module SubscriptionAccess
   end
 
   def paid_access?
-    entitlements.active_at(Time.current).exists?
+    entitlements.in_force.active_at(Time.current).exists?
   end
 
   def active_paid_subscription?
@@ -57,7 +57,7 @@ module SubscriptionAccess
   # When the paid window ends. Windows are stacked end to end when bought, so the
   # latest unexpired end is the end of one unbroken stretch.
   def paid_access_until
-    entitlements.unexpired.maximum(:expires_at)
+    entitlements.in_force.unexpired.maximum(:expires_at)
   end
 
   # Nil means uncapped, so there is no number to show. Every caller asks the user

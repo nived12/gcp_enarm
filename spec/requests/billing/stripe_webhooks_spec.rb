@@ -54,6 +54,16 @@ RSpec.describe "Stripe webhooks", type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    it "ends the window when its charge is refunded in full" do
+      deliver(payload)
+
+      deliver(charge_refunded_json)
+
+      expect(response).to have_http_status(:ok)
+      expect(user).not_to be_paid_access
+      expect(user.entitlements.sole).to be_refunded
+    end
+
     it "needs no session, cookie or CSRF token" do
       deliver(payload)
 

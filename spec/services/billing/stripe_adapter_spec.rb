@@ -83,6 +83,29 @@ RSpec.describe Billing::StripeAdapter do
     it "ignores every other event" do
       expect(adapter.purchase_from(event(type: "checkout.session.expired"))).to be_nil
     end
+
+    describe "refunds" do
+      def refund_event(**charge)
+        payload = charge_refunded_json(**charge)
+        adapter.verified_event(payload, stripe_signature(payload))
+      end
+
+      it "reads a fully refunded charge, in pesos, by its PaymentIntent" do
+        expect(adapter.refund_from(refund_event)).to eq(
+          payment_intent: "pi_test_1", refunded_amount: BigDecimal("449"), full: true
+        )
+      end
+
+      it "reads a partial refund as the running total, not as a full one" do
+        expect(adapter.refund_from(refund_event(amount_refunded: 10_050))).to eq(
+          payment_intent: "pi_test_1", refunded_amount: BigDecimal("100.5"), full: false
+        )
+      end
+
+      it "reads no refund out of any other event" do
+        expect(adapter.refund_from(event)).to be_nil
+      end
+    end
   end
 
   describe "without a webhook secret" do

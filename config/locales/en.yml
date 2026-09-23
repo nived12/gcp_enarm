@@ -647,6 +647,7 @@ en:
     webhook:
       invalid_signature: "The webhook signature is not valid."
       unmatched: "The payment matches no known user or access window."
+      unmatched_refund: "The refund matches no known purchase."
     account:
       eyebrow: "Account"
       title: "My account"
@@ -660,6 +661,8 @@ en:
         title: "Purchase history"
         window: "Access from %{from} to %{to}"
         purchased_on: "Bought on %{date}"
+        refunded: "Refunded on %{date}. This window no longer grants access."
+        partially_refunded: "Partial refund of %{amount}."
         empty:
           title: "You haven't bought an access window yet"
           body: "When you do, its dates and what you paid will show here."

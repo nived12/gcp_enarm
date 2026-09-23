@@ -649,6 +649,7 @@ es:
     webhook:
       invalid_signature: "La firma del webhook no es válida."
       unmatched: "El pago no corresponde a ningún usuario o periodo conocido."
+      unmatched_refund: "El reembolso no corresponde a ninguna compra conocida."
     account:
       eyebrow: "Cuenta"
       title: "Mi cuenta"
@@ -662,6 +663,8 @@ es:
         title: "Historial de compras"
         window: "Acceso del %{from} al %{to}"
         purchased_on: "Comprado el %{date}"
+        refunded: "Reembolsado el %{date}. Este periodo ya no da acceso."
+        partially_refunded: "Reembolso parcial de %{amount}."
         empty:
           title: "Todavía no has comprado ningún periodo"
           body: "Cuando compres uno, aquí verás sus fechas y lo que pagaste."

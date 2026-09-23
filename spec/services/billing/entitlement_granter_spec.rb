@@ -37,6 +37,12 @@ RSpec.describe Billing::EntitlementGranter do
     expect(grant("one_month").payload[:entitlement].starts_at).to eq(Time.current)
   end
 
+  it "queues nothing behind a refunded window, whose days were given back" do
+    create(:entitlement, user: user, starts_at: 1.day.ago, expires_at: 29.days.from_now, refunded_at: Time.current)
+
+    expect(grant("one_month").payload[:entitlement].starts_at).to eq(Time.current)
+  end
+
   it "ignores granted premium, which can be withdrawn" do
     user.update!(granted_premium_until: 1.year.from_now)
 

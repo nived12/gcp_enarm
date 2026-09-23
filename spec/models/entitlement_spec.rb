@@ -26,4 +26,14 @@ RSpec.describe Entitlement do
     expect(described_class.recent.first).to eq(upcoming)
     expect(past.catalog_plan).to eq(Plan.find("one_month"))
   end
+
+  it "stops counting a fully refunded window as in force, and tells the two refunds apart" do
+    kept = create(:entitlement, amount: 199)
+    partial = create(:entitlement, amount: 199, refunded_amount: 50)
+    refunded = create(:entitlement, amount: 199, refunded_amount: 199, refunded_at: Time.current)
+
+    expect(described_class.in_force).to contain_exactly(kept, partial)
+    expect([ kept, partial, refunded ].map(&:refunded?)).to eq([ false, false, true ])
+    expect([ kept, partial, refunded ].map(&:partially_refunded?)).to eq([ false, true, false ])
+  end
 end

@@ -1,4 +1,5 @@
-# Verifies a Stripe webhook and turns a paid Checkout Session into an Entitlement.
+# Verifies a Stripe webhook and turns a paid Checkout Session into an Entitlement, and a
+# refunded charge into a refund on the Entitlement it paid for.
 #
 # Stripe delivers at least once and retries anything that is not a 2xx, so the event id
 # is recorded in the same transaction as its effect: a replay is recognised and
@@ -42,6 +43,9 @@ module Billing
     end
 
     def handle(event)
+      refund = adapter.refund_from(event)
+      return record_refund(refund) if refund
+
       purchase = adapter.purchase_from(event)
       return success(status: :ignored) unless purchase
 
@@ -60,6 +64,24 @@ module Billing
         Analytics.capture(user, "purchase_completed", plan: plan.code, amount: purchase[:amount].to_f)
       end
       success(status: :processed, entitlement: result.payload[:entitlement])
+    end
+
+    # The PaymentIntent is the charge's only link to a sale, and every sale kept it in its
+    # Checkout Session payload. A refund we cannot place is answered with an error, so it
+    # stays visible and retried in the dashboard rather than silently dropped.
+    def record_refund(refund)
+      entitlement = refund[:payment_intent] &&
+        Entitlement.source_stripe.find_by("raw_payload ->> 'payment_intent' = ?", refund[:payment_intent])
+      return failure(I18n.t("billing.webhook.unmatched_refund")) unless entitlement
+
+      result = RefundRecorder.call(entitlement: entitlement, **refund.slice(:refunded_amount, :full))
+      if result.payload[:revoked]
+        Analytics.capture(
+          entitlement.user, "purchase_refunded", plan: entitlement.plan,
+          amount: entitlement.amount.to_f
+        )
+      end
+      success(status: :refunded, entitlement: entitlement)
     end
   end
 end

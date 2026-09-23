@@ -41,6 +41,23 @@ RSpec.describe "Account", type: :request do
     expect(body).to include(I18n.t("billing.account.history.window", from: window.first, to: window.last))
   end
 
+  it "marks a refunded window and a partial refund in the history" do
+    freeze_time
+    create(:entitlement, user: student, amount: 199, refunded_amount: 199, refunded_at: Time.current)
+    create(
+      :entitlement, user: student, amount: 449, plan: "three_months", refunded_amount: 100.5,
+      starts_at: 3.months.ago, expires_at: 1.day.ago
+    )
+
+    get account_path
+
+    expect(response.body).to include(
+      I18n.t("billing.account.history.refunded", date: I18n.l(Date.current, format: :long)),
+      I18n.t("billing.account.history.partially_refunded", amount: "$100.50 MXN")
+    )
+    expect(response.body).to include(I18n.t("billing.account.see_plans"))
+  end
+
   it "says a payment is being confirmed when the student returns from checkout" do
     get account_path(checkout: "success")
 

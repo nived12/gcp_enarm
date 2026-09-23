@@ -71,4 +71,53 @@ RSpec.describe Billing::StripeWebhookHandler, :stripe do
     expect(handle(paid_event(plan_code: "lifetime"))).to be_failure
     expect(Entitlement.count).to eq(0)
   end
+
+  describe "charge.refunded" do
+    let!(:sale) do
+      create(
+        :entitlement, user: user, plan: "three_months", amount: 449, starts_at: 1.day.ago,
+        expires_at: 3.months.from_now, raw_payload: checkout_session_payload(user: user)
+      )
+    end
+
+    it "withdraws a fully refunded window and records the refund" do
+      allow(Analytics).to receive(:capture)
+
+      result = handle(charge_refunded_json)
+
+      expect(result.payload).to eq(status: :refunded, entitlement: sale)
+      expect(sale.reload).to be_refunded
+      expect(user).not_to be_paid_access
+      expect(WebhookEvent.sole).to have_attributes(external_id: "evt_refund_1", event_type: "charge.refunded")
+      expect(Analytics).to have_received(:capture).with(user, "purchase_refunded", plan: "three_months", amount: 449.0)
+    end
+
+    it "keeps access through a partial refund, and reports no refund to analytics" do
+      allow(Analytics).to receive(:capture)
+
+      handle(charge_refunded_json(amount_refunded: 10_000))
+
+      expect(sale.reload).to have_attributes(refunded_amount: 100, refunded_at: nil)
+      expect(user).to be_paid_access
+      expect(Analytics).not_to have_received(:capture)
+    end
+
+    it "acknowledges a replayed refund without acting on it twice" do
+      handle(charge_refunded_json)
+
+      expect(handle(charge_refunded_json).payload).to eq(status: :duplicate)
+    end
+
+    it "fails, so Stripe retries and shows it, when no sale has that PaymentIntent" do
+      result = handle(charge_refunded_json(payment_intent: "pi_someone_else"))
+
+      expect(result.errors.full_messages).to eq([I18n.t("billing.webhook.unmatched_refund")])
+      expect(WebhookEvent.count).to eq(0)
+      expect(sale.reload).not_to be_refunded
+    end
+
+    it "fails for a charge with no PaymentIntent, which no Checkout sale has" do
+      expect(handle(charge_refunded_json(payment_intent: nil))).to be_failure
+    end
+  end
 end
