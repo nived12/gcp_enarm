@@ -25,11 +25,7 @@ module Exams
       access = exam.user.subscription_access_result
       return failure(access[:message]) unless access[:allowed]
 
-      answer = exam_question.create_answer!(
-        answer_option: option, correct: option.correct?, answered_at: Time.current,
-        seconds_spent: [exam.current_elapsed - exam.answers.sum(:seconds_spent), 0].max
-      )
-      success(answer: answer)
+      success(answer: record)
     end
 
     def context_for_logging
@@ -48,7 +44,22 @@ module Exams
       exam.feedback_at_end? || exam.current_question == exam_question
     end
 
-    # A changed mind costs no extra daily allowance and keeps the time first spent.
+    # The study day is counted with the answer or not at all, so the streak never
+    # disagrees with the answers it is built from.
+    def record
+      Answer.transaction do
+        answered_at = Time.current
+        answer = exam_question.create_answer!(
+          answer_option: option, correct: option.correct?, answered_at: answered_at,
+          seconds_spent: [exam.current_elapsed - exam.answers.sum(:seconds_spent), 0].max
+        )
+        StudyDay.count_answer!(exam.user, at: answered_at)
+        answer
+      end
+    end
+
+    # A changed mind costs no extra daily allowance, keeps the time first spent, and is
+    # not a second question answered today.
     def change
       exam_question.answer.tap { |answer| answer.update!(answer_option: option, correct: option.correct?) }
     end
