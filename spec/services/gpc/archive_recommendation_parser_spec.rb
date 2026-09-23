@@ -68,8 +68,14 @@ RSpec.describe Gpc::ArchiveRecommendationParser do
     end
 
     it "never mistakes a statement line for the damaged header" do
-      expect(Gpc::ArchiveTable::Region.table_header?(line(marker: "E", text: "Evitar el uso rutinario.",
-                                                          grading: "Nivel D"))).to be(false)
+      expect(
+        Gpc::ArchiveTable::Region.table_header?(
+          line(
+            marker: "E", text: "Evitar el uso rutinario.",
+            grading: "Nivel D"
+          )
+        )
+      ).to be(false)
     end
   end
 
