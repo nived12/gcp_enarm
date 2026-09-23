@@ -13,7 +13,7 @@ module Gpc
         section = guideline.guideline_sections.find(&:kind_archived_document?)
         next counts[:no_text] += 1 if section.nil?
 
-        title = ArchiveTitles.for(guideline.catalog_key) || DocumentTitle.call(section.body).payload
+        title = ArchiveTitles.for(guideline.catalog_key) || repaired(DocumentTitle.call(section.body).payload)
         counts[outcome(guideline, title)] += 1
       end
 
@@ -21,6 +21,14 @@ module Gpc
     end
 
     private
+
+    def repaired(title)
+      title && repairer.call(title)
+    end
+
+    def repairer
+      @repairer ||= TitleRepairer.new(TitleRepairer.vocabulary)
+    end
 
     # A title the extractor will no longer vouch for has to be retracted, not merely
     # left in place — otherwise tightening the extractor can add good titles but never

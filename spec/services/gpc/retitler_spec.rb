@@ -32,6 +32,17 @@ RSpec.describe Gpc::Retitler do
     )
   end
 
+  it "puts back a space the extraction dropped" do
+    welded = (["Catálogo Maestro de Guías de Práctica Clínica: GPC-IMSS-051-18",
+      "Diagnóstico y Tratamientode la obesidad en el adulto"] * 3).join("\n")
+    create(:recommendation, text: ("Tratamiento de la obesidad. " * 5).strip)
+    guideline = archived(title: "IMSS-051-18", body: welded)
+
+    described_class.call
+
+    expect(guideline.reload.title).to eq("Diagnóstico y Tratamiento de la obesidad en el adulto")
+  end
+
   it "leaves a guideline whose title is already right alone" do
     archived(title: "Tratamiento quirúrgico de la obesidad en el adulto", body: pages)
 

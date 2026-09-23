@@ -107,6 +107,8 @@
           aliases: [sobrepeso, obesidad exógena, obesidad mórbida, tratamiento quirúrgico de la obesidad, paciente obeso]
         - name: Patología suprarrenal
           aliases: [insuficiencia suprarrenal, síndrome de Cushing, hiperplasia suprarrenal congénita, deficiencia de 21 hidroxilasa]
+        - name: Patología hipofisaria
+          aliases: [hiperprolactinemia, prolactinoma, adenoma hipofisario]
     - name: Infectología
       topics:
         - name: Infección de vías urinarias
@@ -177,12 +179,14 @@
         - name: Neuropatías periféricas
           aliases: [polineuropatía, síndrome de Guillain-Barré, túnel del carpo, parálisis de Bell]
         - name: Miastenia gravis
+        - name: Ataxia cerebelosa
+          aliases: [ataxia cerebelosa aguda, ataxia]
     - name: Dermatología
       topics:
         - name: Dermatitis
           aliases: [dermatitis atópica, dermatitis por contacto, eccema]
         - name: Infecciones cutáneas
-          aliases: [tiña, escabiasis, impétigo, micosis superficial, escabiosis, verrugas vulgares]
+          aliases: [tiña, escabiasis, impétigo, micosis superficial, escabiosis, verrugas vulgares, pediculosis]
         - name: Psoriasis
           aliases: [psoriasis en placas]
         - name: Cáncer de piel
@@ -191,6 +195,8 @@
           aliases: [vitíligo, alopecia androgenética]
         - name: Enfermedades ampollosas
           aliases: [pénfigo vulgar, penfigoide]
+        - name: Farmacodermias graves
+          aliases: [síndrome de Stevens Johnson, necrólisis epidérmica tóxica]
     - name: Oncología
       topics:
         - name: Cáncer de mama
@@ -206,6 +212,8 @@
         - name: Cáncer de cabeza y cuello
           aliases: [cavidad oral, carcinoma epidermoide de laringe, cáncer de laringe]
         - name: Cáncer de vejiga
+        - name: Cáncer renal
+          aliases: [carcinoma de células renales]
         # "medulobastoma" is IMSS-264-10's own misspelling.
         - name: Tumores del sistema nervioso central
           aliases: [tumor cerebral, astrocitoma, meduloblastoma, medulobastoma]
@@ -216,15 +224,15 @@
     - name: Geriatría
       topics:
         - name: Valoración geriátrica integral
-          aliases: [valoración del adulto mayor, persona adulta mayor]
+          aliases: [valoración del adulto mayor, persona adulta mayor, adulto mayor hospitalizado]
         - name: Síndromes geriátricos
           aliases: [caídas, fragilidad, delirium, incontinencia, hipotensión ortostática, colapso del cuidador, úlceras por presión]
         - name: Polifarmacia y prescripción razonada
-          aliases: [prescripción razonada, polifarmacia, deprescripción]
+          aliases: [prescripción razonada, polifarmacia, deprescripción, interacciones farmacológicas]
         - name: Nutrición del adulto mayor
           aliases: [desnutrición del adulto mayor, evaluación nutricional]
         - name: Fractura de cadera
-          aliases: [fractura de cadera en el adulto mayor, extremo proximal de fémur]
+          aliases: [fractura de cadera en el adulto mayor, extremo proximal de fémur, fracturas transtrocantéricas]
     - name: Psiquiatría
       topics:
         - name: Trastorno depresivo mayor
@@ -326,6 +334,8 @@
           aliases: [ERC pediátrica]
         - name: Síndrome nefrótico pediátrico
           aliases: [síndrome nefrótico en niños, síndrome nefrítico en edad pediátrica]
+        - name: Malformaciones de vías urinarias
+          aliases: [malformaciones de las vías urinarias, reflujo vesicoureteral]
     - name: Endocrinología pediátrica
       topics:
         - name: Diabetes mellitus tipo 1
@@ -378,7 +388,7 @@
         - name: Trabajo de parto y parto
           aliases: [atención del parto, parto eutócico]
         - name: Puerperio
-          aliases: [puerperio fisiológico, atención del puerperio]
+          aliases: [puerperio fisiológico, atención del puerperio, episiotomía]
         - name: Inducción del trabajo de parto y cesárea
           aliases: [cesárea, inducción del parto]
     - name: Complicaciones del embarazo
@@ -423,6 +433,8 @@
           aliases: [esterilidad, reproducción asistida]
         - name: Dismenorrea
           aliases: [dolor menstrual]
+        - name: Vulvovaginitis
+          aliases: [candidosis vulvovaginal, candidiasis vulvovaginal, vaginosis bacteriana, tricomoniasis]
     - name: Oncología ginecológica
       topics:
         - name: Cáncer cervicouterino
@@ -505,7 +517,7 @@
     - name: Ortopedia y traumatología
       topics:
         - name: Fracturas frecuentes
-          aliases: [fractura de radio distal, fractura de tobillo, fractura expuesta, fractura de tibia, fracturas del pie, epífisis inferior del radio, fracturas de antebrazo, lesiones traumáticas de mano]
+          aliases: [fractura de radio distal, fractura de tobillo, fractura expuesta, fractura de tibia, fracturas del pie, epífisis inferior del radio, fracturas de antebrazo, lesiones traumáticas de mano, fractura de cúbito, fracturas costales, fracturas mandibulares]
         - name: Luxaciones
           aliases: [luxación de hombro, luxación de cadera]
         - name: Lumbalgia y patología de columna
@@ -515,7 +527,9 @@
         - name: Osteomielitis y artritis séptica
           aliases: [osteomielitis, artritis séptica]
         - name: Lesiones de rodilla y hombro
-          aliases: [lesiones ligamentarias, meniscos, inestabilidad anterior de hombro, hombro doloroso]
+          aliases: [lesiones ligamentarias, meniscos, inestabilidad anterior de hombro, hombro doloroso, manguito rotador]
+        - name: Hallux valgus
+          aliases: [juanete]
         - name: Tumores de partes blandas
           aliases: [tumores benignos de tejidos blandos]
     - name: Otorrinolaringología
