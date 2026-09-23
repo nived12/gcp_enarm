@@ -300,21 +300,26 @@ es:
       invalid: "El enlace no es válido o ya expiró. Pide otro."
       verified: "Tu correo quedó confirmado. Ya puedes usar la plataforma."
       verified_sign_in: "Tu correo quedó confirmado. Inicia sesión para continuar."
+  mailer:
+    footer:
+      automated: "Este correo se envió automáticamente; no es necesario responderlo."
+    fallback_link: "¿El botón no funciona? Copia este enlace en tu navegador:"
   email_verifications_mailer:
     verify:
       subject: "Confirma tu correo en GPCEnarm"
       greeting: "Hola, %{name}:"
-      intro: "Para activar tu cuenta, confirma tu correo desde aquí:"
-      link: "confirmar mi correo"
+      intro: "Gracias por crear tu cuenta. Confirma tu correo para empezar tus 14 días de prueba."
+      button: "Confirmar mi correo"
       expiry: "El enlace expira en 3 días."
       not_you: "Si no creaste una cuenta en GPCEnarm, ignora este mensaje."
   passwords_mailer:
     reset:
       subject: "Restablece tu contraseña"
       greeting: "Hola, %{name}:"
-      intro: "Puedes elegir una contraseña nueva desde aquí:"
-      link: "restablecer mi contraseña"
+      intro: "Recibimos una solicitud para restablecer la contraseña de tu cuenta."
+      button: "Elegir una contraseña nueva"
       expiry: "El enlace expira en %{duration}."
+      not_you: "Si no la pediste, ignora este mensaje: tu contraseña no cambia."
 
   difficulties:
     low: "Baja"

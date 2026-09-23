@@ -1,10 +1,7 @@
-<p><%= t("email_verifications_mailer.verify.greeting", name: @user.first_name) %></p>
-
-<p>
-  <%= t("email_verifications_mailer.verify.intro") %>
-  <%= link_to t("email_verifications_mailer.verify.link"), verify_email_url(@token) %>.
-</p>
-
-<p><%= t("email_verifications_mailer.verify.expiry") %></p>
-
-<p><%= t("email_verifications_mailer.verify.not_you") %></p>
+<% url = verify_email_url(@token) %>
+<%= render "mailers/title", text: t("email_verifications_mailer.verify.greeting", name: @user.first_name) %>
+<%= render "mailers/paragraph", text: t("email_verifications_mailer.verify.intro") %>
+<%= render "mailers/button", url: url, label: t("email_verifications_mailer.verify.button") %>
+<%= render "mailers/note", text: t("email_verifications_mailer.verify.expiry") %>
+<%= render "mailers/paragraph", text: t("email_verifications_mailer.verify.not_you") %>
+<%= render "mailers/fallback_link", url: url %>

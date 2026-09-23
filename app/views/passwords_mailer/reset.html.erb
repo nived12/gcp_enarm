@@ -1,11 +1,8 @@
-<p><%= t("passwords_mailer.reset.greeting", name: @user.first_name) %></p>
-
-<p>
-  <%= t("passwords_mailer.reset.intro") %>
-  <%= link_to t("passwords_mailer.reset.link"), edit_password_url(@user.password_reset_token) %>.
-</p>
-
-<p>
-  <%= t("passwords_mailer.reset.expiry",
-        duration: distance_of_time_in_words(0, @user.password_reset_token_expires_in)) %>
-</p>
+<% url = edit_password_url(@user.password_reset_token) %>
+<%= render "mailers/title", text: t("passwords_mailer.reset.greeting", name: @user.first_name) %>
+<%= render "mailers/paragraph", text: t("passwords_mailer.reset.intro") %>
+<%= render "mailers/button", url: url, label: t("passwords_mailer.reset.button") %>
+<%= render "mailers/note", text: t("passwords_mailer.reset.expiry",
+      duration: distance_of_time_in_words(0, @user.password_reset_token_expires_in)) %>
+<%= render "mailers/paragraph", text: t("passwords_mailer.reset.not_you") %>
+<%= render "mailers/fallback_link", url: url %>

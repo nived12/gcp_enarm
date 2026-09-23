@@ -298,21 +298,26 @@ en:
       invalid: "That link is invalid or has expired. Ask for another."
       verified: "Your email is confirmed. You can start using the platform."
       verified_sign_in: "Your email is confirmed. Sign in to continue."
+  mailer:
+    footer:
+      automated: "This email was sent automatically; there's no need to reply."
+    fallback_link: "Button not working? Paste this link into your browser:"
   email_verifications_mailer:
     verify:
       subject: "Confirm your email for GPCEnarm"
       greeting: "Hi %{name},"
-      intro: "To activate your account, confirm your email here:"
-      link: "confirm my email"
+      intro: "Thanks for creating your account. Confirm your email to start your 14-day trial."
+      button: "Confirm my email"
       expiry: "The link expires in 3 days."
       not_you: "If you didn't create a GPCEnarm account, ignore this message."
   passwords_mailer:
     reset:
       subject: "Reset your password"
       greeting: "Hello, %{name}:"
-      intro: "You can choose a new password here:"
-      link: "reset my password"
+      intro: "We received a request to reset your account's password."
+      button: "Choose a new password"
       expiry: "This link expires in %{duration}."
+      not_you: "If you didn't ask for it, ignore this message: your password stays the same."
 
   difficulties:
     low: "Low"

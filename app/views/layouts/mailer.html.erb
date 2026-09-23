@@ -1,13 +1,40 @@
+<%# Shared chrome for every email: wordmark, a white card on the site's cream, footer.
+    Styles are inline and the frame is tables, because Gmail's app and Outlook drop
+    <style> blocks and ignore most layout CSS. The wordmark is text, not an image:
+    nothing to block, and Gmail's dark mode cannot strand it on a recoloured band.
+    Colours are the app's own tokens (alan.com palette). %>
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title><%= message.subject %></title>
   </head>
-
-  <body>
-    <%= yield %>
+  <body style="margin:0; padding:0; background-color:#fffcf5;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fffcf5;">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+            <tr>
+              <td style="padding:0 4px 20px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.3px; color:#282830;">
+                GPC<span style="color:#5c59f3;">Enarm</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color:#ffffff; border:1px solid #dbe2f4; border-radius:16px; padding:36px 32px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#464754;">
+                <%= yield %>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 4px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:1.5; color:#656779;">
+                <strong style="color:#464754;"><%= t("app.name") %></strong> · <%= t("app.tagline") %><br>
+                <%= t("mailer.footer.automated") %>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
