@@ -283,6 +283,29 @@ en:
       due_link: "Review"
       due_pearls: "Pearls"
 
+  email_verifications:
+    show:
+      title: "Confirm your email"
+      subtitle: "We sent a link to %{email}. Open it to activate your account and start your 14-day trial."
+      spam: "Not there? Check your spam or promotions folder, or ask for another link."
+      resend: "Send another link"
+      dev_link: "Verify now (development only)"
+      wrong_email: "Typed the wrong email?"
+      sign_out: "Sign out and sign up again"
+    create:
+      sent: "We sent you a new link."
+    confirm:
+      invalid: "That link is invalid or has expired. Ask for another."
+      verified: "Your email is confirmed. You can start using the platform."
+      verified_sign_in: "Your email is confirmed. Sign in to continue."
+  email_verifications_mailer:
+    verify:
+      subject: "Confirm your email for GPCEnarm"
+      greeting: "Hi %{name},"
+      intro: "To activate your account, confirm your email here:"
+      link: "confirm my email"
+      expiry: "The link expires in 3 days."
+      not_you: "If you didn't create a GPCEnarm account, ignore this message."
   passwords_mailer:
     reset:
       subject: "Reset your password"
@@ -537,6 +560,12 @@ en:
         trial_ends_at: "Trial ends"
         created_at: "Account created"
         activity: "Activity"
+        email: "Email"
+      email:
+        verified: "Confirmed on %{date}"
+        unverified: "Not confirmed."
+        verify: "Mark as confirmed"
+        done: "Email marked as confirmed. The trial starts today."
       access:
         granted: "Full access granted"
         trial: "In trial"
@@ -590,8 +619,6 @@ en:
       subtitle: "Start with 14 days of full access. No card required."
       submit: "Create account"
       have_account: "Already have an account?"
-    create:
-      welcome: "Your account is ready. Welcome."
   identities:
     google:
       continue: "Continue with Google"

@@ -2,6 +2,7 @@
 # to make an account to see what it costs.
 class PricingController < ApplicationController
   allow_unauthenticated_access only: :show
+  allow_unverified_email only: :show
 
   def show
     @plans = Plan.all

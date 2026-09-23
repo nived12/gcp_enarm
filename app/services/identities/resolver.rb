@@ -2,7 +2,11 @@
 # already linked to them, an existing account with the same email (linked now), or a new
 # one. Returns { user:, outcome: } with outcome :returning, :linked or :created.
 #
-# An email is only trusted when the provider says it verified it. Linking on an
+# The role is never read from the provider: a new account is a student, a linked one keeps
+# the role it had, and only an admin changes it, from /admin/users.
+#
+# An email is only trusted when the provider says it verified it, and an account the
+# provider vouches for needs no verification link of its own. Linking on an
 # unverified address would hand an existing account to whoever typed that address into
 # a Google account; creating on one would squat the address before its owner signs up.
 module Identities
@@ -42,7 +46,10 @@ module Identities
     def link(user)
       return failure(I18n.t("identities.already_linked")) if user.identities.exists?(provider: auth.provider)
 
-      user.identities.create!(provider: auth.provider, uid: auth.uid, email: email)
+      user.transaction do
+        user.identities.create!(provider: auth.provider, uid: auth.uid, email: email)
+        user.verify_email!
+      end
       success(user: user, outcome: :linked)
     end
 
@@ -59,7 +66,8 @@ module Identities
     # given name falls back to the display name, then to the address itself.
     def new_user_attributes
       first_name = info["first_name"].presence || info["name"].presence || email.split("@").first
-      { email: email, first_name: first_name.to_s.first(100), last_name: info["last_name"].to_s.first(100).presence,
+      { email: email, email_verified_at: Time.current, first_name: first_name.to_s.first(100),
+        last_name: info["last_name"].to_s.first(100).presence,
         time_zone: (time_zone if User::TIME_ZONES.include?(time_zone)) }.compact
     end
 

@@ -51,6 +51,24 @@ class User < ApplicationRecord
     password_salt&.last(10)
   end
 
+  # A link in the sign-up email proves the address. Salted with the address, so a link
+  # sent to one the account no longer has stops working.
+  generates_token_for :email_verification, expires_in: 3.days do
+    email
+  end
+
+  def email_verified?
+    email_verified_at.present?
+  end
+
+  # The trial is counted from here rather than from sign-up: nothing can be used before
+  # the address is proven, and a link opened days later should not find the trial spent.
+  def verify_email!
+    return if email_verified?
+
+    update!(email_verified_at: Time.current, trial_ends_at: SubscriptionAccess.trial_days.days.from_now)
+  end
+
   def password?
     password_digest.present?
   end

@@ -1,0 +1,26 @@
+<% content_for :title, t("email_verifications.show.title") %>
+
+<%= render layout: "shared/auth_panel",
+      locals: { title: t("email_verifications.show.title"),
+                subtitle: t("email_verifications.show.subtitle", email: Current.user.email) } do %>
+  <p class="text-sm leading-relaxed text-ink-muted"><%= t("email_verifications.show.spam") %></p>
+
+  <%= form_with url: email_verification_path, class: "mt-4" do |form| %>
+    <%= render "shared/submit", form: form, label: t("email_verifications.show.resend") %>
+  <% end %>
+
+  <%# Without a Resend key, development writes mail to tmp/mails; the link is shown here
+      so the flow can be walked through locally. %>
+  <% if Rails.env.development? && ENV["RESEND_API_KEY"].blank? %>
+    <p class="mt-4 text-sm">
+      <%= link_to t("email_verifications.show.dev_link"), verify_email_path(Current.user.generate_token_for(:email_verification)),
+            class: "font-medium text-accent hover:underline" %>
+    </p>
+  <% end %>
+
+  <div class="mt-6 text-sm text-ink-muted">
+    <%= t("email_verifications.show.wrong_email") %>
+    <%= button_to t("email_verifications.show.sign_out"), session_path, method: :delete,
+          form_class: "inline", class: "font-medium text-accent hover:underline" %>
+  </div>
+<% end %>

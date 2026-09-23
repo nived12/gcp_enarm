@@ -36,15 +36,17 @@ RSpec.describe "Authentication", type: :request do
   end
 
   describe "POST /registration" do
-    it "creates the account and signs the user in" do
+    it "creates the account unverified, signs the user in and sends the verification link" do
       expect {
         post registration_path, params: {
           user: { first_name: "Gabriela", last_name: "Guadarrama", email: "nueva@example.com",
                   password: "contrasena-segura", password_confirmation: "contrasena-segura" }
         }
       }.to change(User, :count).by(1)
+        .and have_enqueued_mail(EmailVerificationsMailer, :verify)
 
-      expect(response).to redirect_to(root_path)
+      expect(User.find_by!(email: "nueva@example.com")).not_to be_email_verified
+      expect(response).to redirect_to(email_verification_path)
     end
 
     it "keeps the time zone the browser reported, and the default for one tzinfo does not know" do

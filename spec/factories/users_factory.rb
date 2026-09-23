@@ -6,6 +6,11 @@ FactoryBot.define do
     last_name { "Guadarrama López" }
     locale { "es" }
     role { "student" }
+    email_verified_at { Time.current }
+
+    trait :unverified do
+      email_verified_at { nil }
+    end
 
     trait :admin do
       role { "admin" }

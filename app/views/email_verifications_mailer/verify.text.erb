@@ -1,0 +1,9 @@
+<%= t("email_verifications_mailer.verify.greeting", name: @user.first_name) %>
+
+<%= t("email_verifications_mailer.verify.intro") %>
+
+<%= verify_email_url(@token) %>
+
+<%= t("email_verifications_mailer.verify.expiry") %>
+
+<%= t("email_verifications_mailer.verify.not_you") %>

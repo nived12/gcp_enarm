@@ -117,4 +117,33 @@ RSpec.describe "Admin user lookup", type: :request do
       expect(admin.reload).to be_role_admin
     end
   end
+
+  describe "POST /admin/users/:id/email_verification" do
+    let!(:pending) { create(:user, :unverified, email: "sin.correo@example.com") }
+
+    it "shows an unconfirmed address and lets the admin confirm it, starting the trial" do
+      get admin_user_path(pending)
+      expect(response.body).to include(I18n.t("admin.users.email.unverified"), I18n.t("admin.users.email.verify"))
+
+      freeze_time
+      post admin_user_email_verification_path(pending)
+
+      expect(response).to redirect_to(admin_user_path(pending))
+      expect(flash[:notice]).to eq(I18n.t("admin.users.email.done"))
+      expect(pending.reload.email_verified_at).to eq(Time.current)
+      expect(pending.trial_ends_at).to eq(SubscriptionAccess.trial_days.days.from_now)
+      follow_redirect!
+      expect(response.body).not_to include(I18n.t("admin.users.email.verify"))
+    end
+
+    it "is refused to a reviewer" do
+      delete session_path
+      reviewer = create(:user, role: "reviewer")
+      post session_path, params: { email: reviewer.email, password: "contrasena-segura" }
+
+      post admin_user_email_verification_path(pending)
+
+      expect(pending.reload).not_to be_email_verified
+    end
+  end
 end

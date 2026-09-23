@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   resource :session
   resource :registration, only: %i[new create]
   resources :passwords, param: :token
+  # Sign-up sends a link; until it is followed the account sees only the waiting page.
+  resource :email_verification, only: %i[show create]
+  get "email_verification/:token" => "email_verifications#confirm", as: :verify_email
 
   # OmniAuth's middleware answers POST /auth/:provider itself and hands the callback on
   # with the provider's answer in request.env["omniauth.auth"].
@@ -60,7 +63,9 @@ Rails.application.routes.draw do
     resources :question_reports, only: %i[index update]
     resource :costs, only: :show
     resource :ingestion, only: :show, controller: "ingestion"
-    resources :users, only: %i[index show update]
+    resources :users, only: %i[index show update] do
+      resource :email_verification, only: :create, controller: "user_email_verifications"
+    end
   end
 
   # The study calendar: one plan per student, its days addressed by date.

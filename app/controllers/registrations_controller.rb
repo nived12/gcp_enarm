@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access
+  allow_unverified_email
 
   rate_limit to: 10, within: 10.minutes, only: :create, with: -> {
     redirect_to new_registration_path, alert: t("sessions.create.rate_limited")
@@ -14,8 +15,9 @@ class RegistrationsController < ApplicationController
     @user = User.new(registration_params)
 
     if @user.save(context: :sign_up)
+      EmailVerificationsMailer.verify(@user).deliver_later
       start_new_session_for(@user)
-      redirect_to after_authentication_url, notice: t("registrations.create.welcome")
+      redirect_to email_verification_path
     else
       render :new, status: :unprocessable_content
     end

@@ -2,6 +2,7 @@
 # this only starts the session and says what happened.
 class OmniauthCallbacksController < ApplicationController
   allow_unauthenticated_access
+  allow_unverified_email
 
   def create
     result = Identities::Resolver.call(

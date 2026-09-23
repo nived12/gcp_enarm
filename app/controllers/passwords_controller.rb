@@ -1,5 +1,6 @@
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
+  allow_unverified_email
   before_action :set_user_by_token, only: %i[edit update]
 
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {
@@ -24,6 +25,8 @@ class PasswordsController < ApplicationController
   def update
     @user.assign_attributes(params.permit(:password, :password_confirmation))
     if @user.save(context: :password_reset)
+      # The link arrived in the inbox, which is all verifying the address asks.
+      @user.verify_email!
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: t("passwords.update.success")
     else

@@ -3,12 +3,18 @@ module Authentication
 
   included do
     before_action :require_authentication
+    before_action :require_verified_email
     helper_method :authenticated?
   end
 
   class_methods do
     def allow_unauthenticated_access(**options)
       skip_before_action :require_authentication, **options
+    end
+
+    # Pages a signed-in student whose address is not yet proven may still reach.
+    def allow_unverified_email(**options)
+      skip_before_action :require_verified_email, **options
     end
   end
 
@@ -27,6 +33,13 @@ module Authentication
 
   def find_session_by_cookie
     Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+  end
+
+  # An account made with a password is usable once its address is proven; until then
+  # every page but the few that let the student prove it, or leave, sends them to wait.
+  def require_verified_email
+    user = authenticated? && Current.user
+    redirect_to email_verification_path if user && !user.email_verified?
   end
 
   def request_authentication

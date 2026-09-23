@@ -13,7 +13,7 @@ end
 RSpec.describe "Signing up", type: :system do
   before { driven_by :playwright_cancun }
 
-  it "takes the time zone from the browser, and lets the student change it" do
+  it "waits on the emailed link, takes the time zone from the browser, and lets the student change it" do
     visit new_registration_path
     fill_in I18n.t("attributes.first_name"), with: "Dana"
     fill_in I18n.t("attributes.last_name"), with: "Ríos Vega"
@@ -22,8 +22,12 @@ RSpec.describe "Signing up", type: :system do
     fill_in I18n.t("attributes.password_confirmation"), with: "contrasena-segura"
     click_button I18n.t("registrations.new.submit")
 
-    expect(page).to have_text(I18n.t("registrations.create.welcome"))
-    expect(User.find_by!(email: "dana@example.com").time_zone).to eq("America/Cancun")
+    expect(page).to have_text(I18n.t("email_verifications.show.title"))
+    user = User.find_by!(email: "dana@example.com")
+    expect(user.time_zone).to eq("America/Cancun")
+
+    visit verify_email_path(user.generate_token_for(:email_verification))
+    expect(page).to have_text(I18n.t("email_verifications.confirm.verified"))
 
     visit account_path
     expect(page).to have_checked_field("time_zone_America/Cancun", visible: :all)

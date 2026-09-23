@@ -1,7 +1,8 @@
 require "rails_helper"
 
 # A visitor who picks a plan on /pricing must sign up (or in) before paying, and should
-# land back on that plan afterwards rather than on the home screen.
+# land back on that plan afterwards rather than on the home screen — for a new account,
+# once it has followed the link that confirms its address.
 RSpec.describe "Returning to pricing after signing up", type: :request do
   let(:chosen) { pricing_path(plan: "six_months", anchor: "plan-six_months") }
 
@@ -10,6 +11,8 @@ RSpec.describe "Returning to pricing after signing up", type: :request do
       user: { first_name: "Dana", last_name: "Ríos", email: "nueva@example.com", password: "contrasena-segura",
               password_confirmation: "contrasena-segura" }
     }
+    expect(response).to redirect_to(email_verification_path)
+    get verify_email_path(User.find_by!(email: "nueva@example.com").generate_token_for(:email_verification))
   end
 
   def sign_in(user)
@@ -27,7 +30,7 @@ RSpec.describe "Returning to pricing after signing up", type: :request do
     sign_up
 
     expect(response).to redirect_to("http://www.example.com#{chosen}")
-    expect(flash[:notice]).to eq(I18n.t("registrations.create.welcome"))
+    expect(flash[:notice]).to eq(I18n.t("email_verifications.confirm.verified"))
   end
 
   it "keeps the way back when the visitor switches to signing in" do

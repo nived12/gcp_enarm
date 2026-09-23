@@ -28,6 +28,18 @@
       <dd class="mt-1 text-ink"><%= @user.trial_ends_at ? l(@user.trial_ends_at.to_date, format: :long) : "—" %></dd>
     </div>
     <div>
+      <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.email") %></dt>
+      <dd class="mt-1 text-ink">
+        <% if @user.email_verified? %>
+          <%= t("admin.users.email.verified", date: l(@user.email_verified_at.to_date, format: :long)) %>
+        <% else %>
+          <%= t("admin.users.email.unverified") %>
+          <%= button_to t("admin.users.email.verify"), admin_user_email_verification_path(@user),
+                form_class: "inline", class: "ml-1 font-medium text-accent hover:underline" %>
+        <% end %>
+      </dd>
+    </div>
+    <div>
       <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.created_at") %></dt>
       <dd class="mt-1 text-ink"><%= l(@user.created_at.to_date, format: :long) %></dd>
     </div>

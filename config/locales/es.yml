@@ -285,6 +285,29 @@ es:
       due_link: "Repasar"
       due_pearls: "Perlas"
 
+  email_verifications:
+    show:
+      title: "Confirma tu correo"
+      subtitle: "Te enviamos un enlace a %{email}. Ábrelo para activar tu cuenta y empezar tus 14 días de prueba."
+      spam: "¿No llega? Revisa la carpeta de spam o promociones, o pide otro enlace."
+      resend: "Enviar otro enlace"
+      dev_link: "Verificar ahora (solo en desarrollo)"
+      wrong_email: "¿Escribiste mal tu correo?"
+      sign_out: "Cierra sesión y regístrate de nuevo"
+    create:
+      sent: "Te enviamos un enlace nuevo."
+    confirm:
+      invalid: "El enlace no es válido o ya expiró. Pide otro."
+      verified: "Tu correo quedó confirmado. Ya puedes usar la plataforma."
+      verified_sign_in: "Tu correo quedó confirmado. Inicia sesión para continuar."
+  email_verifications_mailer:
+    verify:
+      subject: "Confirma tu correo en GPCEnarm"
+      greeting: "Hola, %{name}:"
+      intro: "Para activar tu cuenta, confirma tu correo desde aquí:"
+      link: "confirmar mi correo"
+      expiry: "El enlace expira en 3 días."
+      not_you: "Si no creaste una cuenta en GPCEnarm, ignora este mensaje."
   passwords_mailer:
     reset:
       subject: "Restablece tu contraseña"
@@ -539,6 +562,12 @@ es:
         trial_ends_at: "Fin de la prueba"
         created_at: "Cuenta creada"
         activity: "Actividad"
+        email: "Correo"
+      email:
+        verified: "Confirmado el %{date}"
+        unverified: "Sin confirmar."
+        verify: "Marcar como confirmado"
+        done: "Correo marcado como confirmado. La prueba empieza hoy."
       access:
         granted: "Acceso completo otorgado"
         trial: "En periodo de prueba"
@@ -592,8 +621,6 @@ es:
       subtitle: "Empieza con 14 días de acceso completo. No pedimos tarjeta."
       submit: "Crear cuenta"
       have_account: "¿Ya tienes cuenta?"
-    create:
-      welcome: "Tu cuenta está lista. Te damos la bienvenida."
   identities:
     google:
       continue: "Continuar con Google"

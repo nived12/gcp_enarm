@@ -75,6 +75,7 @@ RSpec.describe "Signing in with Google", type: :request do
         expect([ user.first_name, user.last_name, user.time_zone ]).to eq([ "Dana", "Ríos Vega", "America/Cancun" ])
         expect(user.trial_ends_at).to eq(SubscriptionAccess.trial_days.days.from_now)
         expect(user).to be_role_student
+        expect(user).to be_email_verified
         expect(user.password?).to be(false)
         expect(user.identities.sole).to have_attributes(provider: "google", uid: "108000000000000000001")
         expect(response).to redirect_to(root_path)
@@ -135,6 +136,28 @@ RSpec.describe "Signing in with Google", type: :request do
         expect(user.last_name).to eq("Ríos")
       end
 
+      it "keeps its role: an admin stays admin, a student stays student" do
+        user.update!(role: "admin")
+        mock_google
+
+        continue_with_google
+
+        expect(user.reload).to be_role_admin
+      end
+
+      it "no longer waits on the verification link once Google vouches for the address" do
+        freeze_time
+        user.update!(email_verified_at: nil, trial_ends_at: 1.day.from_now)
+        mock_google
+
+        continue_with_google
+        follow_redirect!
+
+        expect(user.reload).to be_email_verified
+        expect(user.trial_ends_at).to eq(SubscriptionAccess.trial_days.days.from_now)
+        expect(response.body).to include(I18n.t("home.dashboard.greeting", name: "Dana"))
+      end
+
       it "is left alone when Google has not verified the address" do
         mock_google(verified: false)
 
@@ -174,6 +197,15 @@ RSpec.describe "Signing in with Google", type: :request do
         expect(flash[:notice]).to eq(I18n.t("identities.outcomes.returning"))
         expect(user.identities.sole.email).to eq("nueva@gmail.com")
         expect(user.sessions.count).to eq(1)
+      end
+
+      it "keeps the role it has, whatever Google says" do
+        user.update!(role: "reviewer")
+        mock_google
+
+        continue_with_google
+
+        expect(user.reload).to be_role_reviewer
       end
 
       it "keeps the address on file when Google sends none" do
