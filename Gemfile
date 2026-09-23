@@ -75,8 +75,9 @@ gem "rails_icons"
 # Markdown rendering for content pages (CommonMark, safe by default)
 gem "commonmarker", "~> 2.0"
 
-# Payments and subscriptions
-gem "pay"
+# Payments: Stripe Checkout for one-time prepaid windows. No Pay gem — it exists for
+# subscription lifecycles this product deliberately does not have. Only app/services/billing
+# may reference Stripe.
 gem "stripe"
 
 # Transactional email

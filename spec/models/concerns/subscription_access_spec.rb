@@ -111,4 +111,32 @@ RSpec.describe SubscriptionAccess do
       expect(create(:user, :trial_expired).daily_questions_limit).to eq(20)
     end
   end
+
+  describe "paid windows" do
+    let(:user) { create(:user, :trial_expired) }
+
+    it "lift the cap while one is open, and only then" do
+      freeze_time
+      create(:entitlement, user: user, starts_at: 2.months.ago, expires_at: 1.month.ago)
+      expect(user).not_to be_paid_access
+      expect(user.daily_questions_limit).to eq(20)
+
+      create(:entitlement, user: user, starts_at: 1.day.ago, expires_at: 1.month.from_now)
+      expect(user).to be_paid_access
+      expect(user).to be_active_paid_subscription
+      expect(user.daily_questions_limit).to be_nil
+    end
+
+    it "run to the end of the last stacked window" do
+      freeze_time
+      create(:entitlement, user: user, starts_at: 1.day.ago, expires_at: 1.month.from_now)
+      create(:entitlement, user: user, starts_at: 1.month.from_now, expires_at: 4.months.from_now)
+
+      expect(user.paid_access_until).to eq(4.months.from_now)
+    end
+
+    it "have no end date when none was bought" do
+      expect(user.paid_access_until).to be_nil
+    end
+  end
 end

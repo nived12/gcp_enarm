@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :exams, dependent: :destroy
+  has_many :entitlements, dependent: :destroy
 
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 
