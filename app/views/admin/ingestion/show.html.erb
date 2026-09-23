@@ -1,0 +1,73 @@
+<%= render "admin/header", section: :ingestion, subtitle: t("admin.ingestion.subtitle") %>
+
+<section class="mt-8">
+  <h2 class="eyebrow"><%= t("admin.ingestion.guidelines") %></h2>
+  <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <% @guidelines.each do |key, count| %>
+      <div class="card px-5 py-4">
+        <dt class="text-xs text-ink-faint"><%= t("admin.ingestion.counts.#{key}") %></dt>
+        <dd class="numeric mt-2 text-2xl font-medium text-ink"><%= number_with_delimiter(count) %></dd>
+      </div>
+    <% end %>
+    <div class="card px-5 py-4">
+      <dt class="text-xs text-ink-faint"><%= t("admin.ingestion.counts.recommendations") %></dt>
+      <dd class="numeric mt-2 text-2xl font-medium text-ink"><%= number_with_delimiter(@recommendations) %></dd>
+    </div>
+  </dl>
+</section>
+
+<section class="mt-10">
+  <h2 class="eyebrow"><%= t("admin.ingestion.by_source") %></h2>
+  <ul class="mt-4 space-y-4">
+    <% Guideline.sources.each_key do |source| %>
+      <% total = @by_source.fetch(source, 0) %>
+      <% with_statements = @with_statements_by_source.fetch(source, 0) %>
+      <li>
+        <div class="flex items-baseline justify-between gap-4 text-sm">
+          <span class="text-ink"><%= t("admin.ingestion.sources.#{source}") %></span>
+          <span class="numeric text-ink-muted"><%= t("admin.ingestion.with_statements", count: with_statements, total: total) %></span>
+        </div>
+        <div class="mt-2 h-2 rounded-full bg-surface-sunk" aria-hidden="true">
+          <div class="h-full rounded-full bg-accent" style="width: <%= bar_percent(with_statements, total) %>%"></div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</section>
+
+<section class="mt-10">
+  <h2 class="eyebrow"><%= t("admin.ingestion.bank") %></h2>
+  <p class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
+    <% ClinicalCase.statuses.each_key do |status| %>
+      <span><%= t("admin.statuses.#{status}") %> · <span class="numeric text-ink"><%= @case_statuses.fetch(status, 0) %></span></span>
+    <% end %>
+  </p>
+
+  <div class="-mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+    <table class="w-full min-w-[24rem] text-left text-sm">
+      <thead class="text-xs uppercase tracking-wide text-ink-faint">
+        <tr>
+          <th scope="col" class="py-2 pr-4 font-medium"><%= t("admin.ingestion.columns.specialty") %></th>
+          <th scope="col" class="py-2 pr-4 text-right font-medium"><%= t("admin.ingestion.columns.cases") %></th>
+          <th scope="col" class="py-2 text-right font-medium"><%= t("admin.ingestion.columns.published") %></th>
+        </tr>
+      </thead>
+      <tbody class="numeric">
+        <% @specialties.each do |specialty| %>
+          <tr class="border-t border-line">
+            <th scope="row" class="py-2 pr-4 font-sans font-normal text-ink"><%= specialty.name %></th>
+            <td class="py-2 pr-4 text-right text-ink-muted"><%= @cases_by_specialty.fetch(specialty.id, 0) %></td>
+            <td class="py-2 text-right text-ink"><%= @published_by_specialty.fetch(specialty.id, 0) %></td>
+          </tr>
+        <% end %>
+        <% if @cases_by_specialty.key?(nil) %>
+          <tr class="border-t border-line">
+            <th scope="row" class="py-2 pr-4 font-sans font-normal text-ink-muted"><%= t("admin.ingestion.unfiled") %></th>
+            <td class="py-2 pr-4 text-right text-ink-muted"><%= @cases_by_specialty[nil] %></td>
+            <td class="py-2 text-right text-ink"><%= @published_by_specialty.fetch(nil, 0) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -31,5 +31,16 @@ Rails.application.routes.draw do
     resources :clinical_cases, only: %i[index show]
   end
 
+  # Staff only, authorised in Admin::BaseController: reviewers see the queue and the
+  # reports, admins everything.
+  namespace :admin do
+    root "dashboard#show"
+    resources :clinical_cases, only: %i[index update]
+    resources :question_reports, only: %i[index update]
+    resource :costs, only: :show
+    resource :ingestion, only: :show, controller: "ingestion"
+    resources :users, only: %i[index show update]
+  end
+
   root "home#show"
 end

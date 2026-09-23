@@ -1,0 +1,27 @@
+<%= render "admin/header", section: :dashboard, subtitle: t("admin.dashboard.subtitle") %>
+
+<ul class="mt-8 grid gap-4 sm:grid-cols-2">
+  <li>
+    <%= link_to admin_question_reports_path, class: "card block px-6 py-5 transition-shadow hover:ring-2 hover:ring-accent" do %>
+      <p class="eyebrow"><%= t("admin.nav.question_reports") %></p>
+      <p class="numeric mt-3 text-3xl font-medium text-ink"><%= @open_reports %></p>
+      <p class="mt-1 text-sm text-ink-muted"><%= t("admin.dashboard.open_reports", count: @open_reports) %></p>
+    <% end %>
+  </li>
+  <li>
+    <%= link_to admin_clinical_cases_path, class: "card block px-6 py-5 transition-shadow hover:ring-2 hover:ring-accent" do %>
+      <p class="eyebrow"><%= t("admin.nav.clinical_cases") %></p>
+      <p class="numeric mt-3 text-3xl font-medium text-ink"><%= @queue %></p>
+      <p class="mt-1 text-sm text-ink-muted"><%= t("admin.dashboard.queue", count: @queue) %></p>
+    <% end %>
+  </li>
+  <% if @spend %>
+    <li>
+      <%= link_to admin_costs_path, class: "card block px-6 py-5 transition-shadow hover:ring-2 hover:ring-accent" do %>
+        <p class="eyebrow"><%= t("admin.nav.costs") %></p>
+        <p class="numeric mt-3 text-3xl font-medium text-ink"><%= usd(@spend) %></p>
+        <p class="mt-1 text-sm text-ink-muted"><%= t("admin.dashboard.spend") %></p>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

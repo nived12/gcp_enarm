@@ -1,0 +1,6 @@
+<%# Published is the normal state and says nothing; the others are why a case is here. %>
+<% unless clinical_case.status_published? %>
+  <span class="rounded-full border px-2 py-0.5 <%= clinical_case.status_draft? ? "border-line text-ink-faint" : "border-line-strong text-ink" %>">
+    <%= t("admin.statuses.#{clinical_case.status}") %>
+  </span>
+<% end %>

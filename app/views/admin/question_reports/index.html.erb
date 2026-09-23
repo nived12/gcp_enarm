@@ -1,0 +1,95 @@
+<%= render "admin/header", section: :question_reports, subtitle: t("admin.question_reports.subtitle") %>
+
+<% pill = "inline-flex min-h-11 items-center rounded-full border px-4" %>
+<nav class="mt-8 flex flex-wrap gap-2 text-sm" aria-label="<%= t("admin.question_reports.status_filter") %>">
+  <% [*QuestionReport.statuses.keys, "all"].each do |status| %>
+    <% active = filters[:filter_status] == status %>
+    <%= link_to admin_question_reports_path(filters.merge(filter_status: status)), aria: { current: active ? "page" : nil },
+          class: "#{pill} #{active ? "border-accent text-ink" : "border-line text-ink-muted hover:border-accent"}" do %>
+      <%= t("admin.question_reports.statuses.#{status}") %>
+      <% if status != "all" %> · <%= @counts.fetch(status, 0) %><% end %>
+    <% end %>
+  <% end %>
+</nav>
+
+<nav class="mt-3 flex flex-wrap gap-2 text-xs" aria-label="<%= t("admin.question_reports.reason_filter") %>">
+  <% [nil, *QuestionReport.reasons.keys].each do |reason| %>
+    <% active = filters[:reason] == reason %>
+    <%= link_to admin_question_reports_path(filters.merge(reason: reason).compact), aria: { current: active ? "page" : nil },
+          class: "inline-flex min-h-11 items-center rounded-full border px-3 #{active ? "border-accent text-ink" : "border-line text-ink-muted hover:border-accent"}" do %>
+      <%= reason ? t("question_reports.reasons.#{reason}") : t("admin.question_reports.any_reason") %>
+    <% end %>
+  <% end %>
+</nav>
+
+<% if filters[:case_id] %>
+  <p class="mt-4 text-sm text-ink-muted">
+    <%= t("admin.question_reports.for_case", id: filters[:case_id]) %>
+    · <%= link_to t("admin.question_reports.all_cases"), admin_question_reports_path(filters.except(:case_id)),
+            class: "inline-flex min-h-11 items-center text-accent underline underline-offset-2" %>
+  </p>
+<% end %>
+
+<% if @reports.empty? %>
+  <div class="mt-10 rounded-card border border-dashed border-line-strong p-8 text-center">
+    <p class="font-medium text-ink"><%= t("admin.question_reports.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm leading-relaxed text-ink-muted"><%= t("admin.question_reports.empty.body") %></p>
+  </div>
+<% else %>
+  <ul class="mt-8 space-y-4">
+    <% @reports.each do |report| %>
+      <% clinical_case = report.question.clinical_case %>
+      <li id="<%= dom_id(report) %>" class="rounded-card border border-line bg-surface px-5 py-5 sm:px-6">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-faint">
+          <span class="rounded-full border px-2 py-0.5 <%= report.status_open? ? "border-incorrect text-incorrect" : "border-line text-ink-muted" %>">
+            <%= t("admin.question_reports.statuses.#{report.status}") %>
+          </span>
+          <span class="font-medium text-ink"><%= t("question_reports.reasons.#{report.reason}") %></span>
+          <span aria-hidden="true">·</span>
+          <span><%= l(report.created_at.to_date, format: :long) %></span>
+          <span aria-hidden="true">·</span>
+          <span class="break-all"><%= report.user.email %></span>
+        </p>
+
+        <% if report.comment.present? %>
+          <p class="mt-3 whitespace-pre-line leading-relaxed text-ink"><%= report.comment %></p>
+        <% end %>
+
+        <p class="mt-3 text-sm leading-relaxed text-ink-muted" lang="<%= clinical_case.locale %>">
+          <span class="numeric text-ink-faint"><%= t("admin.question_reports.question", position: report.question.position) %></span>
+          <%= report.question.text.truncate(200) %>
+        </p>
+        <%= link_to t("admin.question_reports.open_case", id: clinical_case.id), review_clinical_case_path(clinical_case),
+              class: "mt-1 inline-flex min-h-11 items-center text-sm text-accent underline underline-offset-2 hover:text-accent-hover" %>
+
+        <% if report.status_open? %>
+          <%= form_with url: admin_question_report_path(report), method: :patch, class: "mt-3 border-t border-line pt-4" do |form| %>
+            <% filters.each do |key, value| %>
+              <%= hidden_field_tag key, value, id: nil %>
+            <% end %>
+            <%= form.label :resolution_note, t("admin.question_reports.note"), for: dom_id(report, :note),
+                  class: "mb-1.5 block text-sm font-medium text-ink" %>
+            <%= form.text_area :resolution_note, id: dom_id(report, :note), rows: 2,
+                  placeholder: t("admin.question_reports.note_placeholder"), class: "input py-3" %>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <%= form.button t("admin.question_reports.resolve"), name: "status", value: "resolved", class: "btn btn--primary" %>
+              <%= form.button t("admin.question_reports.dismiss"), name: "status", value: "dismissed", class: "btn btn--ghost" %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="mt-3 border-t border-line pt-4 text-sm text-ink-muted">
+            <p>
+              <%= t("admin.question_reports.closed_by", who: report.resolved_by&.email || t("admin.question_reports.someone"),
+                    date: l(report.resolved_at.to_date, format: :long)) %>
+            </p>
+            <% if report.resolution_note.present? %>
+              <p class="mt-1 whitespace-pre-line text-ink"><%= report.resolution_note %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+
+  <%= render "admin/pagination", pagy: @pagy, path_for: ->(page) { admin_question_reports_path(filters.merge(page: page)) } %>
+<% end %>

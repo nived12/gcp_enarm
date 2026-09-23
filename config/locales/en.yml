@@ -346,6 +346,171 @@ en:
         reason: "Choose what you found."
         comment_blank: "Tell us briefly what you would change."
         comment_too_long: "The comment can be up to %{count} characters."
+  admin:
+    eyebrow: "Administration"
+    nav:
+      label: "Administration sections"
+      dashboard: "Overview"
+      clinical_cases: "Review queue"
+      question_reports: "Suggestions"
+      costs: "Costs"
+      ingestion: "Ingestion"
+      users: "Users"
+    pagination:
+      label: "Pages"
+      previous: "Previous"
+      next: "Next"
+      page: "Page %{page} of %{total}"
+    statuses:
+      draft: "Draft"
+      published: "Published"
+      flagged: "Flagged"
+      retired: "Retired"
+    dashboard:
+      title: "Overview"
+      subtitle: "What is waiting for a person: student suggestions and cases the second opinion did not support."
+      open_reports:
+        one: "open suggestion"
+        other: "open suggestions"
+      queue:
+        one: "case to review"
+        other: "cases to review"
+      spend: "spent on language models"
+    clinical_cases:
+      title: "Review queue"
+      subtitle: "Cases that are flagged, not supported by the second opinion, or have open suggestions. Open them on the review screen to read them in full."
+      filter_label: "Filter the queue"
+      queues:
+        all: "In queue"
+        reported: "With suggestions"
+        flagged: "Flagged"
+        disputed: "Not supported"
+        unverified: "Unverified"
+        retired: "Retired"
+      empty:
+        title: "Nothing to review here"
+        body: "When a case loses its support or someone sends a suggestion, it will show up in this list."
+      open_reports:
+        one: "1 open suggestion"
+        other: "%{count} open suggestions"
+      triage_reports: "Handle the suggestions"
+      flagged_notice: "Flagged case: it does not reach students until someone restores it."
+      actions:
+        flag: "Flag"
+        retire: "Retire"
+        restore: "Restore"
+        confirm_retire: "Retire this case? It stops reaching students."
+      done:
+        flag: "Case flagged. Status: %{status}."
+        retire: "Case retired. Status: %{status}."
+        restore: "Case restored. Status: %{status}."
+    question_reports:
+      title: "Suggestions"
+      subtitle: "What students sent through “Suggest changes”. Review the case, act on it, and close the suggestion with a note."
+      status_filter: "Filter by status"
+      reason_filter: "Filter by reason"
+      statuses:
+        open: "Open"
+        resolved: "Resolved"
+        dismissed: "Dismissed"
+        all: "All"
+      any_reason: "Any reason"
+      for_case: "Only case #%{id}"
+      all_cases: "See every case"
+      empty:
+        title: "No suggestions here"
+        body: "Change the filter to see others, or come back when the next one arrives."
+      question: "Question %{position}:"
+      open_case: "Open case #%{id} in review"
+      note: "Closing note"
+      note_placeholder: "What was done, or why nothing needs to change."
+      resolve: "Resolve"
+      dismiss: "Dismiss"
+      closed_by: "Closed by %{who} on %{date}."
+      someone: "a deleted account"
+      done:
+        resolved: "Suggestion resolved."
+        dismissed: "Suggestion dismissed."
+      not_closed: "The suggestion could not be closed."
+    costs:
+      title: "Costs"
+      subtitle: "Every generation, verification or model comparison run, with the tokens and cost it recorded."
+      empty:
+        title: "No runs yet"
+        body: "Generation runs record their cost and will show up here."
+      total: "Total"
+      total_detail: "%{runs} runs · %{tokens} tokens"
+      by_purpose: "By purpose"
+      by_model: "By purpose, provider and model"
+      purposes:
+        generation: "Generation"
+        verification: "Verification"
+        bake_off: "Model comparison"
+        rationales: "Option rationales"
+      columns:
+        purpose: "Purpose"
+        model: "Provider · model"
+        runs: "Runs"
+        input_tokens: "Input tokens"
+        output_tokens: "Output tokens"
+        cost: "Cost"
+    ingestion:
+      title: "Ingestion"
+      subtitle: "Which guidelines came in, how many yielded citable recommendations, and how the case bank is spread."
+      guidelines: "Guidelines"
+      counts:
+        total: "Guidelines ingested"
+        with_statements: "With recommendations"
+        generatable: "Fit to generate from"
+        current: "Current"
+        expired: "Expired"
+        undated: "Undated"
+        recommendations: "Recommendations"
+      by_source: "By source"
+      sources:
+        live_site: "Live catalog"
+        web_archive: "Web archive"
+      with_statements: "%{count} of %{total} with recommendations"
+      bank: "Case bank"
+      columns:
+        specialty: "Specialty"
+        cases: "Cases"
+        published: "Published"
+      unfiled: "No specialty"
+    users:
+      title: "Users"
+      subtitle: "Look up an account by email to handle a support request."
+      search: "Search"
+      search_placeholder: "email@example.com"
+      empty:
+        title: "No account matches"
+        body: "Check the email or search for part of it."
+      roles:
+        student: "Student"
+        reviewer: "Clinical review"
+        admin: "Administration"
+      premium_until: "access granted until %{date}"
+      back: "← Back to search"
+      fields:
+        role: "Role"
+        access: "Access"
+        granted_premium_until: "Access granted until"
+        trial_ends_at: "Trial ends"
+        created_at: "Account created"
+        activity: "Activity"
+      access:
+        granted: "Full access granted"
+        trial: "In trial"
+        free: "Free: %{limit} questions a day"
+      activity: "%{exams} exams · %{reports} suggestions"
+      entitlements:
+        title: "Payments and access windows"
+        pending: "Purchased access windows will show up here once billing exists."
+      own_role: "You cannot change your own account's role."
+      granted_premium_hint: "Includes the chosen day. Leave it empty to remove granted access."
+      save: "Save changes"
+      saved: "Changes saved."
+      invalid_date: "That date is not valid."
   activerecord:
     errors:
       models:

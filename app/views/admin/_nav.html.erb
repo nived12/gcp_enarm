@@ -1,0 +1,12 @@
+<%# Tabs, scrolling sideways on a phone rather than wrapping into a wall of pills. %>
+<nav class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="<%= t("admin.nav.label") %>">
+  <ul class="flex gap-2 whitespace-nowrap text-sm">
+    <% admin_sections.each do |section, path| %>
+      <% active = section == current %>
+      <li>
+        <%= link_to t("admin.nav.#{section}"), path, aria: { current: active ? "page" : nil },
+              class: "inline-flex min-h-11 items-center rounded-full border px-4 #{active ? "border-accent bg-accent-soft text-ink" : "border-line text-ink-muted hover:border-accent hover:text-ink"}" %>
+      </li>
+    <% end %>
+  </ul>
+</nav>

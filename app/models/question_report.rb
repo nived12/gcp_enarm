@@ -29,6 +29,12 @@ class QuestionReport < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
 
+  # Open reports per case, for marking the cases in a list without a query per row.
+  def self.open_counts_by_case(case_ids)
+    status_open.joins(:question).where(questions: { clinical_case_id: case_ids })
+               .group("questions.clinical_case_id").count
+  end
+
   # Closing records who closed it and when, so a student's report is never silently lost.
   def close(status:, note:, by:)
     return false unless CLOSED.include?(status)

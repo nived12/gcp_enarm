@@ -1,0 +1,9 @@
+<% content_for :title, t("admin.#{section}.title") %>
+<%= render "admin/nav", current: section %>
+<section class="mt-8">
+  <p class="eyebrow"><%= t("admin.eyebrow") %></p>
+  <h1 class="mt-3 text-2xl font-semibold tracking-tight text-ink"><%= t("admin.#{section}.title") %></h1>
+  <% if local_assigns[:subtitle] %>
+    <p class="mt-3 max-w-prose leading-relaxed text-ink-muted"><%= subtitle %></p>
+  <% end %>
+</section>

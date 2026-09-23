@@ -29,6 +29,7 @@ module Review
     def index
       @pagy, @cases = pagy(ordered.includes(:guideline, :topic, :questions, :clinical_image), limit: PER_PAGE)
       @verdict_counts = verdict_counts
+      @report_counts = QuestionReport.open_counts_by_case(@cases.map(&:id))
       @runs = GenerationRun.recent.limit(5)
     end
 
@@ -39,6 +40,7 @@ module Review
       @total = scope.count
       @previous = ordered.where(created_at: @case.created_at..).where.not(id: @case.id).last
       @next = ordered.where(created_at: ..@case.created_at).where.not(id: @case.id).first
+      @open_reports = @case.question_reports.status_open.includes(:question).order(:created_at)
     end
 
     private
