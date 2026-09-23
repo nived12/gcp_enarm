@@ -1,0 +1,43 @@
+<section class="card px-6 py-5" aria-labelledby="streak-title">
+  <h2 id="streak-title" class="eyebrow"><%= t("stats.streak.title") %></h2>
+
+  <div class="mt-3 flex items-center gap-3">
+    <%= render "stats/flame", lit: streak.current.positive?, size: "size-9" %>
+    <p class="min-w-0 flex-1">
+      <span class="numeric text-4xl font-medium tracking-tight <%= streak.current.positive? ? "text-ink" : "text-ink-faint" %>"><%= streak.current %></span>
+      <span class="ml-1 text-sm text-ink-muted"><%= t("stats.streak.days", count: streak.current) %></span>
+    </p>
+    <% if streak.freezes.positive? %>
+      <p class="numeric shrink-0 rounded-full bg-surface-sunk px-3 py-1 text-xs text-ink-muted"><%= t("stats.streak.freezes", count: streak.freezes) %></p>
+    <% end %>
+  </div>
+
+  <div class="mt-4">
+    <p class="text-sm text-ink">
+      <%= streak.today_done ? t("stats.streak.today_done", answered: streak.today_questions) : t("stats.streak.today", answered: streak.today_questions, minimum: streak.minimum) %>
+    </p>
+    <div class="mt-2 h-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
+      <div class="h-full rounded-full bg-accent" style="width: <%= [100.0 * streak.today_questions / streak.minimum, 100].min.round(1) %>%"></div>
+    </div>
+    <% unless streak.today_done %>
+      <p class="mt-1.5 text-xs text-ink-faint">
+        <%= streak.current.positive? ? t("stats.streak.keep", remaining: streak.today_remaining) : t("stats.streak.start", minimum: streak.minimum) %>
+      </p>
+    <% end %>
+  </div>
+
+  <% if streak.frozen_dates.any? || streak.best > streak.current %>
+    <ul class="mt-4 space-y-1 border-t border-line pt-3 text-sm text-ink-muted">
+      <% if streak.frozen_dates.any? %>
+        <li><%= t("stats.streak.frozen", count: streak.frozen_dates.size, dates: streak.frozen_dates.map { |date| l(date, format: :short) }.to_sentence) %></li>
+      <% end %>
+      <% if streak.best > streak.current %>
+        <li><%= t("stats.streak.best", count: streak.best) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <p class="mt-4 text-xs leading-relaxed text-ink-faint">
+    <%= t("stats.streak.rules", minimum: streak.minimum, days: Stats::StreakCalculator::DAYS_PER_FREEZE, max: Stats::StreakCalculator::MAX_FREEZES) %>
+  </p>
+</section>

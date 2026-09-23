@@ -1,0 +1,33 @@
+<section class="mt-10" aria-labelledby="coverage-title">
+  <h2 id="coverage-title" class="eyebrow"><%= t("stats.coverage.title") %></h2>
+
+  <% if coverage.published.zero? %>
+    <div class="mt-3 rounded-card border border-dashed border-line-strong p-6 text-center text-sm text-ink-muted">
+      <%= t("stats.coverage.empty") %>
+    </div>
+  <% else %>
+    <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("stats.coverage.intro") %></p>
+
+    <% if coverage.neglected.any? %>
+      <%# Named plainly, with a way straight into it — the point is a nudge, not a verdict. %>
+      <div class="mt-4 rounded-card bg-ground-tint px-5 py-4" data-testid="neglected">
+        <p class="text-sm font-medium text-ink"><%= t("stats.coverage.neglected_title") %></p>
+        <p class="mt-1 text-sm text-ink-muted"><%= t("stats.coverage.neglected_body") %></p>
+        <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <% coverage.neglected.each do |area| %>
+            <%= button_to t("stats.coverage.practice", name: area.specialty.name), exams_path,
+                  params: { mode: "custom", filters: { specialty_ids: [area.specialty.id], unseen_only: 1, question_count: 10 } },
+                  class: "btn btn--ghost w-full sm:w-auto", form: { class: "contents" } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <ul class="mt-3 divide-y divide-line border-y border-line">
+      <% coverage.areas.each do |area| %>
+        <%= render "stats/bar", label: area.specialty.name, percentage: area.share,
+              detail: area.published.positive? ? t("stats.coverage.area", seen: area.seen, published: area.published) : t("stats.coverage.none_published") %>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

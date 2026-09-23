@@ -1,0 +1,55 @@
+<% content_for :title, t("stats.show.title") %>
+
+<section>
+  <p class="eyebrow"><%= t("stats.show.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("stats.show.title") %></h1>
+</section>
+
+<div class="mt-8"><%= render "stats/streak", streak: @streak %></div>
+
+<% if @performance.empty? %>
+  <div class="mt-6 rounded-card border border-dashed border-line-strong p-6 text-center">
+    <p class="text-sm font-medium text-ink"><%= t("stats.show.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("stats.show.empty.body") %></p>
+    <%= button_to t("stats.show.empty.start"), exams_path(mode: "quick_quiz"), class: "btn btn--primary mt-4 w-full sm:w-auto", form: { class: "contents" } %>
+  </div>
+<% else %>
+  <section class="card mt-3 px-6 py-5" aria-labelledby="average-title">
+    <h2 id="average-title" class="eyebrow"><%= t("stats.show.average") %></h2>
+    <% if @performance.average %>
+      <p class="numeric mt-2 text-4xl font-medium tracking-tight text-ink"><%= score_text(@performance.average) %></p>
+      <p class="mt-1 text-sm text-ink-muted"><%= t("stats.show.completed", count: @performance.completed_exams) %></p>
+    <% else %>
+      <p class="numeric mt-2 text-4xl font-medium tracking-tight text-ink-faint">—</p>
+      <p class="mt-1 text-sm text-ink-muted"><%= t("stats.show.no_average") %></p>
+    <% end %>
+    <p class="mt-3 border-t border-line pt-3 text-sm text-ink-muted">
+      <%= t("stats.show.tally", count: @performance.overall.correct, total: @performance.overall.asked) %>
+    </p>
+  </section>
+
+  <section class="mt-10" aria-labelledby="difficulty-title">
+    <h2 id="difficulty-title" class="eyebrow"><%= t("stats.show.by_difficulty") %></h2>
+    <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("stats.show.by_difficulty_note") %></p>
+    <ul class="mt-3 divide-y divide-line border-y border-line">
+      <% @performance.by_difficulty.each do |difficulty, tally| %>
+        <%= render "stats/bar", label: t("difficulties.#{difficulty}"), percentage: tally.percentage,
+              detail: tally.asked.positive? ? t("stats.show.tally", count: tally.correct, total: tally.asked) : t("stats.show.no_questions") %>
+      <% end %>
+    </ul>
+  </section>
+
+  <% if @performance.by_specialty.any? %>
+    <section class="mt-10" aria-labelledby="specialty-title">
+      <h2 id="specialty-title" class="eyebrow"><%= t("stats.show.by_specialty") %></h2>
+      <ul class="mt-3 divide-y divide-line border-y border-line">
+        <% @performance.by_specialty.each do |specialty, tally| %>
+          <%= render "stats/bar", label: specialty.name, percentage: tally.percentage,
+                detail: t("stats.show.tally", count: tally.correct, total: tally.asked) %>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+<% end %>
+
+<%= render "stats/coverage", coverage: @coverage %>

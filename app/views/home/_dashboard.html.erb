@@ -30,6 +30,7 @@
       <p class="numeric mt-2 text-4xl font-medium tracking-tight text-ink-faint">—</p>
       <p class="mt-1 text-sm text-ink-muted"><%= t("home.dashboard.no_average") %></p>
     <% end %>
+    <%= render "home/streak", streak: Stats::StreakCalculator.call(Current.user).payload %>
   </section>
 
   <% if unfinished %>

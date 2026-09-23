@@ -248,6 +248,13 @@ en:
       empty:
         title: "No questions yet"
         body: "The bank is built from the GPC catalog. Once the first ingestion finishes, your plan for the day appears here."
+      streak:
+        one: "1-day streak"
+        other: "%{count}-day streak"
+      streak_none: "No streak yet"
+      streak_today: "today %{answered} of %{minimum}"
+      streak_today_done: "today counts"
+      streak_link: "Stats"
 
   passwords_mailer:
     reset:
@@ -343,3 +350,51 @@ en:
       have_account: "Already have an account?"
     create:
       welcome: "Your account is ready. Welcome."
+  stats:
+    show:
+      title: "Your progress"
+      eyebrow: "Stats"
+      average: "Your average"
+      completed:
+        one: "across 1 finished exam"
+        other: "across %{count} finished exams"
+      no_average: "It appears once you finish your first exam."
+      tally:
+        one: "1 correct out of %{total} questions"
+        other: "%{count} correct out of %{total} questions"
+      no_questions: "No questions yet"
+      by_difficulty: "By difficulty"
+      by_difficulty_note: "In a tie, the ENARM counts correct answers in High first, then in Medium."
+      by_specialty: "By specialty"
+      empty:
+        title: "Nothing to measure yet"
+        body: "Your average and your accuracy by specialty and by difficulty appear as soon as you answer your first questions."
+        start: "Start Quiz Express"
+    streak:
+      title: "Daily streak"
+      days:
+        one: "day in a row"
+        other: "days in a row"
+      today: "Today: %{answered} of %{minimum} questions"
+      today_done: "Today counts: %{answered} questions"
+      start: "Answer %{minimum} questions today to start a streak."
+      keep: "%{remaining} more and today counts."
+      best:
+        one: "Your best streak: 1 day"
+        other: "Your best streak: %{count} days"
+      freezes:
+        one: "1 freeze"
+        other: "%{count} freezes"
+      frozen:
+        one: "A freeze covered %{dates}."
+        other: "Your freezes covered %{dates}."
+      rules: "%{minimum} questions a day keeps it. Every %{days} days of study earns a freeze, up to %{max}, spent only on a day you cannot study, like a night shift. The day ends at 4 a.m."
+    coverage:
+      title: "What you have seen"
+      intro: "Cases from the bank you have already answered, by area. The ENARM frames its cases in Public Health, Emergency and Family Medicine, so those count too."
+      area: "%{seen} of %{published} cases"
+      none_published: "No published cases yet"
+      neglected_title: "You are leaving behind"
+      neglected_body: "You have seen much less of these areas than of the rest of the bank."
+      practice: "Practise %{name}"
+      empty: "No published cases yet."

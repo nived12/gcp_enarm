@@ -250,6 +250,13 @@ es:
       empty:
         title: "Todavía no hay preguntas"
         body: "El banco se construye a partir del catálogo de GPC. En cuanto termine la primera carga, aquí aparecerá tu plan del día."
+      streak:
+        one: "1 día de racha"
+        other: "%{count} días de racha"
+      streak_none: "Sin racha todavía"
+      streak_today: "hoy %{answered} de %{minimum}"
+      streak_today_done: "hoy ya cuenta"
+      streak_link: "Estadísticas"
 
   passwords_mailer:
     reset:
@@ -345,3 +352,51 @@ es:
       have_account: "¿Ya tienes cuenta?"
     create:
       welcome: "Tu cuenta está lista. Te damos la bienvenida."
+  stats:
+    show:
+      title: "Tu avance"
+      eyebrow: "Estadísticas"
+      average: "Tu promedio"
+      completed:
+        one: "en 1 examen terminado"
+        other: "en %{count} exámenes terminados"
+      no_average: "Aparecerá cuando termines tu primer examen."
+      tally:
+        one: "1 acierto de %{total} preguntas"
+        other: "%{count} aciertos de %{total} preguntas"
+      no_questions: "Sin preguntas todavía"
+      by_difficulty: "Por dificultad"
+      by_difficulty_note: "En un empate, el ENARM cuenta primero los aciertos en Alta y luego en Media."
+      by_specialty: "Por especialidad"
+      empty:
+        title: "Aún no hay nada que medir"
+        body: "Tu promedio, tus aciertos por especialidad y por dificultad aparecen en cuanto respondas tus primeras preguntas."
+        start: "Empezar Quiz Express"
+    streak:
+      title: "Racha diaria"
+      days:
+        one: "día seguido"
+        other: "días seguidos"
+      today: "Hoy: %{answered} de %{minimum} preguntas"
+      today_done: "Hoy ya cuenta: %{answered} preguntas"
+      start: "Responde %{minimum} preguntas hoy para empezar una racha."
+      keep: "Te faltan %{remaining} para que hoy cuente."
+      best:
+        one: "Tu mejor racha: 1 día"
+        other: "Tu mejor racha: %{count} días"
+      freezes:
+        one: "1 protector"
+        other: "%{count} protectores"
+      frozen:
+        one: "Un protector cubrió el %{dates}."
+        other: "Tus protectores cubrieron %{dates}."
+      rules: "Con %{minimum} preguntas al día la mantienes. Cada %{days} días de estudio ganas un protector, hasta %{max}, que se usa solo si un día no puedes, como en una guardia. El día termina a las 4 a. m."
+    coverage:
+      title: "Lo que has visto"
+      intro: "Casos del banco que ya respondiste, por área. El ENARM enmarca sus casos en Salud Pública, Urgencias y Medicina Familiar, así que también cuentan."
+      area: "%{seen} de %{published} casos"
+      none_published: "Aún no hay casos publicados"
+      neglected_title: "Estás dejando de lado"
+      neglected_body: "Has visto mucho menos de estas áreas que del resto del banco."
+      practice: "Practicar %{name}"
+      empty: "Todavía no hay casos publicados."
