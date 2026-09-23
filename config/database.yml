@@ -3,15 +3,17 @@ default: &default
   encoding: unicode
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
+# DB_SUFFIX gives each git worktree its own databases (e.g. DB_SUFFIX=_stats), so
+# agents working in parallel never truncate each other's tables. Unset on main.
 development:
   <<: *default
-  database: gpc_enarm_development
+  database: gpc_enarm_development<%= ENV["DB_SUFFIX"] %>
 
 test:
   <<: *default
   # TEST_ENV_NUMBER is set by parallel_tests (empty for the first process, then
   # "2", "3", …) so each process owns its own database.
-  database: gpc_enarm_test<%= ENV["TEST_ENV_NUMBER"] %>
+  database: gpc_enarm_test<%= ENV["DB_SUFFIX"] %><%= ENV["TEST_ENV_NUMBER"] %>
 
 # One database, not the four Rails 8 scaffolds. Railway provides a single
 # DATABASE_URL; the Solid Queue/Cache/Cable tables live in the primary schema via
