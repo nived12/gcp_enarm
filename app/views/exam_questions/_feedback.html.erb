@@ -1,0 +1,53 @@
+<% question = exam_question.question %>
+<% recommendation = question.recommendation %>
+
+<% if question.explanation.present? %>
+  <section class="mt-8">
+    <p class="eyebrow"><%= t("exams.feedback.explanation") %></p>
+    <p class="mt-3 leading-relaxed text-ink" lang="<%= exam_question.clinical_case.locale %>"><%= question.explanation %></p>
+  </section>
+<% end %>
+
+<%# The trust feature: the statement the answer rests on, in full, with the span the
+    question used marked inside it, its grade, and the guideline's year — so a student can
+    judge an eight-year-old guideline for themselves. %>
+<% if recommendation %>
+  <% guideline = recommendation.guideline %>
+  <section class="mt-8 rounded-card bg-surface-sunk px-5 py-5 sm:px-6">
+    <div class="flex flex-wrap items-center gap-3">
+      <% if recommendation.grade.present? %>
+        <span class="grade-marker"><%= recommendation.grade %></span>
+      <% end %>
+      <p class="eyebrow"><%= t("exams.feedback.source") %></p>
+    </div>
+
+    <p class="vignette mt-4 text-sm leading-loose text-ink" lang="es">
+      <%= highlighted(recommendation.text, question.source_quote) %>
+    </p>
+
+    <%# The figure the statement sends the reader to — an algorithm, a criteria table.
+        Only here, after the answer: beside the question it would be the answer key. %>
+    <% if (figure = recommendation.figure) %>
+      <%= render "shared/figure", image: figure, spacing: "mt-5" %>
+    <% end %>
+
+    <div class="numeric mt-5 space-y-1 text-xs leading-relaxed text-ink-faint">
+      <p><%= question.citation %></p>
+      <p>
+        <%= guideline.catalog_key %> · <%= guideline.year || t("exams.feedback.undated") %>
+        <% if guideline.expired? %>
+          · <span class="font-medium text-incorrect"><%= t("exams.feedback.expired") %></span>
+        <% end %>
+      </p>
+      <p class="font-sans text-ink-muted"><%= guideline.title %></p>
+      <% if (path = recommendation.guideline_section.menu_path).present? %>
+        <p class="font-sans"><%= path %></p>
+      <% end %>
+    </div>
+
+    <% if guideline.source_url.present? %>
+      <%= link_to t("exams.feedback.open_guideline"), guideline.source_url, target: "_blank", rel: "noopener",
+            class: "mt-2 inline-flex min-h-11 items-center text-sm text-accent underline underline-offset-2 hover:text-accent-hover" %>
+    <% end %>
+  </section>
+<% end %>

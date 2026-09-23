@@ -10,6 +10,6 @@
       if image.caption.present? %> — <%= image.caption %><% end %>
     <span class="mt-1 block"><%= image.attribution %></span>
   </figcaption>
-  <%= link_to t("review.show.open_figure"), url_for(image.file), target: "_blank", rel: "noopener",
+  <%= link_to t("shared.figure.open"), url_for(image.file), target: "_blank", rel: "noopener",
         class: "mt-2 inline-flex min-h-11 items-center text-sm text-accent underline underline-offset-2 hover:text-accent-hover" %>
 </figure>

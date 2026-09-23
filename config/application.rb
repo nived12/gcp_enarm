@@ -43,9 +43,11 @@ module GpcEnarm
     config.i18n.default_locale = :es
     config.i18n.fallbacks = true
 
-    # Store UTC, render in the user's zone per request. The ENARM is a Mexican exam,
-    # so every displayed date is America/Mexico_City unless the user says otherwise.
-    config.time_zone = "UTC"
+    # The database stores UTC; the app reads and shows Mexico City time, because the
+    # ENARM is a Mexican exam. "Today" — the date on an exam, the free daily allowance —
+    # is a Mexican day, not one that ends at 6 p.m. local time. A per-user zone can
+    # replace this once users have one.
+    config.time_zone = "America/Mexico_City"
 
     config.generators do |g|
       g.test_framework :rspec, view_specs: false, helper_specs: false, routing_specs: false

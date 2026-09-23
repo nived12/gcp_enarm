@@ -12,6 +12,19 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  resources :exams, only: %i[index new create show destroy] do
+    member do
+      patch :pause
+      patch :resume
+      patch :complete
+    end
+
+    # Addressed by position, the number the student sees ("Pregunta 3 de 10").
+    resources :questions, only: :show, controller: "exam_questions", param: :position do
+      resource :answer, only: %i[create update]
+    end
+  end
+
   # Reviewer-only. Generated cases are drafts until a doctor has read them.
   namespace :review do
     resources :clinical_cases, only: %i[index show]

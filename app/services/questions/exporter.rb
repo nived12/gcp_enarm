@@ -24,7 +24,7 @@ module Questions
     ].freeze
 
     QUESTION_ATTRIBUTES = %w[position text explanation source_quote].freeze
-    OPTION_ATTRIBUTES = %w[position text correct].freeze
+    OPTION_ATTRIBUTES = %w[position text correct rationale].freeze
 
     BATCH_SIZE = 50
 

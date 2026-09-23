@@ -1,0 +1,4 @@
+<% answered = @exam.answers.count %>
+<%= turbo_stream.update dom_id(@exam, :progress_label), partial: "exams/answered", locals: { exam: @exam, answered: answered } %>
+<%= turbo_stream.replace dom_id(@exam, :progress), partial: "exams/progress_fill", locals: { exam: @exam, progress: answered.fdiv(@exam.question_count) } %>
+<%= turbo_stream.update dom_id(@exam_question, :saved), t("exams.sheet.saved") %>

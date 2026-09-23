@@ -1,3 +1,7 @@
+<% exams = Current.user.exams.kept %>
+<% average = exams.status_completed.average(:score) %>
+<% unfinished = exams.unfinished.recent.first %>
+
 <section>
   <p class="eyebrow"><%= t("home.dashboard.today") %></p>
   <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink">
@@ -5,11 +9,53 @@
   </h1>
 </section>
 
-<%# Honest empty state: the question bank does not exist until Phase 2 ingests and
-    generates it. Saying so beats a dashboard of zeroes pretending to be data. %>
-<div class="mt-8 rounded-card border border-dashed border-line-strong p-6 text-center">
-  <p class="text-sm font-medium text-ink"><%= t("home.dashboard.empty.title") %></p>
-  <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
-    <%= t("home.dashboard.empty.body") %>
-  </p>
-</div>
+<% if ClinicalCase.status_published.none? %>
+  <%# Honest empty state: until cases are published there is nothing to practise on, and
+      a dashboard of zeroes pretending to be data would say otherwise. %>
+  <div class="mt-8 rounded-card border border-dashed border-line-strong p-6 text-center">
+    <p class="text-sm font-medium text-ink"><%= t("home.dashboard.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
+      <%= t("home.dashboard.empty.body") %>
+    </p>
+  </div>
+<% else %>
+  <%# Your average, where you left off, and the button that starts a quiz. Nothing else
+      above the fold. %>
+  <section class="card mt-8 px-6 py-6">
+    <p class="eyebrow"><%= t("home.dashboard.average") %></p>
+    <% if average %>
+      <p class="numeric mt-2 text-4xl font-medium tracking-tight text-ink"><%= score_text(average) %></p>
+      <p class="mt-1 text-sm text-ink-muted"><%= t("home.dashboard.completed", count: exams.status_completed.count) %></p>
+    <% else %>
+      <p class="numeric mt-2 text-4xl font-medium tracking-tight text-ink-faint">—</p>
+      <p class="mt-1 text-sm text-ink-muted"><%= t("home.dashboard.no_average") %></p>
+    <% end %>
+  </section>
+
+  <% if unfinished %>
+    <%= link_to exam_path(unfinished), class: "card mt-3 flex items-center gap-4 px-6 py-4 transition-shadow hover:ring-2 hover:ring-accent" do %>
+      <span class="min-w-0 flex-1">
+        <span class="block text-sm font-medium text-ink"><%= t("home.dashboard.unfinished", mode: t("exams.modes.#{unfinished.mode}")) %></span>
+        <span class="mt-0.5 block text-xs text-ink-faint">
+          <%= t("exams.paused.progress", answered: unfinished.answers.count, total: unfinished.question_count) %>
+        </span>
+      </span>
+      <span class="shrink-0 text-sm font-medium text-accent"><%= t("exams.index.continue") %></span>
+    <% end %>
+    <div class="mt-1 flex justify-end"><%= render "exams/discard", exam: unfinished %></div>
+  <% end %>
+
+  <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+    <%= button_to t("home.dashboard.start_quiz"), exams_path(mode: "quick_quiz"), class: "btn btn--primary w-full sm:w-auto", form: { class: "contents" } %>
+    <%# The mock exam and the custom one open their own form rather than starting at once:
+        a six-hour sitting deserves a look at its conditions first. %>
+    <%= link_to t("home.dashboard.mock_exam"), new_exam_path(section: "mock"), class: "btn btn--ghost" %>
+    <%= link_to t("home.dashboard.build_exam"), new_exam_path(section: "custom"), class: "btn btn--ghost" %>
+  </div>
+
+  <% if exams.any? %>
+    <p class="mt-6 text-sm">
+      <%= link_to t("home.dashboard.history"), exams_path, class: "text-accent underline underline-offset-2 hover:text-accent-hover" %>
+    </p>
+  <% end %>
+<% end %>

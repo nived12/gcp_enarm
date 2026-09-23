@@ -303,7 +303,7 @@ RSpec.describe "Review::ClinicalCases", type: :request do
 
       get review_clinical_case_path(clinical_case)
 
-      expect(response.body).to include(I18n.t("review.show.open_figure"))
+      expect(response.body).to include(I18n.t("shared.figure.open"))
       expect(response.body).to match(%r{href="[^"]*/rails/active_storage/blobs/[^"]*cuadro_2\.png"})
     end
 

@@ -1,0 +1,148 @@
+# Draws an exam from the published bank: whole clinical cases, never orphan questions,
+# because every ENARM item is a case with its two or three questions.
+#
+# Specialties are interleaved unless the student opts out. Blocked practice — all of
+# Cardiología, then all of Nefrología — feels better and trains the wrong skill: on exam
+# day nothing announces which specialty the next case belongs to, and telling them apart
+# is part of what is being examined.
+module Exams
+  class Builder < ApplicationService
+    CUSTOM_COUNTS = (5..100)
+    DEFAULT_CUSTOM_COUNT = 20
+    CUSTOM_CHOICES = [10, 20, 40, 60, 100].freeze
+
+    def initialize(user:, mode:, filters: {}, settings: {}, random: Random.new)
+      super()
+      @user = user
+      @mode = mode.to_s
+      @raw_filters = filters.to_h.with_indifferent_access
+      @settings = settings.to_h.with_indifferent_access
+      @random = random
+    end
+
+    def call
+      return failure(I18n.t("exams.builder.unknown_mode")) unless Exam.modes.key?(mode)
+
+      picked = pick
+      return failure(I18n.t("exams.builder.nothing_matches")) if picked.empty?
+
+      success(exam: create_exam(picked))
+    end
+
+    def context_for_logging
+      { user_id: user.id, mode: mode, filters: filters }
+    end
+
+    private
+
+    attr_reader :user, :mode, :raw_filters, :settings, :random
+
+    # Each mode has defaults; the student may change either. A missing or unknown value
+    # falls back to the default rather than failing the exam.
+    def feedback_timing
+      chosen = settings[:feedback_timing]
+      Exam.feedback_timings.key?(chosen) ? chosen : Exam.default_feedback_timing(mode)
+    end
+
+    # "" is the student choosing no clock at all, which is different from not saying.
+    def seconds_per_question
+      return Exam.default_seconds_per_question(mode) unless settings.key?(:seconds_per_question)
+
+      settings[:seconds_per_question].to_i.then { |pace| pace if Exam::PACES.include?(pace) }
+    end
+
+    # The presets are fixed exams; only "Arma tu examen" reads the student's choices.
+    def filters
+      @filters ||= if mode == "custom"
+        {
+          "question_count" => raw_filters[:question_count].presence&.to_i&.clamp(CUSTOM_COUNTS) || DEFAULT_CUSTOM_COUNT,
+          "specialty_ids" => Array(raw_filters[:specialty_ids]).compact_blank.map(&:to_i),
+          "topic_ids" => Array(raw_filters[:topic_ids]).compact_blank.map(&:to_i),
+          "difficulties" => Array(raw_filters[:difficulties]) & ClinicalCase.difficulties.keys,
+          "unseen_only" => boolean(:unseen_only, default: false),
+          "previously_wrong_only" => boolean(:previously_wrong_only, default: false),
+          "interleave" => boolean(:interleave, default: true)
+        }.compact_blank.merge("interleave" => boolean(:interleave, default: true))
+      else
+        { "interleave" => true }
+      end
+    end
+
+    def boolean(key, default:)
+      raw_filters.key?(key) ? ActiveModel::Type::Boolean.new.cast(raw_filters[key]) : default
+    end
+
+    def target
+      filters["question_count"] || Exam::QUESTION_COUNTS.fetch(mode)
+    end
+
+    # Cases are added until the target is met, so an exam can run a question or two
+    # over it rather than split a case.
+    def pick
+      total = 0
+      ordered(candidates).take_while do |_id, _specialty_id, questions|
+        (total < target).tap { total += questions }
+      end.then { |rows| filters["interleave"] ? rows : blocked(rows) }
+    end
+
+    def candidates
+      cases = ClinicalCase.status_published
+      cases = cases.where(specialty_id: filters["specialty_ids"]) if filters["specialty_ids"]
+      cases = cases.where(topic_id: filters["topic_ids"]) if filters["topic_ids"]
+      cases = cases.where(difficulty: filters["difficulties"]) if filters["difficulties"]
+      cases = cases.where.not(id: seen_cases) if filters["unseen_only"]
+      cases = cases.where(id: missed_cases) if filters["previously_wrong_only"]
+
+      cases.joins(:questions).group(:id, :specialty_id)
+           .order(:id).pluck(:id, :specialty_id, Arel.sql("COUNT(questions.id)"))
+    end
+
+    def seen_cases
+      ExamQuestion.joins(:exam).where(exams: { user_id: user.id }).select(:clinical_case_id)
+    end
+
+    # A blank counts as a miss, as it does on the exam.
+    def missed_cases
+      ExamQuestion.joins(:exam, :answer).where(exams: { user_id: user.id }, answers: { correct: false })
+                  .select(:clinical_case_id)
+    end
+
+    # Shuffled, then dealt one specialty at a time, so the draw is interleaved and a
+    # short quiz still touches several specialties.
+    def ordered(rows)
+      queues = rows.shuffle(random: random).group_by { |_id, specialty_id, _count| specialty_id }.values
+      dealt = []
+      dealt.concat(queues.filter_map(&:shift)) until queues.all?(&:empty?)
+      dealt
+    end
+
+    def blocked(rows)
+      positions = Specialty.pluck(:id, :position).to_h
+      rows.each_with_index.sort_by { |(_id, specialty_id, _count), index| [positions.fetch(specialty_id, Float::INFINITY), index] }
+          .map(&:first)
+    end
+
+    def create_exam(picked)
+      case_ids = picked.map(&:first)
+      questions = Question.where(clinical_case_id: case_ids).order(:position).group_by(&:clinical_case_id)
+      sequence = case_ids.flat_map { |case_id| questions.fetch(case_id) }
+
+      pace = seconds_per_question
+      Exam.transaction do
+        exam = user.exams.create!(
+          mode: mode, filters: filters, question_count: sequence.size,
+          feedback_timing: feedback_timing, seconds_per_question: pace,
+          time_limit_seconds: pace && (pace * sequence.size),
+          started_at: Time.current, running_since: Time.current
+        )
+        sequence.each.with_index(1) do |question, position|
+          exam.exam_questions.create!(
+            question: question, clinical_case_id: question.clinical_case_id,
+            position: position
+          )
+        end
+        exam
+      end
+    end
+  end
+end

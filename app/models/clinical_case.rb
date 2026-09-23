@@ -36,12 +36,24 @@ class ClinicalCase < ApplicationRecord
   validates :stem, presence: true
   validates :locale, presence: true
 
-  scope :publishable, -> { where(verification_verdict: "supported") }
+  validate :published_only_when_supported
+
+  # Withdrawn cases stay back whatever the verifier said: `retired` is a person's decision
+  # that outranks a model's agreement, and `flagged` is a student's report still unread.
+  WITHDRAWN = %w[flagged retired].freeze
+
+  scope :publishable, -> { verdict_supported.where.not(status: WITHDRAWN) }
 
   # A case may only go live once a second model family has agreed its correct answer is
   # actually supported by the quote it cites. Unverified and unsupported both stay back:
   # silence from the verifier is not assent.
   def publishable?
-    verdict_supported?
+    verdict_supported? && WITHDRAWN.exclude?(status)
+  end
+
+  private
+
+  def published_only_when_supported
+    errors.add(:status, :not_supported) if status_published? && !verdict_supported?
   end
 end

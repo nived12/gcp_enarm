@@ -1,0 +1,7 @@
+<label class="group/option flex min-h-11 cursor-pointer items-center gap-3 rounded-control px-3 text-sm text-ink hover:bg-surface-sunk has-checked:bg-accent-soft has-checked:font-medium has-focus-visible:ring-2 has-focus-visible:ring-accent"
+       data-topic-picker-target="option">
+  <%= check_box_tag "filters[topic_ids][]", topic.id, false, id: "filters_topic_#{topic.id}", class: "size-4 shrink-0 accent-accent",
+        data: { action: "change->topic-picker#update" } %>
+  <span class="min-w-0 flex-1" data-topic-picker-target="name"><%= topic.name %></span>
+  <span class="numeric shrink-0 text-xs text-ink-faint"><%= count %></span>
+</label>

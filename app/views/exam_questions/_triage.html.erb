@@ -1,0 +1,19 @@
+<%# Why it was wrong, in the student's own words — one tap, never required. Reviewing
+    the cause rather than the score is the whole point of reviewing. %>
+<%= turbo_frame_tag dom_id(answer, :triage) do %>
+  <section class="mt-8 rounded-card border border-line px-5 py-5 sm:px-6">
+    <p id="<%= dom_id(answer, :triage_label) %>" class="text-sm font-medium text-ink"><%= t("exams.triage.prompt") %></p>
+    <%= form_with url: exam_question_answer_path(exam, exam_question.position), method: :patch,
+          class: "mt-4 flex flex-wrap gap-2", aria: { labelledby: dom_id(answer, :triage_label) } do %>
+      <% Answer.error_reasons.each_key do |reason| %>
+        <% chosen = answer.error_reason == reason %>
+        <%= button_tag t("exams.triage.reasons.#{reason}"), name: "answer[error_reason]", value: chosen ? "" : reason,
+              aria: { pressed: chosen },
+              class: "min-h-11 rounded-full border px-4 text-sm transition-colors #{chosen ? "border-accent bg-accent text-accent-ink" : "border-line-strong text-ink hover:border-accent hover:text-accent"}" %>
+      <% end %>
+    <% end %>
+    <% if answer.error_reason.present? && answer.errors.none? %>
+      <p class="mt-3 text-xs text-ink-faint"><%= t("exams.triage.saved") %></p>
+    <% end %>
+  </section>
+<% end %>

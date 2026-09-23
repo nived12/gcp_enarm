@@ -1,0 +1,17 @@
+<%# A short choice drawn as pills instead of a native select, whose list the browser
+    draws in its own style. The radio stays in the DOM for keyboards and screen readers;
+    only its circle is hidden, and the pill shows focus and the choice. %>
+<fieldset>
+  <legend class="text-sm font-medium text-ink"><%= legend %></legend>
+  <div class="mt-3 flex flex-wrap gap-2">
+    <% options.each do |label, value| %>
+      <label class="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-line-strong px-4 text-sm text-ink transition-colors hover:border-accent has-checked:border-accent has-checked:bg-accent has-checked:text-accent-ink has-focus-visible:ring-2 has-focus-visible:ring-accent has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-surface">
+        <%= radio_button_tag name, value, value.to_s == selected.to_s, id: "#{id_prefix}_#{value.presence || "none"}", class: "sr-only" %>
+        <%= label %>
+      </label>
+    <% end %>
+  </div>
+  <% if local_assigns[:hint] %>
+    <p class="mt-2 text-xs leading-relaxed text-ink-faint"><%= hint %></p>
+  <% end %>
+</fieldset>

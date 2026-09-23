@@ -1,0 +1,413 @@
+require "rails_helper"
+
+RSpec.describe "Exams", type: :request do
+  let(:student) { create(:user) }
+
+  def sign_in(user = student)
+    post session_path, params: { email: user.email, password: "contrasena-segura" }
+  end
+
+  def start(mode = "quick_quiz", filters: {})
+    post exams_path, params: { mode: mode, filters: filters }
+    Exam.last
+  end
+
+  def answer(exam, position, text)
+    exam_question = exam.exam_questions.find_by!(position: position)
+    post exam_question_answer_path(exam, position),
+      params: { answer_option_id: exam_question.question.answer_options.find_by!(text: text).id }
+  end
+
+  before { sign_in }
+
+  it "turns away anyone not signed in" do
+    delete session_path
+
+    get new_exam_path
+
+    expect(response).to redirect_to(new_session_path)
+  end
+
+  describe "choosing an exam" do
+    it "offers the presets and the custom form, counting what is published" do
+      create(
+        :published_case, specialty: create(:specialty, name: "Pediatría"),
+        topic: create(:topic, name: "Bronquiolitis")
+      )
+
+      get new_exam_path
+
+      expect(response.body).to include(I18n.t("exams.modes.quick_quiz"), I18n.t("exams.modes.custom"))
+      expect(response.body).to include(I18n.t("exams.new.bank", count: 1), "Pediatría", "Bronquiolitis")
+    end
+
+    it "says so plainly when nothing is published yet" do
+      get new_exam_path
+
+      expect(response.body).to include(I18n.t("home.dashboard.empty.title"))
+    end
+
+    it "starts at the first question" do
+      create(:published_case)
+
+      exam = start
+
+      expect(response).to redirect_to(exam_question_path(exam, 1))
+    end
+
+    it "opens only the section a home button names" do
+      create(:published_case)
+
+      get new_exam_path(section: "mock")
+      expect(response.body).to include(I18n.t("exams.new.mock.length"))
+      expect(response.body).not_to include(
+        I18n.t("exams.new.custom.question_count"),
+        I18n.t("exams.new.presets.quick_quiz")
+      )
+
+      get new_exam_path(section: "custom")
+      expect(response.body).to include(I18n.t("exams.new.custom.question_count"))
+      expect(response.body).not_to include(I18n.t("exams.new.mock.length"))
+    end
+
+    it "sends the student back to the form they came from with the reason when nothing matches" do
+      post exams_path, params: { mode: "custom" }
+      expect(response).to redirect_to(new_exam_path(section: "custom"))
+
+      post exams_path, params: { mode: "full_exam" }
+      expect(response).to redirect_to(new_exam_path(section: "mock"))
+
+      post exams_path, params: { mode: "quick_quiz" }
+
+      expect(response).to redirect_to(new_exam_path)
+      expect(flash[:alert]).to eq(I18n.t("exams.builder.nothing_matches"))
+    end
+  end
+
+  describe "a practice exam" do
+    let!(:kase) { create(:published_case, questions_count: 2, figure: true) }
+    let(:exam) { start }
+
+    it "shows the question with nothing that gives the answer away" do
+      get exam_question_path(exam, 1)
+
+      expect(response.body).to include(kase.stem, I18n.t("exams.question.submit"))
+      expect(response.body).not_to include(I18n.t("exams.feedback.source"), "<figure", "<mark>")
+      expect(response.body).not_to include("no es el estudio inicial")
+    end
+
+    it "explains the answer on the same page once it is given, with the cited figure" do
+      answer(exam, 1, "Troponina I")
+      expect(response).to redirect_to(exam_question_path(exam, 1))
+
+      get exam_question_path(exam, 1)
+
+      expect(response.body).to include(I18n.t("exams.question.wrong"), I18n.t("exams.feedback.source"), "<mark>")
+      expect(response.body).to include("CUADRO 2", I18n.t("exams.triage.prompt"), kase.guideline.catalog_key)
+      expect(response.body).to include(
+        "Troponina I no es el estudio inicial",
+        "Ecocardiograma no es el estudio inicial"
+      )
+    end
+
+    it "warns when the cited guideline is past its validity" do
+      kase.guideline.update!(year: 2008)
+      answer(exam, 1, "Troponina I")
+
+      get exam_question_path(exam, 1)
+
+      expect(response.body).to include(I18n.t("exams.feedback.expired"))
+    end
+
+    it "does not let the student jump ahead of the question they are on" do
+      get exam_question_path(exam, 2)
+
+      expect(response).to redirect_to(exam_question_path(exam, 1))
+    end
+
+    it "offers the results after the last explanation" do
+      answer(exam, 1, "Troponina I")
+      answer(exam, 2, "Electrocardiograma de 12 derivaciones")
+
+      get exam_question_path(exam, 2)
+
+      expect(response.body).to include(I18n.t("exams.question.see_results"))
+    end
+
+    it "sends a refused answer back to the question with the reason" do
+      post exam_question_answer_path(exam, 1), params: { answer_option_id: "" }
+
+      expect(response).to redirect_to(exam_question_path(exam, 1))
+      expect(flash[:alert]).to eq(I18n.t("exams.answers.choose_option"))
+    end
+
+    it "is another student's business only to 404" do
+      exam
+      delete session_path
+      sign_in(create(:user))
+
+      get exam_question_path(exam, 1)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "why a wrong answer was wrong" do
+    let!(:kase) { create(:published_case, questions_count: 2) }
+    let(:exam) { start }
+
+    def triage(reason)
+      patch exam_question_answer_path(exam, 1), params: { answer: { error_reason: reason } }
+    end
+
+    it "records the student's reason in place, and clears it on a second tap" do
+      answer(exam, 1, "Troponina I")
+
+      triage("confused_diagnoses")
+      expect(response.body).to include("turbo-frame", "aria-pressed=\"true\"")
+      expect(Answer.last).to be_error_confused_diagnoses
+
+      triage("")
+      expect(Answer.last.error_reason).to be_nil
+    end
+
+    it "refuses a reason the interface does not offer" do
+      answer(exam, 1, "Troponina I")
+
+      triage("guessed")
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(Answer.last.error_reason).to be_nil
+    end
+
+    it "has nothing to ask about a right answer, or an unanswered one" do
+      triage("did_not_know")
+      expect(response).to have_http_status(:not_found)
+
+      answer(exam, 1, "Electrocardiograma de 12 derivaciones")
+      triage("did_not_know")
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "a mock exam on a single page" do
+    let!(:cases) { [create(:published_case, questions_count: 2), create(:published_case, questions_count: 1)] }
+    let(:exam) { start("full_exam") }
+
+    def choose(position, text, format: :turbo_stream)
+      exam_question = exam.exam_questions.find_by!(position: position)
+      post exam_question_answer_path(exam, position),
+        headers: format == :turbo_stream ? { "Accept" => "text/vnd.turbo-stream.html" } : {},
+        params: { answer_option_id: exam_question.question.answer_options.find_by!(text: text).id }
+    end
+
+    it "opens on the whole exam: every case and question, nothing that gives an answer away" do
+      post exams_path, params: { mode: "full_exam" }
+      expect(response).to redirect_to(exam_path(Exam.last))
+
+      get exam_path(Exam.last)
+
+      expect(response.body).to include(*cases.map(&:stem), I18n.t("exams.sheet.answered", answered: 0, total: 3))
+      expect(response.body).not_to include(I18n.t("exams.feedback.source"), "<mark>", I18n.t("exams.question.wrong"))
+    end
+
+    it "saves each choice in place, in any order, and a change of mind replaces it" do
+      choose(3, "Troponina I")
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+      expect(response.body).to include(
+        I18n.t("exams.sheet.saved"),
+        I18n.t("exams.sheet.answered", answered: 1, total: 3)
+      )
+
+      choose(3, "Electrocardiograma de 12 derivaciones")
+      expect(exam.exam_questions.find_by!(position: 3).answer).to be_correct
+      expect(response.body).not_to include(I18n.t("exams.question.right"))
+
+      get exam_path(exam)
+      expect(response.body).to include("checked=\"checked\"")
+    end
+
+    it "falls back to a plain redirect to the question without JavaScript" do
+      choose(2, "Troponina I", format: :html)
+
+      expect(response).to redirect_to(exam_path(exam, anchor: "exam_question_#{exam.exam_questions.second.id}"))
+    end
+
+    it "sends a question's own page back to its place on the sheet" do
+      get exam_question_path(exam, 2)
+
+      expect(response).to redirect_to(exam_path(exam, anchor: "exam_question_#{exam.exam_questions.second.id}"))
+    end
+
+    it "asks nothing about a wrong answer until the exam is over — the question would give it away" do
+      choose(1, "Troponina I")
+
+      patch exam_question_answer_path(exam, 1), params: { answer: { error_reason: "did_not_know" } }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "shows the results and every explanation once finished" do
+      choose(1, "Troponina I")
+      choose(2, "Electrocardiograma de 12 derivaciones")
+
+      patch complete_exam_path(exam)
+      follow_redirect!
+      expect(response.body).to include("33.3%", I18n.t("exams.results.tally", correct: 1, total: 3))
+
+      get exam_question_path(exam, 3)
+      expect(response.body).to include(I18n.t("exams.question.unanswered"), I18n.t("exams.feedback.source"))
+      expect(response.body).to include(I18n.t("exams.question.back_to_results"))
+    end
+
+    it "ends the exam when the clock runs out" do
+      exam.update!(running_since: 4.minutes.ago)
+
+      choose(1, "Troponina I")
+
+      expect(response).to redirect_to(exam_path(exam))
+      expect(flash[:alert]).to eq(I18n.t("exams.answers.time_up"))
+    end
+
+    it "sends a question visited after the clock ran out to the exam, which ends it" do
+      exam.update!(running_since: 4.minutes.ago)
+
+      get exam_question_path(exam, 1)
+
+      expect(response).to redirect_to(exam_path(exam))
+    end
+
+    it "finishes on its own when the clock is found out at the exam page" do
+      exam.update!(running_since: 4.minutes.ago)
+
+      get exam_path(exam)
+
+      expect(exam.reload).to be_status_completed
+      expect(response.body).to include(I18n.t("exams.results.blank"))
+    end
+
+    it "breaks the results down by specialty when there is more than one" do
+      specialties = [create(:specialty, name: "Pediatría"), create(:specialty, name: "Cirugía General")]
+      cases.zip(specialties).each { |kase, specialty| kase.update!(specialty: specialty) }
+      patch complete_exam_path(exam)
+
+      get exam_path(exam)
+
+      expect(response.body).to include(I18n.t("exams.results.by_specialty"), "Pediatría", "Cirugía General")
+    end
+
+    it "goes one question at a time when the student asks for explanations as they answer" do
+      post exams_path,
+        params: { mode: "full_exam", settings: { feedback_timing: "after_each", seconds_per_question: "" } }
+
+      expect(response).to redirect_to(exam_question_path(Exam.last, 1))
+      expect(Exam.last.time_limit_seconds).to be_nil
+    end
+  end
+
+  describe "the finish screen, one question at a time" do
+    before { create(:published_case, questions_count: 1) }
+
+    it "asks before finishing once every question has an answer" do
+      exam = start
+      answer(exam, 1, "Troponina I")
+
+      get exam_path(exam)
+
+      expect(response.body).to include(I18n.t("exams.finish.title"))
+    end
+  end
+
+  describe "pausing" do
+    before { create(:published_case, questions_count: 2) }
+
+    let(:exam) { start }
+
+    it "stops the clock, shows where the student stopped, and picks up there" do
+      answer(exam, 1, "Troponina I")
+
+      patch pause_exam_path(exam)
+      follow_redirect!
+      expect(response.body).to include(I18n.t("exams.paused.progress", answered: 1, total: 2))
+
+      get exam_question_path(exam, 2)
+      expect(response).to redirect_to(exam_path(exam))
+
+      patch resume_exam_path(exam)
+      expect(response).to redirect_to(exam_path(exam))
+      follow_redirect!
+      expect(response).to redirect_to(exam_question_path(exam, 2))
+    end
+  end
+
+  describe "discarding an exam started by mistake" do
+    before { create(:published_case) }
+
+    let(:exam) { start }
+
+    it "takes it out of the student's view, asking first" do
+      get exam_question_path(exam, 1)
+      expect(response.body).to include(I18n.t("exams.discard.button"), I18n.t("exams.discard.confirm"))
+
+      delete exam_path(exam)
+
+      expect(response).to redirect_to(root_path)
+      expect(exam.reload).to be_status_discarded
+      get exams_path
+      expect(response.body).to include(I18n.t("exams.index.empty.title"))
+      get exam_path(exam)
+      expect(response).to redirect_to(root_path)
+    end
+
+    it "discards a finished one too, from its results, and takes it out of the average" do
+      patch complete_exam_path(exam)
+      get exam_path(exam)
+      expect(response.body).to include(I18n.t("exams.discard.button"))
+
+      delete exam_path(exam)
+
+      expect(response).to redirect_to(exams_path)
+      expect(exam.reload).to be_status_discarded
+      get root_path
+      expect(response.body).to include(I18n.t("home.dashboard.no_average"))
+    end
+  end
+
+  describe "the history and the home screen" do
+    it "lists past exams with their score, and the unfinished ones to continue" do
+      create(:exam, user: student, status: "completed", score: 72.5, completed_at: Time.current)
+      create(:exam, user: student)
+
+      get exams_path
+
+      expect(response.body).to include("72.5%", I18n.t("exams.index.continue"))
+    end
+
+    it "says so when there is no history yet" do
+      get exams_path
+
+      expect(response.body).to include(I18n.t("exams.index.empty.title"))
+    end
+
+    it "shows the average, where the student left off, and the button that starts a quiz" do
+      create(:published_case)
+      create(:exam, user: student, status: "completed", score: 60, completed_at: Time.current)
+      create(:exam, user: student, status: "completed", score: 80, completed_at: Time.current)
+      create(:exam, user: student, status: "paused", running_since: nil)
+
+      get root_path
+
+      expect(response.body).to include("70%", I18n.t("home.dashboard.completed", count: 2))
+      expect(response.body).to include(I18n.t("home.dashboard.unfinished", mode: I18n.t("exams.modes.quick_quiz")))
+      expect(response.body).to include(I18n.t("home.dashboard.start_quiz"))
+    end
+
+    it "shows no average before the first finished exam" do
+      create(:published_case)
+
+      get root_path
+
+      expect(response.body).to include(I18n.t("home.dashboard.no_average"))
+    end
+  end
+end

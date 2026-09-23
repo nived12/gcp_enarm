@@ -1,0 +1,15 @@
+<% content_for :title, t("exams.paused.title") %>
+
+<section class="card mt-4 px-6 py-8 text-center">
+  <p class="eyebrow"><%= t("exams.modes.#{@exam.mode}") %></p>
+  <h1 class="mt-3 text-xl font-semibold tracking-tight text-ink"><%= t("exams.paused.title") %></h1>
+  <p class="mt-2 text-sm text-ink-muted">
+    <%= t("exams.paused.progress", answered: @exam.answers.count, total: @exam.question_count) %>
+  </p>
+  <p class="numeric mt-4 text-3xl text-ink"><%= clock_reading(@exam) %></p>
+  <p class="mt-1 text-xs text-ink-faint">
+    <%= @exam.time_limit_seconds ? t("exams.bar.time_left") : t("exams.bar.time_spent") %>
+  </p>
+  <%= button_to t("exams.paused.resume"), resume_exam_path(@exam), method: :patch, class: "btn btn--primary mt-6" %>
+  <%= render "exams/discard", exam: @exam, form_class: "mt-4" %>
+</section>

@@ -1,0 +1,29 @@
+<%# Correct and incorrect never rely on hue alone: the mark and the words carry the
+    meaning, colour only agrees with them. %>
+<ul class="mt-6 space-y-3" lang="<%= exam_question.clinical_case.locale %>">
+  <% exam_question.question.answer_options.each_with_index do |option, index| %>
+    <% chosen = answer&.answer_option_id == option.id %>
+    <li class="flex items-start gap-4 rounded-card border px-5 py-4 text-sm leading-relaxed <%=
+          if option.correct? then "border-correct bg-correct-soft"
+          elsif chosen then "border-incorrect bg-incorrect-soft"
+          else "border-line" end %>">
+      <span class="numeric mt-px w-4 shrink-0 font-medium <%= option.correct? ? "text-correct" : chosen ? "text-incorrect" : "text-ink-faint" %>">
+        <%= option.correct? ? "✓" : chosen ? "✗" : option_letter(index) %>
+      </span>
+      <span class="min-w-0">
+        <span class="text-ink"><%= option.text %></span>
+        <% if option.correct? || chosen %>
+          <span lang="<%= I18n.locale %>" class="mt-1 block text-xs font-medium <%= option.correct? ? "text-correct" : "text-incorrect" %>">
+            <%= option.correct? ? t("exams.question.correct_option") : t("exams.question.your_answer") %><%=
+                t("exams.question.also_yours") if option.correct? && chosen %>
+          </span>
+        <% end %>
+        <%# Why a distractor is not the answer — under every one, not only the one chosen:
+            the others are the next exam's wrong answers. %>
+        <% if option.rationale.present? && !option.correct? %>
+          <span class="mt-2 block text-xs leading-relaxed text-ink-muted"><%= option.rationale %></span>
+        <% end %>
+      </span>
+    </li>
+  <% end %>
+</ul>

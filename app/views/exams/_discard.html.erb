@@ -1,0 +1,5 @@
+<%# Quiet on purpose: discarding is the way out of an exam started by mistake, not an
+    action to invite. It asks first, because it cannot be undone from the interface. %>
+<%= button_to t("exams.discard.button"), exam_path(exam), method: :delete,
+      form: { class: local_assigns.fetch(:form_class, ""), data: { turbo_confirm: t("exams.discard.confirm") } },
+      class: "inline-flex min-h-11 items-center text-sm text-ink-muted underline underline-offset-2 hover:text-incorrect" %>

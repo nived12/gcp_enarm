@@ -1,0 +1,21 @@
+<%= form_with url: exams_path, method: :post, class: "card space-y-8 px-5 py-6 sm:px-6" do %>
+  <fieldset>
+    <legend class="text-sm font-medium text-ink"><%= t("exams.new.mock.length") %></legend>
+    <div class="mt-3 space-y-2">
+      <% Exam::EXAM_LENGTH_MODES.each_with_index do |mode, index| %>
+        <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-card border border-line px-4 py-3 has-checked:border-accent has-checked:bg-accent-soft">
+          <%= radio_button_tag :mode, mode, index.zero?, class: "mt-1 size-4 shrink-0 accent-accent" %>
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-medium text-ink"><%= t("exams.modes.#{mode}") %></span>
+            <span class="mt-0.5 block text-xs leading-relaxed text-ink-faint"><%= t("exams.new.presets.#{mode}") %></span>
+          </span>
+          <span class="numeric shrink-0 text-sm text-ink-faint"><%= Exam::QUESTION_COUNTS[mode] %></span>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <%= render "settings", mode: "full_exam", prefix: "mock" %>
+
+  <%= button_tag t("exams.new.mock.submit"), class: "btn btn--primary w-full sm:w-auto" %>
+<% end %>

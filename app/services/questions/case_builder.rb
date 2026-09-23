@@ -61,7 +61,11 @@ module Questions
         recommendation: cited(attributes["recommendation"]), source_quote: attributes["quote"]
       )
       options.each.with_index(1) do |option, order|
-        question.answer_options.build(position: order, text: option["text"], correct: option["correct"] ? true : false)
+        correct = option["correct"] ? true : false
+        question.answer_options.build(
+          position: order, text: option["text"], correct: correct,
+          rationale: (option["rationale"].to_s.squish.presence unless correct)
+        )
       end
 
       return question if usable?(question, options)

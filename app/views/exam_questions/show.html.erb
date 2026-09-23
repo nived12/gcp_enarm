@@ -1,0 +1,61 @@
+<% content_for :title, t("exams.bar.position", position: @exam_question.position, total: @exam.question_count) %>
+<% question = @exam_question.question %>
+<% answer = @exam_question.answer %>
+<% revealed = answer.present? || @exam.status_completed? %>
+
+<%= render "exams/bar", exam: @exam,
+      progress_label: t("exams.bar.position", position: @exam_question.position, total: @exam.question_count),
+      progress: @exam_question.position.fdiv(@exam.question_count) %>
+
+<div class="mt-8">
+  <%= render "case", clinical_case: @exam_question.clinical_case, question: question %>
+
+  <article class="mt-10">
+    <h1 class="text-base font-medium leading-relaxed text-ink sm:text-lg" lang="<%= @exam_question.clinical_case.locale %>">
+      <%= question.text %>
+    </h1>
+
+    <% if revealed %>
+      <%# Words first, then the marks: whether it was right is the first thing a student
+          looks for, and it must not depend on reading a colour. %>
+      <p class="mt-6 text-sm font-semibold <%= answer&.correct? ? "text-correct" : "text-incorrect" %>" role="status">
+        <%= if answer.nil? then t("exams.question.unanswered")
+            elsif answer.correct? then t("exams.question.right")
+            else t("exams.question.wrong") end %>
+      </p>
+      <%= render "options_revealed", exam_question: @exam_question, answer: answer %>
+      <%= render "feedback", exam_question: @exam_question %>
+      <% if answer && !answer.correct? %>
+        <%= render "triage", answer: answer, exam: @exam, exam_question: @exam_question %>
+      <% end %>
+    <% else %>
+      <%= render "form", exam: @exam, exam_question: @exam_question %>
+    <% end %>
+  </article>
+</div>
+
+<% if revealed %>
+  <% following = @exam_question.next_in_exam %>
+  <nav class="mt-12 flex items-center justify-between gap-4 border-t border-line pt-8">
+    <% if @exam.status_completed? %>
+      <% if (previous = @exam.exam_questions.find_by(position: @exam_question.position - 1)) %>
+        <%= link_to t("exams.question.previous"), exam_question_path(@exam, previous.position), class: "btn btn--ghost" %>
+      <% else %>
+        <span></span>
+      <% end %>
+      <%= link_to following ? t("exams.question.next") : t("exams.question.back_to_results"),
+            following ? exam_question_path(@exam, following.position) : exam_path(@exam), class: "btn btn--primary" %>
+    <% else %>
+      <span></span>
+      <% if following %>
+        <%= link_to t("exams.question.next"), exam_question_path(@exam, following.position), class: "btn btn--primary" %>
+      <% else %>
+        <%= button_to t("exams.question.see_results"), complete_exam_path(@exam), method: :patch, class: "btn btn--primary" %>
+      <% end %>
+    <% end %>
+  </nav>
+<% end %>
+
+<% if @exam.unfinished? %>
+  <div class="mt-12 flex justify-center"><%= render "exams/discard", exam: @exam %></div>
+<% end %>

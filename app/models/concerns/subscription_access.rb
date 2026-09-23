@@ -57,7 +57,7 @@ module SubscriptionAccess
   end
 
   def questions_answered_today
-    0
+    Answer.joins(exam_question: :exam).where(exams: { user_id: id }).answered_on(Date.current).count
   end
 
   def set_trial_ends_at

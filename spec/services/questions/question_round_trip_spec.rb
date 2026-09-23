@@ -28,7 +28,10 @@ RSpec.describe "question bank export and import" do
       source_quote: "electrocardiograma de 12 derivaciones"
     )
     create(:answer_option, question: question, position: 1, text: "Electrocardiograma", correct: true)
-    create(:answer_option, question: question, position: 2, text: "Radiografía de tórax", correct: false)
+    create(
+      :answer_option, question: question, position: 2, text: "Radiografía de tórax", correct: false,
+      rationale: "La radiografía no muestra la isquemia."
+    )
     kase
   end
 
@@ -63,6 +66,7 @@ RSpec.describe "question bank export and import" do
     expect(question.source_quote).to eq("electrocardiograma de 12 derivaciones")
     expect(question.recommendation.text).to include("12 derivaciones")
     expect(question.correct_option.text).to eq("Electrocardiograma")
+    expect(question.answer_options.second.rationale).to eq("La radiografía no muestra la isquemia.")
     expect(question.clinical_case.guideline.catalog_key).to eq("IMSS-028-22")
   end
 

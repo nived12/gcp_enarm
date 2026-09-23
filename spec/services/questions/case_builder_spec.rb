@@ -39,6 +39,15 @@ RSpec.describe Questions::CaseBuilder do
     expect(kase.questions.sole.recommendation).to eq(recommendation)
   end
 
+  it "keeps why each distractor is wrong, and nothing on the correct option" do
+    opts = options.each_with_index.map { |option, i| option.merge("rationale" => "  Razón\n#{i}  ") }
+
+    kase = build_from(one_case(question(options: opts)))[:cases].sole
+
+    rationales = kase.questions.sole.answer_options.map(&:rationale)
+    expect(rationales).to eq([nil, "Razón 1", "Razón 2", "Razón 3"])
+  end
+
   it "records the language it was asked for" do
     expect(build_from(one_case(question), locale: "en")[:cases].sole.locale).to eq("en")
   end

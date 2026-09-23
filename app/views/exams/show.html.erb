@@ -1,0 +1,10 @@
+<%# Every question has an answer and the exam is still open: the exam-length modes land
+    here after the last one, so finishing is a decision rather than an accident. %>
+<% content_for :title, t("exams.finish.title") %>
+
+<section class="card mt-4 px-6 py-8 text-center">
+  <p class="eyebrow"><%= t("exams.modes.#{@exam.mode}") %></p>
+  <h1 class="mt-3 text-xl font-semibold tracking-tight text-ink"><%= t("exams.finish.title") %></h1>
+  <p class="mt-2 text-sm text-ink-muted"><%= t("exams.finish.body", count: @exam.question_count) %></p>
+  <%= button_to t("exams.finish.submit"), complete_exam_path(@exam), method: :patch, class: "btn btn--primary mt-6" %>
+</section>

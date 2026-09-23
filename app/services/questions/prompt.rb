@@ -32,6 +32,24 @@ module Questions
       de hospitalización genérica.
     TEXT
 
+    # Asked for after a student chose a distractor and could not tell why it was wrong: the
+    # explanation said why the answer was right, which is a different fact. Many of the
+    # best distractors are right somewhere else in the same guideline — the ECG it
+    # recommends after the circulation returns, not during compressions — and saying so is
+    # the lesson. Shared with Questions::RationaleWriter, which writes them for cases
+    # generated before this existed.
+    RATIONALE_INSTRUCTIONS = <<~TEXT.strip
+      - Para cada distractor, una razón breve (una o dos oraciones) de por qué no es la
+        mejor respuesta en ESTE caso: qué es o para qué sirve esa opción, y qué le falta
+        frente a lo que se pregunta. Si la opción es correcta en otro momento o situación
+        que las recomendaciones describen, dilo. Si la opción es útil pero no responde lo
+        que se pregunta, di eso; no afirmes que algo "no se recomienda" o "no es estándar"
+        salvo que las recomendaciones lo digan. Tono respetuoso y didáctico: explica, no
+        reprendas, sin calificativos tajantes como "inaceptable", y no te dirijas al alumno.
+        Apóyate solo en el caso y en las recomendaciones; no inventes cifras, datos ni
+        recomendaciones.
+    TEXT
+
     # An unknown detail level falls back to focused rather than failing the call.
     def initialize(guideline, recommendations, detail: :focused, locale: "es")
       @guideline = guideline
@@ -58,6 +76,7 @@ module Questions
           que elegiría alguien que estudió el tema de forma incompleta. Un distractor
           evidentemente absurdo hace inútil el reactivo.
         - Una explicación breve de por qué la correcta lo es.
+        #{RATIONALE_INSTRUCTIONS}
         - El número de la recomendación en la que se basa, y una cita textual de esa
           recomendación.
         - Ni la pregunta ni las opciones mencionan cuadros, algoritmos, figuras ni escalas de
@@ -71,8 +90,8 @@ module Questions
         Devuelve SOLO JSON, sin markdown ni texto alrededor. Las llaves van en inglés:
         {"cases":[{"stem":"...","questions":[{"text":"...","explanation":"...",
         "recommendation":1,"quote":"...","options":[{"text":"...","correct":true},
-        {"text":"...","correct":false},{"text":"...","correct":false},
-        {"text":"...","correct":false}]}]}]}
+        {"text":"...","correct":false,"rationale":"..."},{"text":"...","correct":false,"rationale":"..."},
+        {"text":"...","correct":false,"rationale":"..."}]}]}]}
 
         Recomendaciones:
         #{listing}

@@ -121,6 +121,12 @@ holds figures and the **filename** decides whether each one is medicine —
 `Gpc::ImageParser::METHODOLOGY_FILE`. Never widen that filter without measuring what it
 lets through.
 
+**Only `published` cases reach students, and only `Questions::Publisher` publishes.**
+A case qualifies when the verifier supported it and nobody withdrew it (`flagged`,
+`retired`). The exam builder reads `status_published` and nothing else; never point a
+student-facing query at `publishable` or at drafts. After a verification run, run
+`questions:publish`.
+
 **Difficulty uses the exam's own vocabulary** — `low`/`medium`/`high`, rendered Baja /
 Media / Alta — never a competitor's Interno/Residente/Adscrito. Score is a plain
 percentage; do not weight it.
@@ -142,6 +148,13 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
 - Coverage floor only ever moves up. It is at 99.7% line / 100% branch; keep it there.
   Prefer deleting a speculative branch to writing a spec that proves it is unreachable.
 - `bundle exec rspec`, `rubocop` and `brakeman` are all green before a phase is closed.
+- End-to-end specs live in `spec/system` and drive Chromium through Playwright
+  (`capybara-playwright-driver`). One-time setup: `npx playwright install chromium`.
+  Tag an example `viewport: :phone` for 375px and `color_scheme: :dark` for a dark system
+  theme; `HEADED=1` opens a visible, slowed-down window. One file per flow a student
+  depends on, each run once at the width that matters for it — not every flow at every
+  width. Shared steps live in `spec/support/system_helpers.rb`; request specs carry the
+  branches.
 
 ## Gotchas already paid for
 

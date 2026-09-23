@@ -17,16 +17,29 @@ RSpec.describe ClinicalCase do
     it "is false when the verifier disagreed" do
       expect(build(:clinical_case, verification_verdict: "unsupported")).not_to be_publishable
     end
+
+    it "is false once a person has withdrawn it, even if supported" do
+      expect(build(:clinical_case, verification_verdict: "supported", status: "retired")).not_to be_publishable
+      expect(build(:clinical_case, verification_verdict: "supported", status: "flagged")).not_to be_publishable
+    end
   end
 
   describe ".publishable" do
-    it "returns only the supported cases" do
+    it "returns only the supported cases nobody has withdrawn" do
       supported = create(:clinical_case, verification_verdict: "supported")
+      create(:clinical_case, verification_verdict: "supported", status: "retired")
       create(:clinical_case, verification_verdict: "unsupported")
       create(:clinical_case, verification_verdict: nil)
 
       expect(described_class.publishable).to contain_exactly(supported)
     end
+  end
+
+  it "refuses to be published without a supported verdict" do
+    kase = build(:clinical_case, verification_verdict: "ambiguous", status: "published")
+
+    expect(kase).not_to be_valid
+    expect(kase.errors.of_kind?(:status, :not_supported)).to be(true)
   end
 
   it "uses the exam's own difficulty vocabulary" do

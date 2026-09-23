@@ -1,4 +1,12 @@
 en:
+  number:
+    format:
+      separator: "."
+      delimiter: ","
+    percentage:
+      format:
+        format: "%n%"
+
   app:
     name: "GPCEnarm"
     tagline: "Every question backed by a clinical practice guideline"
@@ -48,8 +56,160 @@ en:
   exams:
     denied:
       daily_limit_reached: "You've used your %{limit} free questions for today. Come back tomorrow or subscribe."
+    modes:
+      quick_quiz: "Quick Quiz"
+      custom: "Build your Exam"
+      full_exam: "Current ENARM"
+      extended_exam: "Classic ENARM"
+    builder:
+      unknown_mode: "That kind of exam does not exist."
+      nothing_matches: "No published cases match those filters. Try fewer."
+    answers:
+      not_running: "This exam is not in progress."
+      not_current: "That question is no longer the current one."
+      choose_option: "Choose an option to answer."
+      time_up: "Time is up. The exam ended with what you managed to answer."
+    bar:
+      position: "Question %{position} of %{total}"
+      time_left: "Time left"
+      time_spent: "Time elapsed"
+      pause: "Pause"
+      finish: "Finish"
+      back_to_results: "Results"
+    question:
+      case_label: "Clinical case · question %{number} of %{total}"
+      choose: "Choose an answer"
+      submit: "Answer"
+      correct_option: "Correct answer"
+      your_answer: "Your answer"
+      also_yours: " · you chose it"
+      unanswered: "Not answered"
+      right: "Correct"
+      wrong: "Incorrect"
+      previous: "← Previous"
+      next: "Next question →"
+      back_to_results: "Back to results"
+      see_results: "See results"
+    feedback:
+      explanation: "Explanation"
+      source: "Cited recommendation"
+      undated: "undated"
+      expired: "Past its validity"
+      open_guideline: "Open the guideline ↗"
+    triage:
+      prompt: "What made you miss it?"
+      saved: "Noted. You will see it in your stats."
+      reasons:
+        did_not_know: "I did not know it"
+        confused_diagnoses: "I confused diagnoses"
+        misread_case: "I misread the case"
+        ran_out_of_time: "I ran out of time"
+    new:
+      eyebrow: "Simulator"
+      title: "Choose your exam"
+      bank:
+        one: "1 published clinical case"
+        other: "%{count} published clinical cases"
+      presets:
+        quick_quiz: "Ten questions across every specialty. You see the explanation as you answer each one."
+        full_exam: "The current exam: cases from every specialty, mixed."
+        extended_exam: "The long version from before 2021."
+      sections:
+        mock:
+          title: "ENARM mock exam"
+          subtitle: "Like the real exam: everything on one page, you can go back and change answers, and explanations come at the end. You can change those conditions."
+        custom:
+          title: "Build your Exam"
+          subtitle: "You choose the topic, the size and the conditions."
+      mock:
+        length: "Length"
+        submit: "Start mock exam"
+      custom:
+        question_count: "Number of questions"
+        specialties: "Specialties"
+        none_means_all: "Choose none and they are all included."
+        topics: "Topics"
+        all_topics: "All topics"
+        search_topic: "Search topics"
+        no_topic: "No topic matches."
+        clear_topics: "Clear all"
+        done_topics: "Done"
+        many_topics: "%{count} topics"
+        difficulty: "Difficulty"
+        options: "Options"
+        unseen_only:
+          label: "Only cases I have not seen"
+          hint: "Leaves out the cases from earlier exams."
+        previously_wrong_only:
+          label: "Only cases I missed"
+          hint: "Goes back to the cases where you missed or left a question blank."
+        interleave:
+          label: "Mix specialties"
+          hint: "As on the real exam: nothing tells you which specialty the next case is."
+        submit: "Start"
+    settings:
+      pace:
+        label: "Time"
+        none: "No limit"
+        option: "%{seconds} s"
+        suggested: "%{seconds} s · suggested"
+        hint: "Seconds per question, as a total for the whole exam: you can spend more on one case and less on another. %{seconds} s matches the real exam's 6 hours."
+      feedback:
+        label: "Explanations"
+        after_each: "As you answer each question"
+        at_end: "When you finish the exam"
+        hints:
+          after_each: "One question at a time, with the explanation as you answer."
+          at_end: "A single page, like the real exam. You can change answers until you finish."
+    sheet:
+      answered: "%{answered} of %{total} answered"
+      case_label: "Clinical case · questions %{first} to %{last}"
+      case_label_one: "Clinical case · question %{number}"
+      save: "Save answer"
+      saved: "Answer saved"
+      finish: "Finish exam"
+      finish_hint: "You can go back to any question and change your answer until you finish."
+      confirm_finish: "Finish the exam? Unanswered questions count as wrong."
+    finish:
+      title: "You answered everything"
+      body:
+        one: "You answered the only question. When you finish you will see your score and every explanation."
+        other: "You answered all %{count} questions. When you finish you will see your score and every explanation."
+      submit: "Finish and see results"
+    discard:
+      button: "Discard exam"
+      confirm: "Discard this exam? It disappears from your history and your average."
+      done: "Exam discarded."
+    paused:
+      title: "Exam paused"
+      progress: "%{answered} of %{total} questions answered"
+      resume: "Continue"
+    results:
+      title: "Results"
+      tally: "%{correct} correct out of %{total} questions"
+      time: "time %{time}"
+      by_specialty: "By specialty"
+      specialty_tally: "%{correct} of %{total}"
+      questions: "Questions"
+      blank: "Blank"
+      right: "Correct"
+      wrong: "Incorrect"
+      new_exam: "Another exam"
+      history: "History"
+    index:
+      title: "History"
+      new: "New exam"
+      continue: "Continue →"
+      questions:
+        one: "1 question"
+        other: "%{count} questions"
+      empty:
+        title: "You have not taken an exam yet"
+        body: "Start with a Quick Quiz: ten questions, each with its explanation."
 
   shared:
+    figure:
+      open: "Open the full figure ↗"
     theme:
       toggle: "Switch theme"
       light: "Light"
@@ -73,6 +233,16 @@ en:
       today: "TODAY"
       greeting: "Hello, %{name}"
       fallback_name: "colleague"
+      average: "Your average"
+      completed:
+        one: "across 1 finished exam"
+        other: "across %{count} finished exams"
+      no_average: "It will appear when you finish your first exam."
+      unfinished: "You have an unfinished %{mode}"
+      start_quiz: "Start a Quick Quiz"
+      mock_exam: "ENARM mock exam"
+      build_exam: "Build your exam"
+      history: "See history"
       showing: "Showing %{from}–%{to} of %{total}"
       expired_flag: "Out of date"
       empty:
@@ -139,7 +309,6 @@ en:
       expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."
       retired_notice: "Withdrawn case: it will not reach students."
       second_opinion: "Second opinion"
-      open_figure: "Open the full figure ↗"
       verdict_meaning:
         supported: "Another model answered every question from the cited recommendation alone and chose the same option."
         ambiguous: "Another model could not decide at least one question from the cited recommendation. Check whether the question asks more than the recommendation says."
@@ -148,6 +317,10 @@ en:
   activerecord:
     errors:
       models:
+        clinical_case:
+          attributes:
+            status:
+              not_supported: "can only be published once the second opinion has supported every answer"
         question:
           attributes:
             source_quote:

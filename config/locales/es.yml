@@ -1,4 +1,14 @@
 es:
+  # rails-i18n's `es` writes numbers the way Spain does ("66,7 %"). Students here read
+  # Mexican notation, which is also what rails-i18n's own es-MX uses.
+  number:
+    format:
+      separator: "."
+      delimiter: ","
+    percentage:
+      format:
+        format: "%n%"
+
   app:
     name: "GPCEnarm"
     tagline: "Cada pregunta, respaldada por una Guía de Práctica Clínica"
@@ -48,8 +58,160 @@ es:
   exams:
     denied:
       daily_limit_reached: "Llegaste a tus %{limit} preguntas gratuitas de hoy. Vuelve mañana o activa tu suscripción."
+    modes:
+      quick_quiz: "Quiz Express"
+      custom: "Arma tu Examen"
+      full_exam: "ENARM Actual"
+      extended_exam: "ENARM Clásico"
+    builder:
+      unknown_mode: "Ese tipo de examen no existe."
+      nothing_matches: "No hay casos publicados con esos filtros. Prueba con menos."
+    answers:
+      not_running: "Este examen no está en curso."
+      not_current: "Esa pregunta ya no es la actual."
+      choose_option: "Elige una opción para responder."
+      time_up: "Se acabó el tiempo. El examen terminó con lo que alcanzaste a responder."
+    bar:
+      position: "Pregunta %{position} de %{total}"
+      time_left: "Tiempo restante"
+      time_spent: "Tiempo transcurrido"
+      pause: "Pausar"
+      finish: "Terminar"
+      back_to_results: "Resultados"
+    question:
+      case_label: "Caso clínico · pregunta %{number} de %{total}"
+      choose: "Elige una respuesta"
+      submit: "Responder"
+      correct_option: "Respuesta correcta"
+      your_answer: "Tu respuesta"
+      also_yours: " · la elegiste"
+      unanswered: "Sin responder"
+      right: "Correcta"
+      wrong: "Incorrecta"
+      previous: "← Anterior"
+      next: "Siguiente pregunta →"
+      back_to_results: "Volver a resultados"
+      see_results: "Ver resultados"
+    feedback:
+      explanation: "Explicación"
+      source: "Recomendación citada"
+      undated: "sin año"
+      expired: "Fuera de vigencia"
+      open_guideline: "Abrir la guía ↗"
+    triage:
+      prompt: "¿Qué te hizo fallar?"
+      saved: "Anotado. Lo verás en tus estadísticas."
+      reasons:
+        did_not_know: "No lo sabía"
+        confused_diagnoses: "Confundí diagnósticos"
+        misread_case: "Leí mal el caso"
+        ran_out_of_time: "Me faltó tiempo"
+    new:
+      eyebrow: "Simulador"
+      title: "Elige tu examen"
+      bank:
+        one: "1 caso clínico publicado"
+        other: "%{count} casos clínicos publicados"
+      presets:
+        quick_quiz: "Diez preguntas de todas las especialidades. Ves la explicación al responder cada una."
+        full_exam: "El examen actual: casos de todas las especialidades, mezclados."
+        extended_exam: "La versión larga de antes de 2021."
+      sections:
+        mock:
+          title: "Simulacro ENARM"
+          subtitle: "Como el examen real: todo en una página, puedes volver y cambiar respuestas, y las explicaciones llegan al final. Puedes cambiar esas condiciones."
+        custom:
+          title: "Arma tu Examen"
+          subtitle: "Tú eliges el tema, el tamaño y las condiciones."
+      mock:
+        length: "Extensión"
+        submit: "Empezar simulacro"
+      custom:
+        question_count: "Número de preguntas"
+        specialties: "Especialidades"
+        none_means_all: "Sin elegir ninguna, entran todas."
+        topics: "Temas"
+        all_topics: "Todos los temas"
+        search_topic: "Buscar tema"
+        no_topic: "Ningún tema coincide."
+        clear_topics: "Quitar todos"
+        done_topics: "Listo"
+        many_topics: "%{count} temas"
+        difficulty: "Dificultad"
+        options: "Opciones"
+        unseen_only:
+          label: "Solo casos que no he visto"
+          hint: "Deja fuera los casos de exámenes anteriores."
+        previously_wrong_only:
+          label: "Solo casos que fallé"
+          hint: "Vuelve a los casos donde fallaste o dejaste en blanco alguna pregunta."
+        interleave:
+          label: "Mezclar especialidades"
+          hint: "Como en el examen real: nada te avisa de qué especialidad es el siguiente caso."
+        submit: "Empezar"
+    settings:
+      pace:
+        label: "Tiempo"
+        none: "Sin límite"
+        option: "%{seconds} s"
+        suggested: "%{seconds} s · sugerido"
+        hint: "Segundos por pregunta, como tiempo total para todo el examen: puedes dedicar más a un caso y menos a otro. %{seconds} s equivale a las 6 horas del examen real."
+      feedback:
+        label: "Explicaciones"
+        after_each: "Al responder cada pregunta"
+        at_end: "Al terminar el examen"
+        hints:
+          after_each: "Pregunta por pregunta, con la explicación al responder."
+          at_end: "Una sola página, como el examen real. Puedes cambiar respuestas hasta terminar."
+    sheet:
+      answered: "%{answered} de %{total} respondidas"
+      case_label: "Caso clínico · preguntas %{first} a %{last}"
+      case_label_one: "Caso clínico · pregunta %{number}"
+      save: "Guardar respuesta"
+      saved: "Respuesta guardada"
+      finish: "Terminar examen"
+      finish_hint: "Puedes volver a cualquier pregunta y cambiar tu respuesta hasta terminar."
+      confirm_finish: "¿Terminar el examen? Las preguntas sin responder cuentan como error."
+    finish:
+      title: "Respondiste todo"
+      body:
+        one: "Contestaste la única pregunta. Al terminar verás tu calificación y cada explicación."
+        other: "Contestaste las %{count} preguntas. Al terminar verás tu calificación y cada explicación."
+      submit: "Terminar y ver resultados"
+    discard:
+      button: "Descartar examen"
+      confirm: "¿Descartar este examen? Desaparece de tu historial y de tu promedio."
+      done: "Examen descartado."
+    paused:
+      title: "Examen en pausa"
+      progress: "%{answered} de %{total} preguntas respondidas"
+      resume: "Continuar"
+    results:
+      title: "Resultados"
+      tally: "%{correct} aciertos de %{total} preguntas"
+      time: "tiempo %{time}"
+      by_specialty: "Por especialidad"
+      specialty_tally: "%{correct} de %{total}"
+      questions: "Preguntas"
+      blank: "En blanco"
+      right: "Correcta"
+      wrong: "Incorrecta"
+      new_exam: "Otro examen"
+      history: "Historial"
+    index:
+      title: "Historial"
+      new: "Nuevo examen"
+      continue: "Continuar →"
+      questions:
+        one: "1 pregunta"
+        other: "%{count} preguntas"
+      empty:
+        title: "Todavía no has hecho ningún examen"
+        body: "Empieza con un Quiz Express: diez preguntas, con la explicación de cada una."
 
   shared:
+    figure:
+      open: "Abrir la figura completa ↗"
     theme:
       toggle: "Cambiar tema"
       light: "Claro"
@@ -73,6 +235,16 @@ es:
       today: "HOY"
       greeting: "Hola, %{name}"
       fallback_name: "colega"
+      average: "Tu promedio"
+      completed:
+        one: "en 1 examen terminado"
+        other: "en %{count} exámenes terminados"
+      no_average: "Aparecerá cuando termines tu primer examen."
+      unfinished: "Tienes un %{mode} sin terminar"
+      start_quiz: "Empezar Quiz Express"
+      mock_exam: "Simulacro ENARM"
+      build_exam: "Arma tu examen"
+      history: "Ver historial"
       showing: "Mostrando %{from}–%{to} de %{total}"
       expired_flag: "Fuera de vigencia"
       empty:
@@ -139,7 +311,6 @@ es:
       expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
       retired_notice: "Caso retirado: no llegará a los alumnos."
       second_opinion: "Segunda opinión"
-      open_figure: "Abrir la figura completa ↗"
       verdict_meaning:
         supported: "Otro modelo respondió cada pregunta usando solo la recomendación citada y eligió la misma opción."
         ambiguous: "Otro modelo no pudo decidir al menos una pregunta con la recomendación citada. Revisa si la pregunta pide más de lo que la recomendación dice."
@@ -148,6 +319,10 @@ es:
   activerecord:
     errors:
       models:
+        clinical_case:
+          attributes:
+            status:
+              not_supported: "solo puede publicarse si la segunda opinión respaldó todas sus respuestas"
         question:
           attributes:
             source_quote:

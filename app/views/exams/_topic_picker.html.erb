@@ -1,0 +1,44 @@
+<%# Seventy-odd topics are too many for pills and a native select draws its list in the
+    browser's style, so this is a disclosure with a search box over checkboxes. Several
+    topics may be chosen, and none means all, as with specialties. It is a <details>:
+    without JavaScript it still opens and submits; the controller only filters the list
+    and names the choice on the closed picker. %>
+<% groups = @topics.group_by { |topic| topic.branch.specialty.name } %>
+<div data-controller="topic-picker"
+     data-topic-picker-all-value="<%= t("exams.new.custom.all_topics") %>"
+     data-topic-picker-many-value="<%= t("exams.new.custom.many_topics", count: "%{count}") %>">
+  <p id="topic_picker_label" class="text-sm font-medium text-ink"><%= t("exams.new.custom.topics") %></p>
+  <p class="mt-1 text-xs text-ink-faint"><%= t("exams.new.custom.none_means_all") %></p>
+  <details class="group mt-2" data-topic-picker-target="details">
+    <summary class="input flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden"
+             aria-describedby="topic_picker_label">
+      <span class="truncate" data-topic-picker-target="summary"><%= t("exams.new.custom.all_topics") %></span>
+      <svg class="size-4 shrink-0 text-ink-faint transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+
+    <div class="mt-2 rounded-card border border-line bg-surface p-3 shadow-[var(--shadow-card)]">
+      <div class="flex items-center gap-2">
+        <input type="search" class="input" placeholder="<%= t("exams.new.custom.search_topic") %>"
+               aria-label="<%= t("exams.new.custom.search_topic") %>" autocomplete="off"
+               data-topic-picker-target="search" data-action="input->topic-picker#filter keydown.esc->topic-picker#close">
+        <button type="button" class="inline-flex min-h-11 shrink-0 items-center px-2 text-sm text-accent hover:text-accent-hover"
+                data-action="topic-picker#clear"><%= t("exams.new.custom.clear_topics") %></button>
+      </div>
+
+      <div class="mt-3 max-h-80 overflow-y-auto" role="group" aria-labelledby="topic_picker_label">
+        <% groups.each do |specialty, topics| %>
+          <div data-topic-picker-target="group">
+            <p class="eyebrow px-3 pb-1 pt-4 first:pt-1"><%= specialty %></p>
+            <% topics.each do |topic| %>
+              <%= render "exams/topic_option", topic: topic, count: @topic_counts[topic.id] %>
+            <% end %>
+          </div>
+        <% end %>
+        <p class="hidden px-3 py-4 text-sm text-ink-faint" data-topic-picker-target="empty"><%= t("exams.new.custom.no_topic") %></p>
+      </div>
+
+      <button type="button" class="btn btn--ghost mt-3 w-full" data-action="topic-picker#close"><%= t("exams.new.custom.done_topics") %></button>
+    </div>
+  </details>
+</div>

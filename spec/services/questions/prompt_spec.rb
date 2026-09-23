@@ -9,6 +9,11 @@ RSpec.describe Questions::Prompt do
     described_class.new(guideline, recommendations, **options).to_s
   end
 
+  it "asks why each distractor is wrong, politely and from the recommendations alone" do
+    expect(prompt).to include(described_class::RATIONALE_INSTRUCTIONS, "\"rationale\"")
+    expect(described_class::RATIONALE_INSTRUCTIONS).to include("no inventes", "reprendas", "no se recomienda")
+  end
+
   it "numbers the statements it is handed, in order, so the model can cite them by number" do
     expect(prompt).to include(
       "1. Se recomienda realizar electrocardiograma de 12 derivaciones.\n2. Se recomienda iniciar aspirina 300 mg."

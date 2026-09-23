@@ -1,0 +1,43 @@
+<%# One page per kind of exam, so each button on the home screen opens only its own
+    form. Without a section — from the history or the results — it offers all three. %>
+<% heading = @section ? t("exams.new.sections.#{@section}.title") : t("exams.new.title") %>
+<% content_for :title, heading %>
+
+<section>
+  <p class="eyebrow"><%= t("exams.new.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= heading %></h1>
+  <p class="mt-2 text-sm leading-relaxed text-ink-muted">
+    <%= @section ? t("exams.new.sections.#{@section}.subtitle") : t("exams.new.bank", count: @published.count) %>
+  </p>
+</section>
+
+<% if @published.none? %>
+  <div class="mt-8 rounded-card border border-dashed border-line-strong p-6 text-center">
+    <p class="text-sm font-medium text-ink"><%= t("home.dashboard.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("home.dashboard.empty.body") %></p>
+  </div>
+<% elsif @section %>
+  <div class="mt-8"><%= render @section %></div>
+<% else %>
+  <%# Quiz Express is one tap: a student who opens the simulator to practise should be
+      answering a question a second later, not filling in a form. %>
+  <%= button_to exams_path(mode: "quick_quiz"), class: "card mt-8 flex w-full items-center gap-4 px-5 py-4 text-left transition-shadow hover:ring-2 hover:ring-accent" do %>
+    <span class="min-w-0 flex-1">
+      <span class="block font-medium text-ink"><%= t("exams.modes.quick_quiz") %></span>
+      <span class="mt-1 block text-sm leading-relaxed text-ink-muted"><%= t("exams.new.presets.quick_quiz") %></span>
+    </span>
+    <span class="numeric shrink-0 text-sm text-ink-faint"><%= Exam::QUESTION_COUNTS["quick_quiz"] %></span>
+  <% end %>
+
+  <section class="mt-12">
+    <h2 class="text-lg font-semibold tracking-tight text-ink"><%= t("exams.new.sections.mock.title") %></h2>
+    <p class="mt-1 text-sm text-ink-muted"><%= t("exams.new.sections.mock.subtitle") %></p>
+    <div class="mt-5"><%= render "mock" %></div>
+  </section>
+
+  <section class="mt-12">
+    <h2 class="text-lg font-semibold tracking-tight text-ink"><%= t("exams.new.sections.custom.title") %></h2>
+    <p class="mt-1 text-sm text-ink-muted"><%= t("exams.new.sections.custom.subtitle") %></p>
+    <div class="mt-5"><%= render "custom" %></div>
+  </section>
+<% end %>

@@ -1,0 +1,25 @@
+<%# The two conditions a student may change on any exam they build. Defaults come from
+    the mode: the exam-length modes start at the real exam's conditions. %>
+<% pace = Exam.default_seconds_per_question(mode) %>
+<% timing = Exam.default_feedback_timing(mode) %>
+<%= render "shared/pill_radios", name: "settings[seconds_per_question]", id_prefix: "#{prefix}_pace",
+      legend: t("exams.settings.pace.label"), selected: pace,
+      hint: t("exams.settings.pace.hint", seconds: Exam::SUGGESTED_SECONDS_PER_QUESTION),
+      options: [[t("exams.settings.pace.none"), ""]] + Exam::PACES.map { |seconds|
+        [t(seconds == Exam::SUGGESTED_SECONDS_PER_QUESTION ? "exams.settings.pace.suggested" : "exams.settings.pace.option", seconds: seconds), seconds]
+      } %>
+
+<fieldset>
+  <legend class="text-sm font-medium text-ink"><%= t("exams.settings.feedback.label") %></legend>
+  <div class="mt-3 grid gap-2 sm:grid-cols-2">
+    <% Exam.feedback_timings.each_key do |key| %>
+      <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-card border border-line px-4 py-3 transition-colors hover:border-accent has-checked:border-accent has-checked:bg-accent-soft has-focus-visible:ring-2 has-focus-visible:ring-accent">
+        <%= radio_button_tag "settings[feedback_timing]", key, key == timing, id: "#{prefix}_feedback_#{key}", class: "mt-1 size-4 shrink-0 accent-accent" %>
+        <span>
+          <span class="block text-sm font-medium text-ink"><%= t("exams.settings.feedback.#{key}") %></span>
+          <span class="mt-0.5 block text-xs leading-relaxed text-ink-faint"><%= t("exams.settings.feedback.hints.#{key}") %></span>
+        </span>
+      </label>
+    <% end %>
+  </div>
+</fieldset>

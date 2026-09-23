@@ -1,0 +1,42 @@
+<% content_for :title, t("exams.index.title") %>
+
+<section class="flex items-end justify-between gap-4">
+  <div>
+    <p class="eyebrow"><%= t("exams.new.eyebrow") %></p>
+    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("exams.index.title") %></h1>
+  </div>
+  <%= link_to t("exams.index.new"), new_exam_path, class: "btn btn--primary shrink-0" %>
+</section>
+
+<% if @exams.none? %>
+  <div class="mt-8 rounded-card border border-dashed border-line-strong p-6 text-center">
+    <p class="text-sm font-medium text-ink"><%= t("exams.index.empty.title") %></p>
+    <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("exams.index.empty.body") %></p>
+  </div>
+<% else %>
+  <ul class="mt-8 space-y-2">
+    <% @exams.each do |exam| %>
+      <li class="card flex items-center gap-2 pr-3 transition-shadow hover:ring-2 hover:ring-accent">
+        <%= link_to exam_path(exam), class: "flex min-w-0 flex-1 items-center gap-4 py-4 pl-5 text-sm" do %>
+          <span class="min-w-0 flex-1">
+            <span class="block font-medium text-ink"><%= t("exams.modes.#{exam.mode}") %></span>
+            <span class="mt-0.5 block text-xs text-ink-faint">
+              <%= l(exam.started_at.to_date, format: :long) %> · <%= t("exams.index.questions", count: exam.question_count) %>
+            </span>
+          </span>
+          <span class="numeric shrink-0 <%= exam.status_completed? ? "text-ink" : "text-accent" %>">
+            <%= exam.status_completed? ? score_text(exam.score) : t("exams.index.continue") %>
+          </span>
+        <% end %>
+        <%= button_to exam_path(exam), method: :delete,
+              form: { data: { turbo_confirm: t("exams.discard.confirm") } },
+              class: "inline-flex size-11 items-center justify-center rounded-full text-ink-faint hover:bg-surface-sunk hover:text-incorrect",
+              aria: { label: t("exams.discard.button") }, title: t("exams.discard.button") do %>
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

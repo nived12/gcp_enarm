@@ -1,0 +1,58 @@
+<% content_for :title, t("exams.modes.#{@exam.mode}") %>
+<% exam_questions = @exam.exam_questions.includes(:answer, clinical_case: :clinical_image, question: :answer_options) %>
+<% answered = exam_questions.count { |exam_question| exam_question.answer } %>
+
+<%# The whole exam on one page, as the real one is: every case with its questions, in
+    order, free to scroll back and change an answer until the student finishes. Each
+    choice saves as it is made; nothing about whether it was right shows until the end. %>
+<%= render "exams/bar", exam: @exam,
+      progress_label: render("exams/answered", exam: @exam, answered: answered),
+      progress: answered.fdiv(@exam.question_count) %>
+
+<% exam_questions.chunk_while { |a, b| a.clinical_case_id == b.clinical_case_id }.each do |group| %>
+  <% clinical_case = group.first.clinical_case %>
+  <section class="mt-12 border-t border-line pt-10 first-of-type:border-0 first-of-type:pt-0" lang="<%= clinical_case.locale %>">
+    <p class="eyebrow" lang="<%= I18n.locale %>">
+      <%= group.one? ? t("exams.sheet.case_label_one", number: group.first.position) : t("exams.sheet.case_label", first: group.first.position, last: group.last.position) %>
+    </p>
+    <p class="vignette mt-3 text-ink"><%= clinical_case.stem %></p>
+    <% if clinical_case.clinical_image&.file&.attached? %>
+      <%= render "shared/figure", image: clinical_case.clinical_image, spacing: "mt-6" %>
+    <% end %>
+
+    <% group.each do |exam_question| %>
+      <article id="<%= dom_id(exam_question) %>" class="mt-10 scroll-mt-44">
+        <h2 class="flex gap-3 text-base font-medium leading-relaxed text-ink">
+          <span class="numeric shrink-0 text-ink-faint"><%= exam_question.position %>.</span>
+          <span><%= exam_question.question.text %></span>
+        </h2>
+
+        <%= form_with url: exam_question_answer_path(@exam, exam_question.position), method: :post, class: "mt-4",
+              data: { controller: "autosave", action: "change->autosave#save" } do %>
+          <fieldset>
+            <legend class="sr-only"><%= t("exams.question.choose") %></legend>
+            <div class="space-y-2">
+              <% exam_question.question.answer_options.each_with_index do |option, index| %>
+                <label class="flex min-h-11 cursor-pointer items-start gap-4 rounded-card border border-line bg-surface px-5 py-3 text-sm leading-relaxed transition-colors hover:border-accent has-checked:border-accent has-checked:bg-accent-soft">
+                  <%= radio_button_tag :answer_option_id, option.id, exam_question.answer&.answer_option_id == option.id,
+                        id: dom_id(option, exam_question.id), class: "mt-1 size-4 shrink-0 accent-accent" %>
+                  <span class="numeric mt-px w-4 shrink-0 font-medium text-ink-faint"><%= option_letter(index) %></span>
+                  <span class="text-ink"><%= option.text %></span>
+                </label>
+              <% end %>
+            </div>
+          </fieldset>
+          <noscript><%= button_tag t("exams.sheet.save"), class: "btn btn--ghost mt-3" %></noscript>
+        <% end %>
+        <p id="<%= dom_id(exam_question, :saved) %>" class="mt-2 min-h-5 text-xs text-ink-faint" lang="<%= I18n.locale %>" aria-live="polite"></p>
+      </article>
+    <% end %>
+  </section>
+<% end %>
+
+<div class="mt-16 border-t border-line pt-8 text-center">
+  <p class="text-sm text-ink-muted"><%= t("exams.sheet.finish_hint") %></p>
+  <%= button_to t("exams.sheet.finish"), complete_exam_path(@exam), method: :patch,
+        form: { data: { turbo_confirm: t("exams.sheet.confirm_finish") } }, class: "btn btn--primary mt-4" %>
+  <%= render "exams/discard", exam: @exam, form_class: "mt-4" %>
+</div>

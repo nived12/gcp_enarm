@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,10 +47,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
     t.datetime "created_at", null: false
     t.integer "position", null: false
     t.bigint "question_id", null: false
+    t.text "rationale"
     t.text "text", null: false
     t.datetime "updated_at", null: false
     t.index ["question_id", "position"], name: "index_answer_options_on_question_id_and_position", unique: true
     t.index ["question_id"], name: "index_answer_options_on_question_id"
+  end
+
+  create_table "answers", force: :cascade do |t|
+    t.bigint "answer_option_id"
+    t.datetime "answered_at", null: false
+    t.boolean "correct", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "error_reason"
+    t.bigint "exam_question_id", null: false
+    t.integer "seconds_spent", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["answer_option_id"], name: "index_answers_on_answer_option_id"
+    t.index ["answered_at"], name: "index_answers_on_answered_at"
+    t.index ["exam_question_id"], name: "index_answers_on_exam_question_id", unique: true
   end
 
   create_table "branches", force: :cascade do |t|
@@ -108,6 +123,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
     t.index ["guideline_section_id"], name: "index_clinical_images_on_guideline_section_id"
     t.index ["kind"], name: "index_clinical_images_on_kind"
     t.index ["label"], name: "index_clinical_images_on_label"
+  end
+
+  create_table "exam_questions", force: :cascade do |t|
+    t.bigint "clinical_case_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "exam_id", null: false
+    t.integer "position", null: false
+    t.bigint "question_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["clinical_case_id"], name: "index_exam_questions_on_clinical_case_id"
+    t.index ["exam_id", "position"], name: "index_exam_questions_on_exam_id_and_position", unique: true
+    t.index ["exam_id", "question_id"], name: "index_exam_questions_on_exam_id_and_question_id", unique: true
+    t.index ["question_id"], name: "index_exam_questions_on_question_id"
+  end
+
+  create_table "exams", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "elapsed_seconds", default: 0, null: false
+    t.string "feedback_timing", default: "after_each", null: false
+    t.jsonb "filters", default: {}, null: false
+    t.string "mode", null: false
+    t.integer "question_count", null: false
+    t.datetime "running_since"
+    t.decimal "score", precision: 5, scale: 2
+    t.integer "seconds_per_question"
+    t.datetime "started_at", null: false
+    t.string "status", default: "in_progress", null: false
+    t.integer "time_limit_seconds"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "status"], name: "index_exams_on_user_id_and_status"
   end
 
   create_table "generation_runs", force: :cascade do |t|
@@ -438,6 +485,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answer_options", "questions"
+  add_foreign_key "answers", "answer_options"
+  add_foreign_key "answers", "exam_questions"
   add_foreign_key "branches", "specialties"
   add_foreign_key "clinical_cases", "clinical_images"
   add_foreign_key "clinical_cases", "generation_runs"
@@ -445,6 +494,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
   add_foreign_key "clinical_cases", "specialties"
   add_foreign_key "clinical_cases", "topics"
   add_foreign_key "clinical_images", "guideline_sections"
+  add_foreign_key "exam_questions", "clinical_cases"
+  add_foreign_key "exam_questions", "exams"
+  add_foreign_key "exam_questions", "questions"
+  add_foreign_key "exams", "users"
   add_foreign_key "guideline_sections", "guideline_sections", column: "source_section_id"
   add_foreign_key "guideline_sections", "guidelines"
   add_foreign_key "guideline_topics", "guidelines"

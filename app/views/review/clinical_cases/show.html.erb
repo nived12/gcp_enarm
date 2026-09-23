@@ -59,7 +59,7 @@
       after the answer, because they carry it. The attribution is a licence condition, so
       it is rendered from the row rather than assembled here. %>
   <% if @case.clinical_image&.file&.attached? %>
-    <%= render "figure", image: @case.clinical_image, spacing: "mt-8" %>
+    <%= render "shared/figure", image: @case.clinical_image, spacing: "mt-8" %>
   <% end %>
 </section>
 
@@ -79,7 +79,13 @@
           <span class="mt-px w-4 shrink-0 text-center font-medium <%= option.correct? ? "text-correct" : "text-ink-faint" %>">
             <%= option.correct? ? "✓" : "·" %>
           </span>
-          <span class="text-ink"><%= option.text %></span>
+          <span class="min-w-0">
+            <span class="text-ink"><%= option.text %></span>
+            <%# What a student who chose it will read. %>
+            <% if option.rationale.present? && !option.correct? %>
+              <span class="mt-2 block text-xs leading-relaxed text-ink-muted"><%= option.rationale %></span>
+            <% end %>
+          </span>
         </li>
       <% end %>
     </ul>
@@ -101,7 +107,7 @@
         <%# The figure the statement points at, as the student will meet it: part of the
             explanation, once the question is answered. %>
         <% if (figure = question.recommendation.figure) %>
-          <%= render "figure", image: figure, spacing: "mt-5" %>
+          <%= render "shared/figure", image: figure, spacing: "mt-5" %>
         <% end %>
 
         <p class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink-faint">

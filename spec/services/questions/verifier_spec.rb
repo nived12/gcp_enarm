@@ -73,6 +73,25 @@ RSpec.describe Questions::Verifier do
     expect(clinical_case.reload).not_to be_publishable
   end
 
+  it "takes a live case off the bank the moment it loses its support" do
+    clinical_case.update!(verification_verdict: "supported", status: "published")
+    build_question
+    stub_verifier("questions" => [judgement(option: "B")])
+
+    described_class.call(clinical_case)
+
+    expect(clinical_case.reload).to have_attributes(verification_verdict: "unsupported", status: "draft")
+  end
+
+  it "leaves a case's status alone otherwise — publishing is the publisher's decision" do
+    build_question
+    stub_verifier("questions" => [judgement])
+
+    described_class.call(clinical_case)
+
+    expect(clinical_case.reload).to have_attributes(verification_verdict: "supported", status: "draft")
+  end
+
   it "takes the worst verdict across a case, because exams select whole cases" do
     build_question(position: 1)
     build_question(position: 2, correct_at: 1)

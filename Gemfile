@@ -117,7 +117,10 @@ end
 
 group :test do
   gem "capybara"
-  gem "selenium-webdriver"
+  # Drives a real browser for the few end-to-end flows a student depends on. The Ruby
+  # client talks to the `playwright` npm package, whose version must match it — see
+  # spec/support/playwright.rb.
+  gem "capybara-playwright-driver"
   gem "database_cleaner-active_record"
   gem "webmock"                          # HTTP stubbing; also the guard against live LLM calls in specs
   gem "parallel_tests", require: false   # Splits the suite across CPU cores — see bin/ci-test

@@ -1,0 +1,15 @@
+<%# The vignette is repeated with each of its questions, as on the exam: the student
+    should never have to scroll back to find the patient. Its language is the case's,
+    whatever the interface's. %>
+<section lang="<%= clinical_case.locale %>">
+  <p class="eyebrow">
+    <%= t("exams.question.case_label", number: question.position, total: clinical_case.questions.size) %>
+  </p>
+  <p class="vignette mt-3 text-ink"><%= clinical_case.stem %></p>
+
+  <%# Only an image that is the question — a tracing or a film to read. A guideline's own
+      figures appear with the explanation, after the answer. %>
+  <% if clinical_case.clinical_image&.file&.attached? %>
+    <%= render "shared/figure", image: clinical_case.clinical_image, spacing: "mt-6" %>
+  <% end %>
+</section>

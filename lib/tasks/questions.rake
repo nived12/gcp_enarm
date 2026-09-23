@@ -72,4 +72,37 @@ namespace :questions do
     run.update!(status: "completed", finished_at: Time.current)
     puts "\n#{tally.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")} tokens=#{run.total_tokens}"
   end
+
+  desc "Publish every verifier-supported case nobody has withdrawn, and pull back any that no longer qualify"
+  task publish: :environment do
+    payload = Questions::Publisher.call.payload
+    puts "publicados=#{payload[:published]} retirados_del_banco=#{payload[:withdrawn]} en_el_banco=#{payload[:live]}"
+  end
+
+  desc "Write why each distractor is wrong, for cases that lack it: rake questions:write_rationales[count]"
+  task :write_rationales, [:count] => :environment do |_task, args|
+    count = (args[:count] || 10).to_i
+    provider = Llm::Provider.for(:generator)
+    abort("Falta la clave del generador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "rationales", provider: provider.name, model: provider.model, started_at: Time.current
+    )
+
+    missing = AnswerOption.where(correct: false, rationale: nil).joins(:question).select("questions.clinical_case_id")
+    cases = ClinicalCase.where(id: missing).where.not(status: "retired").order(:id).limit(count)
+    tally = Hash.new(0)
+    cases.each do |kase|
+      result = Questions::RationaleWriter.call(kase, run: run)
+      state = result.success? ? "#{result.payload[:written]} razones" : result.errors.full_messages.first
+      tally[result.success? ? :ok : :failed] += 1
+      puts "caso #{kase.id}: #{state}"
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    puts "\ncasos=#{tally[:ok]} fallidos=#{tally[:failed]} tokens=#{run.total_tokens} costo=$#{format(
+      "%.4f",
+      run.cost_usd
+    )}"
+  end
 end
