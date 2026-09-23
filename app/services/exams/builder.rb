@@ -96,10 +96,19 @@ module Exams
     # smaller than the target gives what it has; one that cannot add up exactly runs
     # over by as little as a case allows, as the draw always did.
     def pick
-      rows = ordered(candidates)
+      rows = own_topics_first(ordered(candidates))
       quotas = exact_quotas(rows.map(&:last).tally)
       chosen = quotas ? rows.select { |row| (quotas[row.last] -= 1) >= 0 } : overshoot(rows)
       filters["interleave"] ? chosen : blocked(chosen)
+    end
+
+    # A study day widened by its setting still quizzes its own topics first: in a context
+    # like Medicina Familiar, cases merely set there far outnumber the day's topics.
+    def own_topics_first(rows)
+      return rows unless filters["topic_ids"] && filters["also_setting_ids"]
+
+      own = ClinicalCase.where(id: rows.map(&:first), topic_id: filters["topic_ids"]).pluck(:id).to_set
+      rows.partition { |row| own.include?(row.first) }.flatten(1)
     end
 
     def exact_quotas(available)

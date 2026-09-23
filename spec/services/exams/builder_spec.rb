@@ -203,6 +203,21 @@ RSpec.describe Exams::Builder do
       expect(exam.filters).to include("also_setting_ids" => [emergency.id])
     end
 
+    it "puts the day's own topics first when the context has more than the quiz holds" do
+      topic = create(:topic)
+      on_topic = create(:published_case, specialty: pediatrics, topic: topic, questions_count: 1)
+      30.times { create(:published_case, specialty: pediatrics, setting: emergency, questions_count: 1) }
+
+      (1..10).each do |seed|
+        exam = build(
+          filters: { topic_ids: [topic.id], also_setting_ids: [emergency.id], question_count: 5 },
+          seed: seed
+        )
+          .payload[:exam]
+        expect(cases_in(exam)).to include(on_topic)
+      end
+    end
+
     it "draws the cases set in a context when the day's topics have none" do
       exam = build(filters: { topic_ids: [], also_setting_ids: [emergency.id] }).payload[:exam]
 
