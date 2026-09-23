@@ -4,6 +4,9 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :exams, dependent: :destroy
+  has_many :question_reports, dependent: :destroy
+  has_many :resolved_question_reports, class_name: "QuestionReport", foreign_key: :resolved_by_id,
+    inverse_of: :resolved_by, dependent: :nullify
 
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 

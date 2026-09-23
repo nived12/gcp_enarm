@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -231,6 +231,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
     t.index ["institution"], name: "index_guidelines_on_institution"
     t.index ["specialty_labels"], name: "index_guidelines_on_specialty_labels", using: :gin
     t.index ["year"], name: "index_guidelines_on_year"
+  end
+
+  create_table "question_reports", force: :cascade do |t|
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.bigint "question_id", null: false
+    t.string "reason", null: false
+    t.text "resolution_note"
+    t.datetime "resolved_at"
+    t.bigint "resolved_by_id"
+    t.string "status", default: "open", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["question_id"], name: "index_question_reports_on_question_id"
+    t.index ["resolved_by_id"], name: "index_question_reports_on_resolved_by_id"
+    t.index ["status", "created_at"], name: "index_question_reports_on_status_and_created_at"
+    t.index ["user_id", "question_id"], name: "index_question_reports_one_open_per_user", unique: true, where: "((status)::text = 'open'::text)"
   end
 
   create_table "questions", force: :cascade do |t|
@@ -502,6 +519,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
   add_foreign_key "guideline_sections", "guidelines"
   add_foreign_key "guideline_topics", "guidelines"
   add_foreign_key "guideline_topics", "topics"
+  add_foreign_key "question_reports", "questions"
+  add_foreign_key "question_reports", "users"
+  add_foreign_key "question_reports", "users", column: "resolved_by_id"
   add_foreign_key "questions", "clinical_cases"
   add_foreign_key "questions", "recommendations"
   add_foreign_key "recommendations", "guideline_sections"

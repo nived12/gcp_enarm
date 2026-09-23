@@ -9,6 +9,7 @@ class Question < ApplicationRecord
   belongs_to :recommendation, optional: true
 
   has_many :answer_options, -> { order(:position) }, dependent: :destroy, inverse_of: :question
+  has_many :question_reports, dependent: :destroy
 
   OPTION_COUNT = 4
 

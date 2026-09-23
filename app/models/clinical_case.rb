@@ -13,6 +13,7 @@ class ClinicalCase < ApplicationRecord
   belongs_to :clinical_image, optional: true
 
   has_many :questions, -> { order(:position) }, dependent: :destroy, inverse_of: :clinical_case
+  has_many :question_reports, through: :questions
 
   # CIFRHS's own vocabulary, rendered Baja / Media / Alta. Never a competitor's invented
   # Interno / Residente / Adscrito: difficulty is what actually breaks ties on the real
