@@ -13,3 +13,6 @@ application.register("autosave", AutosaveController)
 
 import TopicPickerController from "./topic_picker_controller"
 application.register("topic-picker", TopicPickerController)
+
+import TimeZoneController from "./time_zone_controller"
+application.register("time-zone", TimeZoneController)

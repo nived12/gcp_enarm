@@ -570,6 +570,19 @@ es:
       have_account: "¿Ya tienes cuenta?"
     create:
       welcome: "Tu cuenta está lista. Te damos la bienvenida."
+  time_zones:
+    title: "Tu zona horaria"
+    hint: "Tu día de estudio termina a las 4 a. m. de esta hora: ahí cierran tu racha y tus preguntas gratuitas del día. Chihuahua usa la hora del centro."
+    option: "%{name} · %{time}"
+    submit: "Guardar zona horaria"
+    updated: "Zona horaria actualizada."
+    invalid: "No reconocemos esa zona horaria."
+    names:
+      tijuana: "Tijuana"
+      hermosillo: "Hermosillo"
+      mazatlan: "Mazatlán"
+      mexico_city: "Ciudad de México"
+      cancun: "Cancún"
   stats:
     show:
       title: "Tu avance"

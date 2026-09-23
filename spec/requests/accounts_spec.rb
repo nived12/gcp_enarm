@@ -46,4 +46,41 @@ RSpec.describe "Account", type: :request do
 
     expect(response.body).to include(I18n.t("billing.account.checkout_returned.title"))
   end
+
+  describe "the time zone" do
+    it "offers the Mexican zones as pills, with the student's own chosen" do
+      travel_to(Time.utc(2026, 9, 23, 18, 5)) { get account_path }
+
+      page = Nokogiri::HTML(response.body)
+      expect(page.css("select")).to be_empty
+      expect(page.css("input[name=time_zone]").map { |input| input["value"] }).to eq(User::TIME_ZONE_CHOICES.values)
+      expect(page.at_css("input[name=time_zone][checked]")["value"]).to eq("America/Mexico_City")
+      expect(response.body).to include(I18n.t("time_zones.option", name: "Cancún", time: "13:05"))
+    end
+
+    it "keeps a zone from sign-up that is not among the pills as one more" do
+      student.update!(time_zone: "America/Bogota")
+
+      get account_path
+
+      checked = Nokogiri::HTML(response.body).at_css("input[name=time_zone][checked]")
+      expect(checked["value"]).to eq("America/Bogota")
+      expect(checked.parent.text).to include("Bogota")
+    end
+
+    it "changes the zone the study day ends in" do
+      patch account_path, params: { time_zone: "America/Tijuana" }
+
+      expect(response).to redirect_to(account_path)
+      expect(flash[:notice]).to eq(I18n.t("time_zones.updated"))
+      expect(student.reload.study_date(Time.utc(2026, 9, 23, 10, 30))).to eq(Date.new(2026, 9, 22))
+    end
+
+    it "refuses a zone that does not exist" do
+      patch account_path, params: { time_zone: "Mars/Olympus_Mons" }
+
+      expect(flash[:alert]).to eq(I18n.t("time_zones.invalid"))
+      expect(student.reload.time_zone).to eq("America/Mexico_City")
+    end
+  end
 end

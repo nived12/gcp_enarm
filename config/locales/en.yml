@@ -568,6 +568,19 @@ en:
       have_account: "Already have an account?"
     create:
       welcome: "Your account is ready. Welcome."
+  time_zones:
+    title: "Your time zone"
+    hint: "Your study day ends at 4 a.m. in this zone: that is when your streak and your free questions for the day close. Chihuahua keeps central time."
+    option: "%{name} · %{time}"
+    submit: "Save time zone"
+    updated: "Time zone updated."
+    invalid: "We do not recognise that time zone."
+    names:
+      tijuana: "Tijuana"
+      hermosillo: "Hermosillo"
+      mazatlan: "Mazatlán"
+      mexico_city: "Mexico City"
+      cancun: "Cancún"
   stats:
     show:
       title: "Your progress"
