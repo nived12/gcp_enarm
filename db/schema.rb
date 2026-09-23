@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_010100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,6 +48,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_010000) do
     t.integer "position", null: false
     t.bigint "question_id", null: false
     t.text "rationale"
+    t.text "rationale_note"
+    t.string "rationale_verdict"
     t.text "text", null: false
     t.datetime "updated_at", null: false
     t.index ["question_id", "position"], name: "index_answer_options_on_question_id_and_position", unique: true

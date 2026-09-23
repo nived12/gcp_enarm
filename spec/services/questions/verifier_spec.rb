@@ -182,7 +182,54 @@ RSpec.describe Questions::Verifier do
 
     described_class.call(clinical_case, run: run)
 
-    expect(run.reload).to have_attributes(input_tokens: 400, output_tokens: 120, cost_usd: 0.000264, attempts: 1)
+    expect(run.reload).to have_attributes(
+      input_tokens: 400, output_tokens: 120, cost_usd: 0.000264, attempts: 1, calls: 1
+    )
+  end
+
+  describe "the distractor rationales" do
+    def with_rationale
+      question = build_question(correct_at: 1)
+      question.answer_options.find_by!(correct: false).update!(rationale: "No es la primera prueba.")
+    end
+
+    it "has a supported case's rationales judged next, on the same run" do
+      with_rationale
+      run = create(:generation_run, purpose: "verification")
+      stub_verifier("questions" => [judgement])
+      allow(Questions::RationaleVerifier).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, errors: nil, payload: { sound: 1 })
+      )
+
+      result = described_class.call(clinical_case, run: run)
+
+      expect(result.payload[:rationales]).to eq(sound: 1)
+      expect(Questions::RationaleVerifier).to have_received(:call).with(clinical_case, run: run)
+    end
+
+    it "keeps the verdict when judging the rationales fails, and says why" do
+      with_rationale
+      stub_verifier("questions" => [judgement])
+      errors = ActiveModel::Errors.new(ClinicalCase.new).tap { |e| e.add(:base, "sin respuesta") }
+      allow(Questions::RationaleVerifier).to receive(:call)
+        .and_return(ApplicationService::Response.new(success: false, errors: errors, payload: nil))
+
+      result = described_class.call(clinical_case)
+
+      expect(result.payload).to include(verdict: "supported", rationales: { error: "sin respuesta" })
+    end
+
+    it "does not pay to judge the rationales of a case that cannot go live, or of one without any" do
+      with_rationale
+      allow(Questions::RationaleVerifier).to receive(:call)
+      stub_verifier("questions" => [judgement(option: "B")])
+      expect(described_class.call(clinical_case).payload[:rationales]).to be_nil
+
+      AnswerOption.update_all(rationale: nil)
+      stub_verifier("questions" => [judgement])
+      expect(described_class.call(clinical_case).payload[:rationales]).to be_nil
+      expect(Questions::RationaleVerifier).not_to have_received(:call)
+    end
   end
 
   describe "the prompt" do

@@ -15,7 +15,7 @@ module Questions
   class Exporter < ApplicationService
     RUN_ATTRIBUTES = %w[
       export_key purpose provider model status input_tokens output_tokens cost_usd
-      cases_created attempts rejections notes started_at finished_at
+      cases_created attempts rejections notes started_at finished_at calls rejection_reasons
     ].freeze
 
     CASE_ATTRIBUTES = %w[
@@ -24,7 +24,7 @@ module Questions
     ].freeze
 
     QUESTION_ATTRIBUTES = %w[position text explanation source_quote].freeze
-    OPTION_ATTRIBUTES = %w[position text correct rationale].freeze
+    OPTION_ATTRIBUTES = %w[position text correct rationale rationale_verdict rationale_note].freeze
 
     BATCH_SIZE = 50
 

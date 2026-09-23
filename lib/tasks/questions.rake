@@ -66,7 +66,8 @@ namespace :questions do
       result = Questions::Verifier.call(kase, run: run)
       state = result.success? ? result.payload[:verdict] : result.errors.full_messages.first
       tally[state] += 1
-      puts "caso #{kase.id}: #{state}"
+      rationales = result.payload[:rationales] if result.success?
+      puts "caso #{kase.id}: #{state}#{" razones #{rationales.to_json}" if rationales}"
     end
 
     run.update!(status: "completed", finished_at: Time.current)
@@ -104,5 +105,63 @@ namespace :questions do
       "%.4f",
       run.cost_usd
     )}"
+  end
+
+  desc "Judge the unjudged distractor rationales of verifier-supported cases: " \
+       "rake questions:verify_rationales[count]"
+  task :verify_rationales, [:count] => :environment do |_task, args|
+    count = (args[:count] || 10).to_i
+    provider = Llm::Provider.for(:verifier)
+    abort("Falta la clave del verificador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "verification", provider: provider.name, model: provider.model, started_at: Time.current,
+      notes: "rationales"
+    )
+
+    unjudged = AnswerOption.rationale_unjudged.joins(:question).select("questions.clinical_case_id")
+    cases = ClinicalCase.where(id: unjudged).verdict_supported.where.not(status: "retired")
+    tally = Hash.new(0)
+    cases.order(:id).limit(count).each do |kase|
+      result = Questions::RationaleVerifier.call(kase, run: run)
+      if result.success?
+        result.payload.each { |verdict, n| tally[verdict] += n }
+        puts "caso #{kase.id}: #{result.payload.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")}"
+      else
+        tally[:failed_cases] += 1
+        puts "caso #{kase.id}: #{result.errors.full_messages.first}"
+      end
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    puts "\n#{tally.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")} tokens=#{run.total_tokens} " \
+         "costo=$#{format("%.4f", run.cost_usd)}"
+  end
+
+  desc "Rewrite the rationales the verifier rejected, then run verify_rationales: " \
+       "rake questions:rewrite_rationales[count]"
+  task :rewrite_rationales, [:count] => :environment do |_task, args|
+    count = (args[:count] || 10).to_i
+    provider = Llm::Provider.for(:generator)
+    abort("Falta la clave del generador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "rationales", provider: provider.name, model: provider.model, started_at: Time.current,
+      notes: "rewrite"
+    )
+
+    rejected = AnswerOption.rationale_rejected.joins(:question).select("questions.clinical_case_id")
+    tally = Hash.new(0)
+    ClinicalCase.where(id: rejected).where.not(status: "retired").order(:id).limit(count).each do |kase|
+      result = Questions::RationaleWriter.call(kase, run: run, rewrite: true)
+      state = result.success? ? "#{result.payload[:written]} razones" : result.errors.full_messages.first
+      tally[result.success? ? :ok : :failed] += 1
+      puts "caso #{kase.id}: #{state}"
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    puts "\ncasos=#{tally[:ok]} fallidos=#{tally[:failed]} tokens=#{run.total_tokens} " \
+         "costo=$#{format("%.4f", run.cost_usd)}"
+    puts "Las razones reescritas quedan sin revisar: corre questions:verify_rationales."
   end
 end

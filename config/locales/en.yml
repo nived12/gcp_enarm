@@ -308,6 +308,11 @@ en:
       undated: "undated"
       expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."
       retired_notice: "Withdrawn case: it will not reach students."
+      rationale_verdicts:
+        unjudged: "Rationale not yet checked by the second opinion."
+        sound: "Rationale supported by the second opinion."
+        overstated: "Rationale overstated, hidden from students"
+        contradicted: "Rationale contradicted by the case or the guideline, hidden from students"
       second_opinion: "Second opinion"
       verdict_meaning:
         supported: "Another model answered every question from the cited recommendation alone and chose the same option."

@@ -33,11 +33,12 @@ module Questions
       completion = Llm::Completion.call(role: :verifier, prompt: prompt, max_tokens: MAX_TOKENS)
       return failure(completion.errors) unless completion.success?
 
+      record(completion.payload)
       judgements = parse(completion.payload[:content])
       return failure("El verificador no devolvió JSON legible") if judgements.nil?
 
-      record(completion.payload)
-      success(verdict: apply(judgements), notes: clinical_case.verification_notes)
+      verdict = apply(judgements)
+      success(verdict: verdict, notes: clinical_case.verification_notes, rationales: rationales_for(verdict))
     end
 
     def context_for_logging
@@ -142,12 +143,24 @@ module Questions
       question.answer_options[index] if index
     end
 
+    # Only a case that can go live has its rationales judged: an unsupported case never
+    # reaches a student, and paying to check its prose buys nothing. A failed judgement
+    # leaves them unjudged for questions:verify_rationales, and never fails the verdict.
+    def rationales_for(verdict)
+      return unless verdict == "supported"
+
+      unjudged = AnswerOption.rationale_unjudged.joins(:question)
+                             .where(questions: { clinical_case_id: clinical_case.id })
+      return unless unjudged.exists?
+
+      result = RationaleVerifier.call(clinical_case, run: run)
+      result.success? ? result.payload : { error: result.errors.full_messages.to_sentence }
+    end
+
     def record(usage)
       return if run.nil?
 
-      run.increment!(:input_tokens, usage[:input_tokens])
-      run.increment!(:output_tokens, usage[:output_tokens])
-      run.increment!(:cost_usd, usage[:cost_usd])
+      run.charge!(usage)
       run.increment!(:attempts, 1)
     end
   end
