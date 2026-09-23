@@ -265,6 +265,14 @@ en:
       streak_today: "today %{answered} of %{minimum}"
       streak_today_done: "today counts"
       streak_link: "Stats"
+      today_plan:
+        label: "Today"
+        start: "Start"
+        open: "View"
+        rest: "Rest day today"
+        create: "Build your study plan"
+        create_body: "A day-by-day calendar up to the exam, naming each day's topics."
+        create_action: "Create"
 
   passwords_mailer:
     reset:
@@ -408,3 +416,93 @@ en:
       neglected_body: "You have seen much less of these areas than of the rest of the bank."
       practice: "Practise %{name}"
       empty: "No published cases yet."
+
+  study_plans:
+    eyebrow: "Study plan"
+    back_to_calendar: "‹ Calendar"
+    done: "Done"
+    date_formats:
+      day: "%B %-d"
+      long: "%A, %B %-d, %Y"
+      month: "%B %Y"
+      weekday: "%a"
+    templates:
+      six_days: "6 days (Sunday off)"
+      five_days: "5 days (weekends off)"
+      every_day: "All 7 days"
+    kinds:
+      topics: "Topics day"
+      case_workshop: "Case workshop"
+      case_workshop_of: "Case workshop · %{specialty}"
+      review: "Mixed review"
+      assessment: "ENARM mock exam"
+      catch_up: "Catch-up day"
+    errors:
+      exam_date_missing: "Choose your exam date."
+      exam_date_too_close: "The exam date has to be at least %{minimum} days from today."
+      exam_date_too_far: "The exam date is more than two years away; choose the one in your call."
+    builder:
+      no_topics: "There are no topics to build a plan from yet."
+    rescheduler:
+      no_room: "There are no study days left before the exam. Change the date to rearrange the plan."
+    form:
+      exam_date: "Exam date"
+      exam_date_hint: "We suggest September 28, when ENARM 2026 began. Change it once the call is published."
+      template: "How many days a week do you study?"
+      template_hint: "Rest days stay free on the calendar."
+    new:
+      title: "Build your study plan"
+      intro: "We walk the syllabus by specialty — Surgery, Obstetrics and Gynecology, Pediatrics, Internal Medicine, then Public Health, Emergency and Family Medicine — in up to three passes, each faster than the last. Every day names its topics and has a quiz on exactly those. It starts today."
+      submit: "Create my plan"
+    create:
+      done: "Your plan is ready. It starts today."
+    edit:
+      title: "Change the plan"
+      intro: "What you have done stays where it is; what is pending is rearranged from today to the new date, without restarting the syllabus."
+      submit: "Save changes"
+      start_over: "Start a new plan"
+      start_over_body: "Would you rather start from scratch? This calendar and what you marked on it are deleted; your exams and your average stay."
+      start_over_confirm: "This calendar will be deleted. Continue?"
+    update:
+      done: "Your plan was rearranged."
+    destroy:
+      done: "Your plan was deleted. Build a new one whenever you like."
+    show:
+      title: "Your calendar"
+      summary:
+        one: "Exam on %{exam_date} · 1 day to go"
+        other: "Exam on %{exam_date} · %{count} days to go"
+      change: "Change"
+      behind:
+        one: "You have 1 day pending"
+        other: "You have %{count} days pending"
+      behind_body: "We rearrange what is pending from today, in order. Catch-up days absorb the delay first."
+      catch_up: "Rearrange from today"
+      months: "Plan months"
+      previous_month: "Previous month"
+      next_month: "Next month"
+      empty_month: "This month has no days of your plan."
+    day:
+      pass: "Pass %{number} of %{total}"
+      rest: "Rest day"
+      rest_body: "This day has nothing on your plan. Resting is part of preparing too."
+      cases:
+        one: "1 case in the bank"
+        other: "%{count} cases in the bank"
+      no_cases: "No cases yet: a reading topic"
+      reading: "There are no published cases on these topics yet, so today is for reading. Mark it when you finish."
+      about:
+        case_workshop: "Cases from the whole specialty you just covered, mixed, to close the block."
+        review: "Cases from the whole bank, mixed as on the exam: nothing tells you which specialty comes next."
+        assessment: "A full mock exam under exam conditions: 280 questions, a clock and explanations at the end."
+        catch_up: "A day left free on purpose: use it for whatever fell behind. If you are on track, review what you like."
+      start:
+        topics: "Start today's quiz"
+        case_workshop: "Start workshop"
+        review: "Start review"
+        assessment: "Start mock exam"
+      continue: "Continue quiz"
+      done: "Done. This day counts."
+      see_results: "See results"
+      mark_done: "Mark as done"
+      completed: "Marked as done."

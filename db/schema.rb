@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -464,6 +464,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
     t.index ["user_id", "date"], name: "index_study_days_on_user_id_and_date", unique: true
   end
 
+  create_table "study_plan_day_topics", force: :cascade do |t|
+    t.integer "position", null: false
+    t.bigint "study_plan_day_id", null: false
+    t.bigint "topic_id", null: false
+    t.index ["study_plan_day_id", "topic_id"], name: "index_study_plan_day_topics_on_study_plan_day_id_and_topic_id", unique: true
+    t.index ["topic_id"], name: "index_study_plan_day_topics_on_topic_id"
+  end
+
+  create_table "study_plan_days", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.bigint "exam_id"
+    t.string "kind", null: false
+    t.integer "pass_number", null: false
+    t.bigint "specialty_id"
+    t.bigint "study_plan_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exam_id"], name: "index_study_plan_days_on_exam_id"
+    t.index ["specialty_id"], name: "index_study_plan_days_on_specialty_id"
+    t.index ["study_plan_id", "date"], name: "index_study_plan_days_on_study_plan_id_and_date", unique: true
+  end
+
+  create_table "study_plans", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "exam_date", null: false
+    t.date "starts_on", null: false
+    t.string "template", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_study_plans_on_user_id", unique: true
+  end
+
   create_table "topics", force: :cascade do |t|
     t.jsonb "aliases", default: [], null: false
     t.bigint "branch_id", null: false
@@ -526,5 +559,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "study_days", "users"
+  add_foreign_key "study_plan_day_topics", "study_plan_days"
+  add_foreign_key "study_plan_day_topics", "topics"
+  add_foreign_key "study_plan_days", "exams", on_delete: :nullify
+  add_foreign_key "study_plan_days", "specialties"
+  add_foreign_key "study_plan_days", "study_plans"
+  add_foreign_key "study_plans", "users"
   add_foreign_key "topics", "branches"
 end

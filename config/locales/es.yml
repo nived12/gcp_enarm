@@ -267,6 +267,14 @@ es:
       streak_today: "hoy %{answered} de %{minimum}"
       streak_today_done: "hoy ya cuenta"
       streak_link: "Estadísticas"
+      today_plan:
+        label: "Hoy"
+        start: "Empezar"
+        open: "Ver"
+        rest: "Hoy descansas"
+        create: "Arma tu plan de estudio"
+        create_body: "Un calendario día por día hasta el examen, con los temas de cada día."
+        create_action: "Crear"
 
   passwords_mailer:
     reset:
@@ -410,3 +418,93 @@ es:
       neglected_body: "Has visto mucho menos de estas áreas que del resto del banco."
       practice: "Practicar %{name}"
       empty: "Todavía no hay casos publicados."
+
+  study_plans:
+    eyebrow: "Plan de estudio"
+    back_to_calendar: "‹ Calendario"
+    done: "Hecho"
+    date_formats:
+      day: "%-d de %B"
+      long: "%A %-d de %B de %Y"
+      month: "%B %Y"
+      weekday: "%a"
+    templates:
+      six_days: "6 días (descansas el domingo)"
+      five_days: "5 días (descansas el fin de semana)"
+      every_day: "Los 7 días"
+    kinds:
+      topics: "Día de temas"
+      case_workshop: "Taller de casos"
+      case_workshop_of: "Taller de casos · %{specialty}"
+      review: "Repaso mixto"
+      assessment: "Simulacro ENARM"
+      catch_up: "Día para ponerte al día"
+    errors:
+      exam_date_missing: "Elige la fecha de tu examen."
+      exam_date_too_close: "La fecha del examen tiene que estar al menos a %{minimum} días de hoy."
+      exam_date_too_far: "La fecha del examen está a más de dos años; elige la de tu convocatoria."
+    builder:
+      no_topics: "Todavía no hay temas para armar un plan."
+    rescheduler:
+      no_room: "Ya no quedan días de estudio antes del examen. Cambia la fecha para reacomodar el plan."
+    form:
+      exam_date: "Fecha del examen"
+      exam_date_hint: "Te proponemos el 28 de septiembre, cuando empezó el ENARM 2026. Cámbiala cuando se publique la convocatoria."
+      template: "¿Cuántos días a la semana estudias?"
+      template_hint: "Los días de descanso quedan libres en el calendario."
+    new:
+      title: "Arma tu plan de estudio"
+      intro: "Recorremos el temario por especialidad —Cirugía, Gineco-Obstetricia, Pediatría, Medicina Interna y luego Salud Pública, Urgencias y Medicina Familiar— en hasta tres vueltas, cada una más rápida. Cada día nombra sus temas y trae un quiz de exactamente esos temas. Empieza hoy."
+      submit: "Crear mi plan"
+    create:
+      done: "Tu plan está listo. Empieza hoy."
+    edit:
+      title: "Cambiar el plan"
+      intro: "Lo que ya hiciste se queda donde está; lo pendiente se reacomoda desde hoy hasta la nueva fecha, sin volver a empezar el temario."
+      submit: "Guardar cambios"
+      start_over: "Empezar un plan nuevo"
+      start_over_body: "¿Prefieres empezar de cero? Se borra este calendario y lo que marcaste en él; tus exámenes y tu promedio se quedan."
+      start_over_confirm: "Se borrará este calendario. ¿Continuar?"
+    update:
+      done: "Tu plan se reacomodó."
+    destroy:
+      done: "Borramos tu plan. Arma uno nuevo cuando quieras."
+    show:
+      title: "Tu calendario"
+      summary:
+        one: "Examen el %{exam_date} · falta 1 día"
+        other: "Examen el %{exam_date} · faltan %{count} días"
+      change: "Cambiar"
+      behind:
+        one: "Te quedó 1 día pendiente"
+        other: "Te quedaron %{count} días pendientes"
+      behind_body: "Reacomodamos lo pendiente desde hoy, en orden. Los días para ponerte al día absorben el atraso primero."
+      catch_up: "Reacomodar desde hoy"
+      months: "Meses del plan"
+      previous_month: "Mes anterior"
+      next_month: "Mes siguiente"
+      empty_month: "Este mes no tiene días de tu plan."
+    day:
+      pass: "Vuelta %{number} de %{total}"
+      rest: "Día de descanso"
+      rest_body: "Este día no tiene nada en tu plan. Descansar también es parte de prepararse."
+      cases:
+        one: "1 caso en el banco"
+        other: "%{count} casos en el banco"
+      no_cases: "Sin casos todavía: tema de lectura"
+      reading: "Todavía no hay casos publicados de estos temas, así que hoy es de lectura. Márcalo cuando termines."
+      about:
+        case_workshop: "Casos de toda la especialidad que acabas de recorrer, mezclados, para cerrar el bloque."
+        review: "Casos de todo el banco, mezclados como en el examen: nada te avisa de qué especialidad es el siguiente."
+        assessment: "Un simulacro completo en condiciones de examen: 280 preguntas, reloj y explicaciones al final."
+        catch_up: "Un día libre a propósito: úsalo para lo que se te haya quedado atrás. Si vas al día, repasa lo que quieras."
+      start:
+        topics: "Empezar quiz de hoy"
+        case_workshop: "Empezar taller"
+        review: "Empezar repaso"
+        assessment: "Empezar simulacro"
+      continue: "Continuar quiz"
+      done: "Hecho. Este día ya cuenta."
+      see_results: "Ver resultados"
+      mark_done: "Marcar como hecho"
+      completed: "Marcado como hecho."

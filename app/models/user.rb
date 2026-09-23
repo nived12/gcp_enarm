@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :exams, dependent: :destroy
   has_many :study_days, dependent: :delete_all
+  has_one :study_plan, dependent: :destroy
 
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 
