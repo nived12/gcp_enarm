@@ -109,6 +109,8 @@ GEM
       addressable
       capybara
       playwright-ruby-client (>= 1.16.0)
+    childprocess (5.1.0)
+      logger (~> 1.5)
     commonmarker (2.10.0)
       rb_sys (~> 0.9)
     commonmarker (2.10.0-aarch64-linux)
@@ -203,6 +205,17 @@ GEM
     jwt (3.3.0)
       base64
     language_server-protocol (3.17.0.6)
+    launchy (3.1.1)
+      addressable (~> 2.8)
+      childprocess (~> 5.0)
+      logger (~> 1.6)
+    letter_opener (1.10.0)
+      launchy (>= 2.2, < 4)
+    letter_opener_web (3.0.0)
+      actionmailer (>= 6.1)
+      letter_opener (~> 1.9)
+      railties (>= 6.1)
+      rexml
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.25.2)
@@ -546,6 +559,7 @@ DEPENDENCIES
   jbuilder
   jsbundling-rails
   json (~> 2.9)
+  letter_opener_web
   nokogiri
   omniauth (~> 2.1)
   omniauth-google-oauth2 (~> 1.2)

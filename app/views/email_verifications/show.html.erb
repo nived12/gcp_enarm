@@ -9,8 +9,8 @@
     <%= render "shared/submit", form: form, label: t("email_verifications.show.resend") %>
   <% end %>
 
-  <%# Without a Resend key, development writes mail to tmp/mails; the link is shown here
-      so the flow can be walked through locally. %>
+  <%# Without a Resend key, development catches mail at /letter_opener; the link is also
+      shown here so the flow can be walked through locally. %>
   <% if Rails.env.development? && ENV["RESEND_API_KEY"].blank? %>
     <p class="mt-4 text-sm">
       <%= link_to t("email_verifications.show.dev_link"), verify_email_path(Current.user.generate_token_for(:email_verification)),

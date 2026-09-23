@@ -41,10 +41,9 @@ Rails.application.configure do
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 
-  # With a Resend key, mail really goes out; without one it lands in tmp/mails, and the
-  # waiting page after sign-up shows the verification link itself.
-  config.action_mailer.delivery_method = ENV["RESEND_API_KEY"].present? ? :resend : :file
-  config.action_mailer.file_settings = { location: Rails.root.join("tmp/mails") }
+  # With a Resend key, mail really goes out; without one it is caught and shown, decoded
+  # and with working links, at http://localhost:3000/letter_opener.
+  config.action_mailer.delivery_method = ENV["RESEND_API_KEY"].present? ? :resend : :letter_opener_web
 
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }

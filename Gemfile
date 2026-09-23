@@ -121,6 +121,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Mail sent in development, readable at /letter_opener instead of going out.
+  gem "letter_opener_web"
 end
 
 group :test do
