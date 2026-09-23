@@ -57,7 +57,7 @@ es:
 
   exams:
     denied:
-      daily_limit_reached: "Llegaste a tus %{limit} preguntas gratuitas de hoy. Vuelve mañana o activa tu suscripción."
+      daily_limit_reached: "Llegaste a tus %{limit} preguntas gratuitas de hoy. Mañana tienes %{limit} más, o puedes elegir un periodo sin límite."
     modes:
       quick_quiz: "Quiz Express"
       custom: "Arma tu Examen"
@@ -410,3 +410,120 @@ es:
       neglected_body: "Has visto mucho menos de estas áreas que del resto del banco."
       practice: "Practicar %{name}"
       empty: "Todavía no hay casos publicados."
+
+  billing:
+    plans:
+      one_month:
+        name: "1 mes"
+        product_name: "GPCEnarm · 1 mes de acceso"
+      three_months:
+        name: "3 meses"
+        product_name: "GPCEnarm · 3 meses de acceso"
+      six_months:
+        name: "6 meses"
+        product_name: "GPCEnarm · 6 meses de acceso"
+      twelve_months:
+        name: "12 meses"
+        product_name: "GPCEnarm · 12 meses de acceso"
+    access:
+      title: "Tu acceso"
+      granted: "Tienes acceso completo hasta el %{date}."
+      paid: "Tienes acceso sin límite hasta el %{date}."
+      stacking: "Si compras otro periodo, empieza cuando termine este."
+      trial: "Tu prueba sin límite termina el %{date}."
+      after_trial: "Después tendrás %{limit} preguntas gratis al día."
+      free: "Plan gratuito: %{limit} preguntas al día."
+    checkout:
+      unavailable: "Los pagos todavía no están disponibles."
+      unknown_plan: "Ese periodo de acceso no existe."
+      failed: "No pudimos abrir la página de pago. Intenta de nuevo en unos minutos."
+    webhook:
+      invalid_signature: "La firma del webhook no es válida."
+      unmatched: "El pago no corresponde a ningún usuario o periodo conocido."
+    account:
+      eyebrow: "Cuenta"
+      title: "Mi cuenta"
+      extend: "Extender mi acceso"
+      see_plans: "Ver precios"
+      help: "¿Dudas sobre un pago? Consulta la"
+      checkout_returned:
+        title: "Tu pago está en proceso"
+        body: "Tu acceso se activa en cuanto Stripe confirma el pago; con tarjeta suele tardar unos segundos. Si pagaste en efectivo, se activa cuando se acredita. Recarga esta página para ver tu nuevo periodo."
+      history:
+        title: "Historial de compras"
+        window: "Acceso del %{from} al %{to}"
+        purchased_on: "Comprado el %{date}"
+        empty:
+          title: "Todavía no has comprado ningún periodo"
+          body: "Cuando compres uno, aquí verás sus fechas y lo que pagaste."
+
+  pricing:
+    nav: "Precios"
+    title: "Precios"
+    eyebrow: "Precios"
+    headline: "Pagas una vez. Nada se renueva solo."
+    subhead: "Elige cuánto tiempo necesitas hasta tu examen. Cada periodo es un solo pago: no guardamos tu tarjeta, no hay suscripción que cancelar y el acceso simplemente termina en su fecha."
+    plans_label: "Periodos de acceso"
+    best_value: "Mejor precio por mes"
+    single_payment: "Un solo pago"
+    per_month: "≈ %{amount} al mes · un solo pago"
+    unavailable: "Pagos disponibles muy pronto"
+    choose: "Elegir %{plan}"
+    sign_up_to_buy: "Crea tu cuenta para comprar"
+    free:
+      title: "Gratis, siempre"
+      body: "Sin pagar tienes %{limit} preguntas al día, cada una con su explicación y la recomendación que la respalda. Al crear tu cuenta, los primeros %{trial_days} días no tienen límite."
+    why:
+      title: "Por qué cuesta esto y no más"
+      body: "Cada caso clínico se escribe una sola vez a partir de las Guías de Práctica Clínica y después sirve a todos los estudiantes sin costo adicional. No pagamos a un tutor de IA por cada pregunta que haces, así que no tenemos que cobrártelo. El precio no es una promoción: es lo que nos cuesta."
+    faq:
+      title: "Preguntas frecuentes"
+      renewal:
+        question: "¿Se renueva automáticamente?"
+        answer: "No. Pagas una vez y el acceso termina en la fecha indicada. Si quieres más tiempo, compras otro periodo cuando lo decidas."
+      stacking:
+        question: "¿Qué pasa si compro con un periodo vigente?"
+        answer: "El nuevo periodo empieza cuando termina el actual, así no pierdes ningún día por comprar antes."
+      payment:
+        question: "¿Cómo se paga?"
+        answer: "En la página de pago segura de Stripe, nuestro procesador de pagos. Nunca vemos ni guardamos los datos de tu tarjeta."
+      receipt:
+        question: "¿Cuándo se activa mi acceso?"
+        answer: "En cuanto Stripe confirma el pago, normalmente en segundos. Si elegiste pagar en efectivo, se activa cuando el pago se acredita."
+      refunds:
+        question: "¿Puedo pedir un reembolso?"
+        answer: "Sí, en los términos de nuestra política de reembolsos."
+
+  landing:
+    different:
+      eyebrow: "Por qué es distinto"
+      title: "Preguntas que puedes comprobar"
+      citation:
+        title: "Cada respuesta cita su recomendación"
+        body: "No decimos que las preguntas están «alineadas» con las GPC: te mostramos la frase exacta de la que salió la respuesta, con su grado de evidencia, el año de la guía y la ruta dentro de la guía para encontrarla."
+      currency:
+        title: "Sabes si la guía sigue vigente"
+        body: "Cada cita lleva el año de su guía, y avisamos cuando una guía ya pasó su periodo de vigencia. Estudias con la evidencia a la vista, no de memoria ajena."
+      cases:
+        title: "Casos como los del examen"
+        body: "Viñetas completas —antecedentes, signos vitales, exploración— con dos o tres preguntas cada una, y simulacros con el ritmo real del examen."
+    price:
+      eyebrow: "Precio"
+      title: "Desde %{amount} al mes."
+      body: "Cuatro periodos de acceso —1, 3, 6 o 12 meses—, cada uno de un solo pago y sin renovaciones automáticas. Nuestro costo por estudiante es prácticamente cero, y el precio lo refleja."
+      free: "Además, %{limit} preguntas gratis cada día, y %{trial_days} días sin límite al crear tu cuenta."
+      sign_up: "Crear cuenta gratis"
+      see_plans: "Ver precios"
+
+  legal:
+    eyebrow: "Legal"
+    draft_notice: "Borrador pendiente de revisión legal. Este texto todavía no es definitivo y puede cambiar antes del lanzamiento."
+    titles:
+      terms: "Términos y condiciones"
+      privacy: "Aviso de privacidad"
+      refunds: "Política de reembolsos"
+    footer:
+      label: "Precios y documentos legales"
+      terms: "Términos"
+      privacy: "Privacidad"
+      refunds: "Reembolsos"

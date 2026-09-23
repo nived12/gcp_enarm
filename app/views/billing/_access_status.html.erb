@@ -1,0 +1,13 @@
+<%# What the student has right now, in one sentence. Granted premium outranks a paid
+    window, which outranks the trial. %>
+<% if user.granted_premium? %>
+  <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.granted", date: l(user.granted_premium_until.to_date, format: :long)) %></p>
+<% elsif user.paid_access? %>
+  <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.paid", date: l(user.paid_access_until.to_date, format: :long)) %></p>
+  <p class="mt-1 text-sm leading-relaxed text-ink-muted"><%= t("billing.access.stacking") %></p>
+<% elsif user.active_trial? %>
+  <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.trial", date: l(user.trial_ends_at.to_date, format: :long)) %></p>
+  <p class="mt-1 text-sm leading-relaxed text-ink-muted"><%= t("billing.access.after_trial", limit: SubscriptionAccess.free_daily_questions) %></p>
+<% else %>
+  <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.free", limit: SubscriptionAccess.free_daily_questions) %></p>
+<% end %>

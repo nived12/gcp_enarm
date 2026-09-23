@@ -77,6 +77,7 @@ RSpec.describe Exams::AnswerRecorder do
     result = record(second, "Troponina I")
 
     expect(result.errors.full_messages).to eq([I18n.t("exams.denied.daily_limit_reached", limit: 1)])
+    expect(result.errors.of_kind?(:base, :daily_limit_reached)).to be(true)
   end
 
   describe "on the single page" do

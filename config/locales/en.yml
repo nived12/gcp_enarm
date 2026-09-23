@@ -55,7 +55,7 @@ en:
 
   exams:
     denied:
-      daily_limit_reached: "You've used your %{limit} free questions for today. Come back tomorrow or subscribe."
+      daily_limit_reached: "You've used your %{limit} free questions for today. You'll have %{limit} more tomorrow, or you can choose an unlimited window."
     modes:
       quick_quiz: "Quick Quiz"
       custom: "Build your Exam"
@@ -408,3 +408,120 @@ en:
       neglected_body: "You have seen much less of these areas than of the rest of the bank."
       practice: "Practise %{name}"
       empty: "No published cases yet."
+
+  billing:
+    plans:
+      one_month:
+        name: "1 month"
+        product_name: "GPCEnarm · 1 month of access"
+      three_months:
+        name: "3 months"
+        product_name: "GPCEnarm · 3 months of access"
+      six_months:
+        name: "6 months"
+        product_name: "GPCEnarm · 6 months of access"
+      twelve_months:
+        name: "12 months"
+        product_name: "GPCEnarm · 12 months of access"
+    access:
+      title: "Your access"
+      granted: "You have full access until %{date}."
+      paid: "You have unlimited access until %{date}."
+      stacking: "If you buy another window, it starts when this one ends."
+      trial: "Your unlimited trial ends on %{date}."
+      after_trial: "After that you'll have %{limit} free questions a day."
+      free: "Free plan: %{limit} questions a day."
+    checkout:
+      unavailable: "Payments aren't available yet."
+      unknown_plan: "That access window doesn't exist."
+      failed: "We couldn't open the payment page. Try again in a few minutes."
+    webhook:
+      invalid_signature: "The webhook signature is not valid."
+      unmatched: "The payment matches no known user or access window."
+    account:
+      eyebrow: "Account"
+      title: "My account"
+      extend: "Extend my access"
+      see_plans: "See pricing"
+      help: "Questions about a payment? Read the"
+      checkout_returned:
+        title: "Your payment is being processed"
+        body: "Your access starts as soon as Stripe confirms the payment; by card that usually takes a few seconds. If you paid in cash, it starts when the payment clears. Reload this page to see your new window."
+      history:
+        title: "Purchase history"
+        window: "Access from %{from} to %{to}"
+        purchased_on: "Bought on %{date}"
+        empty:
+          title: "You haven't bought an access window yet"
+          body: "When you do, its dates and what you paid will show here."
+
+  pricing:
+    nav: "Pricing"
+    title: "Pricing"
+    eyebrow: "Pricing"
+    headline: "Pay once. Nothing renews by itself."
+    subhead: "Choose how much time you need before your exam. Each window is a single payment: we don't store your card, there's no subscription to cancel, and access simply ends on its date."
+    plans_label: "Access windows"
+    best_value: "Best price per month"
+    single_payment: "One payment"
+    per_month: "≈ %{amount} a month · one payment"
+    unavailable: "Payments available very soon"
+    choose: "Choose %{plan}"
+    sign_up_to_buy: "Create your account to buy"
+    free:
+      title: "Free, always"
+      body: "Without paying you get %{limit} questions a day, each with its explanation and the recommendation behind it. When you create your account, the first %{trial_days} days are unlimited."
+    why:
+      title: "Why it costs this and no more"
+      body: "Each clinical case is written once from the Clinical Practice Guidelines and then serves every student at no extra cost. We don't pay an AI tutor for every question you ask, so we don't have to charge you for one. The price isn't a promotion: it's what it costs us."
+    faq:
+      title: "Frequently asked questions"
+      renewal:
+        question: "Does it renew automatically?"
+        answer: "No. You pay once and access ends on the date shown. If you want more time, you buy another window whenever you decide to."
+      stacking:
+        question: "What if I buy while a window is still active?"
+        answer: "The new window starts when the current one ends, so buying early never costs you a day."
+      payment:
+        question: "How do I pay?"
+        answer: "On Stripe's secure payment page; Stripe is our payment processor. We never see or store your card details."
+      receipt:
+        question: "When does my access start?"
+        answer: "As soon as Stripe confirms the payment, usually within seconds. If you chose to pay in cash, it starts when the payment clears."
+      refunds:
+        question: "Can I get a refund?"
+        answer: "Yes, under the terms of our refund policy."
+
+  landing:
+    different:
+      eyebrow: "Why it's different"
+      title: "Questions you can check"
+      citation:
+        title: "Every answer cites its recommendation"
+        body: "We don't say our questions are \"aligned\" with the GPCs: we show you the exact sentence the answer came from, with its evidence grade, the guideline's year and the path inside the guideline to find it."
+      currency:
+        title: "You know whether the guideline is still current"
+        body: "Every citation carries its guideline's year, and we flag when a guideline is past its validity period. You study with the evidence in view, not from someone else's memory."
+      cases:
+        title: "Cases like the exam's"
+        body: "Complete vignettes — history, vital signs, examination — with two or three questions each, and mock exams at the real exam's pace."
+    price:
+      eyebrow: "Price"
+      title: "From %{amount} a month."
+      body: "Four access windows — 1, 3, 6 or 12 months — each a single payment with no automatic renewal. Our cost per student is close to zero, and the price reflects it."
+      free: "Plus %{limit} free questions every day, and %{trial_days} unlimited days when you create your account."
+      sign_up: "Create a free account"
+      see_plans: "See pricing"
+
+  legal:
+    eyebrow: "Legal"
+    draft_notice: "Draft pending legal review. This text is not final and may change before launch."
+    titles:
+      terms: "Terms and conditions"
+      privacy: "Privacy notice"
+      refunds: "Refund policy"
+    footer:
+      label: "Pricing and legal documents"
+      terms: "Terms"
+      privacy: "Privacy"
+      refunds: "Refunds"

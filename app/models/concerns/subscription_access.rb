@@ -1,9 +1,9 @@
-# Access gating: granted premium, an active trial, or the free daily allowance.
-# `subscription_access_result` returns { allowed:, reason:, message: } so controllers can
-# render a 403 or a flash unchanged — the shape ported from vittio.
+# Access gating: granted premium, a paid window, an active trial, or the free daily
+# allowance. `subscription_access_result` returns { allowed:, reason:, message: } so
+# controllers can render a 403 or a flash unchanged — the shape ported from vittio.
 #
-# A placeholder until billing. Phase 6 sells prepaid windows recorded as Entitlement rows,
-# not subscriptions, and replaces paid_subscription? with a question to those rows.
+# Paid access is a prepaid window recorded as Entitlement rows, never a subscription.
+# Controllers and views ask this module; none of them may know which provider sold it.
 module SubscriptionAccess
   extend ActiveSupport::Concern
 
@@ -18,8 +18,12 @@ module SubscriptionAccess
     ENV.fetch("FREE_DAILY_QUESTIONS", 20).to_i
   end
 
+  def self.trial_days
+    ENV.fetch("TRIAL_DURATION_DAYS", 14).to_i
+  end
+
   def subscription_access_result(i18n_scope: "exams.denied")
-    return { allowed: true } if active_paid_subscription? || active_trial?
+    return { allowed: true } if unlimited?
 
     limit = SubscriptionAccess.free_daily_questions
     return { allowed: true } if questions_answered_today < limit
@@ -37,31 +41,40 @@ module SubscriptionAccess
     granted_premium_until.present? && granted_premium_until > Time.current
   end
 
+  def paid_access?
+    entitlements.active_at(Time.current).exists?
+  end
+
   def active_paid_subscription?
-    granted_premium? || paid_subscription?
+    granted_premium? || paid_access?
+  end
+
+  # No daily cap right now, for whatever reason.
+  def unlimited?
+    active_paid_subscription? || active_trial?
+  end
+
+  # When the paid window ends. Windows are stacked end to end when bought, so the
+  # latest unexpired end is the end of one unbroken stretch.
+  def paid_access_until
+    entitlements.unexpired.maximum(:expires_at)
   end
 
   # Nil means uncapped, so there is no number to show. Every caller asks the user
   # rather than recomputing the rule.
   def daily_questions_limit
-    return nil if active_paid_subscription? || active_trial?
+    return nil if unlimited?
 
     SubscriptionAccess.free_daily_questions
   end
 
   private
 
-  # Nobody has paid until Phase 6; the granted-premium path carries the whole product.
-  def paid_subscription?
-    false
-  end
-
   def questions_answered_today
     Answer.joins(exam_question: :exam).where(exams: { user_id: id }).answered_on(Date.current).count
   end
 
   def set_trial_ends_at
-    trial_days = ENV.fetch("TRIAL_DURATION_DAYS", 14).to_i
-    update_column(:trial_ends_at, trial_days.days.from_now)
+    update_column(:trial_ends_at, SubscriptionAccess.trial_days.days.from_now)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -123,6 +123,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
     t.index ["guideline_section_id"], name: "index_clinical_images_on_guideline_section_id"
     t.index ["kind"], name: "index_clinical_images_on_kind"
     t.index ["label"], name: "index_clinical_images_on_label"
+  end
+
+  create_table "entitlements", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "MXN", null: false
+    t.datetime "expires_at", null: false
+    t.string "external_id", null: false
+    t.string "plan", null: false
+    t.jsonb "raw_payload", default: {}, null: false
+    t.string "source", null: false
+    t.datetime "starts_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["source", "external_id"], name: "index_entitlements_on_source_and_external_id", unique: true
+    t.index ["user_id", "expires_at"], name: "index_entitlements_on_user_id_and_expires_at"
   end
 
   create_table "exam_questions", force: :cascade do |t|
@@ -493,6 +509,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
     t.index ["granted_premium_until"], name: "index_users_on_granted_premium_until"
   end
 
+  create_table "webhook_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.string "external_id", null: false
+    t.string "provider", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "external_id"], name: "index_webhook_events_on_provider_and_external_id", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answer_options", "questions"
@@ -505,6 +530,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
   add_foreign_key "clinical_cases", "specialties"
   add_foreign_key "clinical_cases", "topics"
   add_foreign_key "clinical_images", "guideline_sections"
+  add_foreign_key "entitlements", "users"
   add_foreign_key "exam_questions", "clinical_cases"
   add_foreign_key "exam_questions", "exams"
   add_foreign_key "exam_questions", "questions"

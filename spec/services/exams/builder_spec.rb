@@ -23,6 +23,18 @@ RSpec.describe Exams::Builder do
     expect(cases_in(exam)).to eq([live])
   end
 
+  it "builds nothing for a free student who has used today's allowance" do
+    user.update_column(:trial_ends_at, 1.day.ago)
+    allow(SubscriptionAccess).to receive(:free_daily_questions).and_return(0)
+    create(:published_case)
+
+    result = build(mode: "quick_quiz")
+
+    expect(result.errors.of_kind?(:base, :daily_limit_reached)).to be(true)
+    expect(result.errors.full_messages).to eq([I18n.t("exams.denied.daily_limit_reached", limit: 0)])
+    expect(Exam.count).to eq(0)
+  end
+
   it "takes whole cases, in their own question order, and records how many questions it drew" do
     kase = create(:published_case, questions_count: 3)
 

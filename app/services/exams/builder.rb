@@ -22,6 +22,7 @@ module Exams
 
     def call
       return failure(I18n.t("exams.builder.unknown_mode")) unless Exam.modes.key?(mode)
+      return daily_limit_reached unless access[:allowed]
 
       picked = pick
       return failure(I18n.t("exams.builder.nothing_matches")) if picked.empty?
@@ -36,6 +37,17 @@ module Exams
     private
 
     attr_reader :user, :mode, :raw_filters, :settings, :random
+
+    # Refused before drawing anything, so a free student who has used today's allowance
+    # is not handed an exam whose first answer would be turned away.
+    def access
+      @access ||= user.subscription_access_result
+    end
+
+    def daily_limit_reached
+      errors.add(:base, :daily_limit_reached, message: access[:message])
+      failure
+    end
 
     # Each mode has defaults; the student may change either. A missing or unknown value
     # falls back to the default rather than failing the exam.

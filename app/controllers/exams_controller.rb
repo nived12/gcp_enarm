@@ -1,6 +1,8 @@
 # Building an exam, and everything around a sitting that is not a question: the pause
 # screen, the finish screen and the results.
 class ExamsController < ApplicationController
+  include UpgradePath
+
   before_action :set_exam, only: %i[show pause resume complete destroy]
 
   HISTORY_LIMIT = 50
@@ -27,6 +29,8 @@ class ExamsController < ApplicationController
       settings: setting_params
     )
     if result.failure?
+      return redirect_to_upgrade(result) if daily_limit_reached?(result)
+
       return redirect_to(
         new_exam_path(section: section_for(params[:mode])),
         alert: result.errors.full_messages.to_sentence
