@@ -55,11 +55,15 @@ module Gpc
       Recommendation.joins(:guideline_section).merge(ungraded).destroy_all
     end
 
+    def headings
+      @headings ||= HeadingCleaner.new(TitleRepairer.vocabulary)
+    end
+
     def rebuild_archive(conflicts)
       counts = { archived_guidelines: 0, archived_recommendations: 0 }
 
       GuidelineSection.kind_archived_document.includes(:guideline).find_each do |document|
-        result = ArchiveSectionBuilder.call(document)
+        result = ArchiveSectionBuilder.call(document, headings: headings)
         next conflicts << result.errors.full_messages.to_sentence if result.failure?
 
         counts[:archived_guidelines] += 1 if result.payload[:recommendations].positive?

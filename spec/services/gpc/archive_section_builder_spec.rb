@@ -10,7 +10,11 @@ RSpec.describe Gpc::ArchiveSectionBuilder do
     )
   end
 
-  def build = described_class.call(document)
+  # Every word known, so the headings are read as the fixture has them; the damaged-heading
+  # example below says otherwise.
+  let(:headings) { Gpc::HeadingCleaner.new(Hash.new(Gpc::HeadingCleaner::MIN_COUNT)) }
+
+  def build = described_class.call(document, headings: headings)
   def derived = document.derived_sections.order(:position)
 
   def section(external_id) = derived.find_by!(external_id: "20090101/#{external_id}")
@@ -37,6 +41,18 @@ RSpec.describe Gpc::ArchiveSectionBuilder do
       position: 1, grade: "D", scale: "Shekelle", citation: "Humes, 2008", label: "D (Shekelle,1999) Humes, 2008"
     )
     expect(Recommendation.actionable.count).to eq(8)
+  end
+
+  it "leaves out a heading extraction damaged, keeping the section" do
+    described_class.call(document, headings: Gpc::HeadingCleaner.new(Hash.new(0)))
+
+    diagnosis = section("4-2-1-1-diagnostico-clinico-y-paraclinico-en-el-adulto-joven-recommendation")
+    expect(diagnosis.menu_path).to eq("4.2 Diagnostico › RECOMENDACIONES")
+    expect(diagnosis.recommendations.count).to be_positive
+  end
+
+  it "reads its vocabulary from the corpus when none is handed to it" do
+    expect(described_class.call(document)).to be_success
   end
 
   it "leaves every section alone when nothing changed" do

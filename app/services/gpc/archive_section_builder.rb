@@ -22,9 +22,12 @@ module Gpc
 
     RECOMMENDATION_ATTRIBUTES = %i[text label grade scale citation].freeze
 
-    def initialize(document)
+    # The heading cleaner reads the whole corpus's vocabulary, so a caller building many
+    # documents passes one in rather than paying for it per document.
+    def initialize(document, headings: nil)
       super()
       @document = document
+      @headings = headings
     end
 
     def call
@@ -77,12 +80,22 @@ module Gpc
       counts[:recommendations] += statements.size
 
       if section.content_hash == digest && !parked?(section)
-        section.update!(position: position)
+        section.update!(position: position, **path(statements.first))
       else
         rebuild(section, statements, position, digest)
         counts[:rebuilt] += 1
       end
       section.id
+    end
+
+    # Where the section sits in the document, minus any heading extraction damaged.
+    def path(first)
+      label = first[:heading] if first[:heading] != first[:chapter]
+      { chapter: headings.call(first[:chapter]), question_label: headings.call(label) }
+    end
+
+    def headings
+      @headings ||= HeadingCleaner.new(TitleRepairer.vocabulary)
     end
 
     # Rows an earlier reconcile left below zero; see reconcile. Rebuilding the section
@@ -94,8 +107,7 @@ module Gpc
     def rebuild(section, statements, position, digest)
       first = statements.first
       section.update!(
-        heading: HEADINGS.fetch(first[:kind]), kind: first[:kind], position: position,
-        chapter: first[:chapter], question_label: (first[:heading] if first[:heading] != first[:chapter]),
+        heading: HEADINGS.fetch(first[:kind]), kind: first[:kind], position: position, **path(first),
         body: statements.pluck(:text).join("\n\n"), content_hash: digest
       )
       reconcile(section, statements)
