@@ -56,7 +56,7 @@ module Questions
     def import_case(attributes, counts)
       questions = attributes.delete("questions")
       figure = attributes.delete("image")
-      references = attributes.extract!("run_key", "catalog_key", "topic_slug", "specialty_slug")
+      references = attributes.extract!("run_key", "catalog_key", "topic_slug", "specialty_slug", "setting_slug")
 
       ClinicalCase.transaction do
         kase = ClinicalCase.find_or_initialize_by(export_key: attributes["export_key"])
@@ -76,7 +76,16 @@ module Questions
         guideline: find_by!(Guideline, :catalog_key, references["catalog_key"], "la guía"),
         topic: find_by!(Topic, :slug, references["topic_slug"], "el tema"),
         specialty: find_by!(Specialty, :slug, references["specialty_slug"], "la especialidad")
-      }
+      }.merge(setting(references))
+    end
+
+    # A file written before cases carried a setting says nothing about it, and replaying
+    # it must not erase a setting this database has since classified. Only a file that
+    # names the key — nil included — decides it.
+    def setting(references)
+      return {} unless references.key?("setting_slug")
+
+      { setting: find_by!(Specialty, :slug, references["setting_slug"], "el contexto") }
     end
 
     # Figures are rebuilt here by gpc:images rather than carried in the file, so a

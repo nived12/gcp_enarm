@@ -7,8 +7,8 @@
 # everything is carried here, and this file is the only backup the one part of the app that
 # costs money will ever have.
 #
-# Nothing is referenced by row id. A case names its guideline by catalog_key and its topic
-# and specialty by slug, and a question names its recommendation by the path that
+# Nothing is referenced by row id. A case names its guideline by catalog_key and its topic,
+# specialty and setting by slug, and a question names its recommendation by the path that
 # identifies it in any database: the guideline, the section inside it, and the position
 # inside that section.
 module Questions
@@ -68,6 +68,7 @@ module Questions
 
     def cases
       ClinicalCase.order(:id).includes(
+        :generation_run, :guideline, :topic, :specialty, :setting,
         { clinical_image: { guideline_section: :guideline } },
         questions: [:answer_options, { recommendation: { guideline_section: :guideline } }]
       )
@@ -81,6 +82,7 @@ module Questions
         "catalog_key" => kase.guideline&.catalog_key,
         "topic_slug" => kase.topic&.slug,
         "specialty_slug" => kase.specialty&.slug,
+        "setting_slug" => kase.setting&.slug,
         "image" => figure_payload(kase.clinical_image),
         "questions" => kase.questions.map { |question| question_payload(question) }
       )

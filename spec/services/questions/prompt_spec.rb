@@ -33,6 +33,11 @@ RSpec.describe Questions::Prompt do
     expect(prompt).to include("No sitúes el caso en una sala")
   end
 
+  it "asks for the setting it chose as a fixed code, in the JSON beside the stem" do
+    expect(prompt).to include("family_medicine, emergency, public_health")
+    expect(prompt).to include('{"cases":[{"stem":"...","setting":"family_medicine|emergency|public_health",')
+  end
+
   describe "how much of the patient the vignette carries" do
     it "asks for a whole-patient vignette and three questions on a full workup" do
       text = prompt(detail: :full_workup)

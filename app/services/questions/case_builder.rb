@@ -65,7 +65,8 @@ module Questions
 
       kase = ClinicalCase.new(
         stem: attributes["stem"], guideline: guideline, generation_run: run,
-        topic: topic, specialty: topic&.branch&.specialty, source: "gpc_generated", locale: locale
+        topic: topic, specialty: topic&.branch&.specialty, setting: setting(attributes["setting"]),
+        source: "gpc_generated", locale: locale
       )
       built = questions.filter_map.with_index(1) { |question, position| build_question(kase, question, position) }
       return if built.empty?
@@ -138,6 +139,17 @@ module Questions
       return "high" if grades.any? { |grade| grade.match?(WEAK_GRADES) }
 
       "medium"
+    end
+
+    # The context the model says it set the case in. A code it made up, or none at all,
+    # leaves the setting unknown — questions:classify_settings can read the stem later —
+    # and never costs the case: where it happens is filing, not content.
+    def setting(code)
+      settings.fetch(code.to_s) { settings[code.to_s] = Specialty.for_setting_code(code) }
+    end
+
+    def settings
+      @settings ||= {}
     end
 
     def topic
