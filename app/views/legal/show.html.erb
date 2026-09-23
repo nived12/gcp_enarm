@@ -1,0 +1,26 @@
+<% content_for :title, t("legal.titles.#{@page.name}") %>
+
+<article>
+  <p class="eyebrow"><%= t("legal.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink sm:text-3xl"><%= t("legal.titles.#{@page.name}") %></h1>
+
+  <%# Every page is a draft until the owner's lawyer signs it off. Remove this notice then. %>
+  <p role="note" class="mt-4 rounded-control border border-dashed border-line-strong px-4 py-3 text-sm leading-relaxed text-ink-muted">
+    <%= t("legal.draft_notice") %>
+  </p>
+
+  <div class="mt-6 max-w-prose text-[0.9375rem] leading-relaxed text-ink-muted
+              [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2
+              [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-ink
+              [&_h3]:mt-6 [&_h3]:font-semibold [&_h3]:text-ink
+              [&_li]:mt-1.5 [&_ol]:mt-3 [&_ol]:list-decimal [&_ol]:pl-5
+              [&_p]:mt-3 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5">
+    <%= @page.to_html %>
+  </div>
+
+  <nav class="mt-10 flex flex-wrap gap-x-4 gap-y-2 text-sm" aria-label="<%= t("legal.eyebrow") %>">
+    <% LegalPage::NAMES.excluding(@page.name).each do |name| %>
+      <%= link_to t("legal.titles.#{name}"), legal_path(name), class: "inline-flex min-h-11 items-center text-accent underline underline-offset-2 hover:text-accent-hover" %>
+    <% end %>
+  </nav>
+</article>

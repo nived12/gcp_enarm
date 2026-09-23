@@ -1,0 +1,58 @@
+<% content_for :title, t("billing.account.title") %>
+
+<section>
+  <p class="eyebrow"><%= t("billing.account.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= @user.name.presence || t("billing.account.title") %></h1>
+  <p class="mt-1 text-sm text-ink-muted"><%= @user.email %></p>
+</section>
+
+<% if @checkout_returned %>
+  <%# The webhook, not this redirect, grants access. Until it lands the window below
+      still shows what the student had before, so say so plainly. %>
+  <div role="status" class="mt-6 rounded-control bg-accent-soft px-4 py-3 text-sm leading-relaxed text-accent-hover">
+    <p class="font-medium"><%= t("billing.account.checkout_returned.title") %></p>
+    <p class="mt-1"><%= t("billing.account.checkout_returned.body") %></p>
+  </div>
+<% end %>
+
+<section class="card mt-6 px-5 py-5">
+  <p class="eyebrow"><%= t("billing.access.title") %></p>
+  <div class="mt-2"><%= render "billing/access_status", user: @user %></div>
+  <%= link_to (@user.unlimited? ? t("billing.account.extend") : t("billing.account.see_plans")), pricing_path,
+        class: "btn btn--ghost mt-4 w-full sm:w-auto" %>
+</section>
+
+<section class="mt-10">
+  <h2 class="text-lg font-semibold tracking-tight text-ink"><%= t("billing.account.history.title") %></h2>
+
+  <% if @entitlements.none? %>
+    <div class="mt-4 rounded-card border border-dashed border-line-strong p-6 text-center">
+      <p class="text-sm font-medium text-ink"><%= t("billing.account.history.empty.title") %></p>
+      <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("billing.account.history.empty.body") %></p>
+    </div>
+  <% else %>
+    <ul class="mt-4 space-y-2">
+      <% @entitlements.each do |entitlement| %>
+        <li class="card flex items-start gap-4 px-5 py-4 text-sm">
+          <span class="min-w-0 flex-1">
+            <span class="block font-medium text-ink"><%= t("billing.plans.#{entitlement.plan}.name") %></span>
+            <span class="mt-0.5 block text-xs leading-relaxed text-ink-faint">
+              <%= t("billing.account.history.window",
+                    from: l(entitlement.starts_at.to_date, format: :long),
+                    to: l(entitlement.expires_at.to_date, format: :long)) %>
+            </span>
+            <span class="mt-0.5 block text-xs text-ink-faint">
+              <%= t("billing.account.history.purchased_on", date: l(entitlement.created_at.to_date, format: :long)) %>
+            </span>
+          </span>
+          <span class="numeric shrink-0 text-ink"><%= money(entitlement.amount) %> <span class="text-ink-faint"><%= entitlement.currency %></span></span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
+
+<p class="mt-10 text-sm text-ink-muted">
+  <%= t("billing.account.help") %>
+  <%= link_to t("legal.titles.refunds"), legal_path("refunds"), class: "text-accent underline underline-offset-2 hover:text-accent-hover" %>
+</p>

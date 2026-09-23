@@ -1,0 +1,10 @@
+# The four prepaid windows. Public: a classmate sent the link, and nobody should have
+# to make an account to see what it costs.
+class PricingController < ApplicationController
+  allow_unauthenticated_access only: :show
+
+  def show
+    @plans = Plan.all
+    @checkout_available = Billing::StripeAdapter.checkout_available?
+  end
+end

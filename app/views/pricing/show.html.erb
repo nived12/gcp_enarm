@@ -1,0 +1,80 @@
+<% content_for :title, t("pricing.title") %>
+<% signed_in = authenticated? %>
+
+<section class="pt-2 sm:pt-6">
+  <p class="eyebrow"><%= t("pricing.eyebrow") %></p>
+  <h1 class="mt-2 text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl"><%= t("pricing.headline") %></h1>
+  <p class="mt-3 max-w-prose leading-relaxed text-ink-muted"><%= t("pricing.subhead") %></p>
+</section>
+
+<% if signed_in %>
+  <div class="card mt-6 px-5 py-4">
+    <p class="eyebrow"><%= t("billing.access.title") %></p>
+    <div class="mt-2"><%= render "billing/access_status", user: Current.user %></div>
+  </div>
+<% end %>
+
+<ul class="mt-8 grid gap-3 sm:grid-cols-2" aria-label="<%= t("pricing.plans_label") %>">
+  <% @plans.each do |plan| %>
+    <% best = plan.code == "twelve_months" %>
+    <li class="card flex flex-col px-5 py-5 <%= "ring-2 ring-accent" if best %>" data-plan="<%= plan.code %>">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-base font-semibold text-ink"><%= t("billing.plans.#{plan.code}.name") %></h2>
+        <% if best %>
+          <span class="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent-hover"><%= t("pricing.best_value") %></span>
+        <% end %>
+      </div>
+
+      <p class="mt-3 flex items-baseline gap-1.5">
+        <span class="numeric text-3xl font-medium tracking-tight text-ink"><%= money(plan.price) %></span>
+        <span class="text-sm text-ink-faint"><%= plan.currency %></span>
+      </p>
+      <p class="mt-1 text-sm text-ink-muted">
+        <%= plan.months == 1 ? t("pricing.single_payment") : t("pricing.per_month", amount: money(plan.monthly_price)) %>
+      </p>
+
+      <div class="mt-5 flex-1 content-end">
+        <% if !@checkout_available %>
+          <p class="btn w-full cursor-default border border-dashed border-line-strong text-sm text-ink-faint"><%= t("pricing.unavailable") %></p>
+        <% elsif signed_in %>
+          <%# Turbo cannot follow a redirect to another origin, so this form is a plain submit. %>
+          <%= button_to t("pricing.choose", plan: t("billing.plans.#{plan.code}.name")), checkouts_path(plan: plan.code),
+                class: "btn w-full #{best ? "btn--primary" : "btn--ghost"}", form: { data: { turbo: false } } %>
+        <% else %>
+          <%= link_to t("pricing.sign_up_to_buy"), new_registration_path, class: "btn btn--ghost w-full" %>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+</ul>
+
+<section class="mt-6 rounded-card border border-dashed border-line-strong px-5 py-5">
+  <h2 class="text-base font-semibold text-ink"><%= t("pricing.free.title") %></h2>
+  <p class="mt-2 text-sm leading-relaxed text-ink-muted">
+    <%= t("pricing.free.body", limit: SubscriptionAccess.free_daily_questions, trial_days: SubscriptionAccess.trial_days) %>
+  </p>
+</section>
+
+<section class="mt-10">
+  <h2 class="text-xl font-semibold tracking-tight text-ink"><%= t("pricing.why.title") %></h2>
+  <p class="mt-3 max-w-prose leading-relaxed text-ink-muted"><%= t("pricing.why.body") %></p>
+</section>
+
+<section class="mt-10">
+  <h2 class="text-xl font-semibold tracking-tight text-ink"><%= t("pricing.faq.title") %></h2>
+  <div class="mt-4 divide-y divide-line rounded-card border border-line">
+    <% %w[renewal stacking payment receipt refunds].each do |question| %>
+      <details class="group px-5">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-sm font-medium text-ink">
+          <%= t("pricing.faq.#{question}.question") %>
+          <span class="text-ink-faint transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+        </summary>
+        <p class="pb-4 text-sm leading-relaxed text-ink-muted"><%= t("pricing.faq.#{question}.answer") %></p>
+      </details>
+    <% end %>
+  </div>
+  <p class="mt-4 text-sm text-ink-muted">
+    <%= link_to t("legal.titles.refunds"), legal_path("refunds"), class: "text-accent underline underline-offset-2 hover:text-accent-hover" %>
+    · <%= link_to t("legal.titles.terms"), legal_path("terms"), class: "text-accent underline underline-offset-2 hover:text-accent-hover" %>
+  </p>
+</section>

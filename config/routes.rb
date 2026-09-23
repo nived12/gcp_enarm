@@ -25,6 +25,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # Billing and the launch surface. Paid access is a prepaid window granted by the
+  # provider's webhook; returning from checkout grants nothing by itself.
+  resource :pricing, only: :show, controller: "pricing"
+  resources :checkouts, only: :create
+  resource :account, only: :show
+  post "webhooks/stripe" => "stripe_webhooks#create", as: :stripe_webhook
+  get "legal/:page" => "legal#show", as: :legal, constraints: { page: /terms|privacy|refunds/ }
+
   # Reviewer-only. Generated cases are drafts until a doctor has read them.
   namespace :review do
     resources :clinical_cases, only: %i[index show]

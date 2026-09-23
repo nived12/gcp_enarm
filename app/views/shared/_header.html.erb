@@ -8,11 +8,26 @@
       <%= render "shared/theme_toggle" %>
 
       <% if authenticated? %>
+        <%# An icon on a phone, where the header has room for little else. %>
+        <%= link_to account_path, aria: { label: t("navigation.account") },
+              class: "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full text-sm font-medium text-ink-muted hover:bg-surface-sunk hover:text-ink sm:px-4" do %>
+          <svg class="size-5 sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21a8 8 0 0 1 16 0" stroke-linecap="round"/>
+          </svg>
+          <span class="hidden sm:inline"><%= t("navigation.account") %></span>
+        <% end %>
         <%= button_to t("navigation.sign_out"), session_path, method: :delete,
               class: "min-h-11 rounded-full px-4 text-sm font-medium text-ink-muted hover:bg-surface-sunk hover:text-ink" %>
-      <% elsif !current_page?(new_session_path) %>
-        <%= link_to t("navigation.sign_in"), new_session_path,
-              class: "inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-accent-ink hover:bg-accent-hover" %>
+      <% else %>
+        <% unless current_page?(pricing_path) %>
+          <%= link_to t("pricing.nav"), pricing_path,
+                class: "hidden min-h-11 items-center rounded-full px-4 text-sm font-medium text-ink-muted hover:bg-surface-sunk hover:text-ink sm:inline-flex" %>
+        <% end %>
+        <% unless current_page?(new_session_path) %>
+          <%= link_to t("navigation.sign_in"), new_session_path,
+                class: "inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-accent-ink hover:bg-accent-hover" %>
+        <% end %>
       <% end %>
     </div>
   </div>
