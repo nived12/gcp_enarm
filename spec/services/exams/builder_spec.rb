@@ -145,6 +145,14 @@ RSpec.describe Exams::Builder do
         .to contain_exactly(internal_in_emergency, emergency_in_emergency, emergency_unknown, internal_unknown)
     end
 
+    # A guideline with no main topic leaves its cases with no subject; where they happen
+    # still files them.
+    it "draws a case with no subject from the context it is set in" do
+      unfiled = create(:published_case, specialty: nil, topic: nil, setting: emergency, questions_count: 1)
+
+      expect(cases_in(build(filters: { specialty_ids: [emergency.id] }).payload[:exam])).to include(unfiled)
+    end
+
     it "leaves a troncal's filter to what the case is about" do
       exam = build(filters: { specialty_ids: [internal.id] }).payload[:exam]
 

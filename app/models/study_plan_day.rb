@@ -42,9 +42,9 @@ class StudyPlanDay < ApplicationRecord
   # A day of Medicina Familiar, Urgencias or Salud Pública also quizzes the cases set in
   # that context. The bank files cases by subject, so a context's own topics hold almost
   # none, and without these its days would stay reading days however many consults and
-  # emergencies the bank holds.
+  # emergencies the bank holds. A topics day always has its block's specialty.
   def setting_cases
-    return ClinicalCase.none unless kind_topics? && specialty&.kind_cross_cutting?
+    return ClinicalCase.none unless kind_topics? && specialty.kind_cross_cutting?
 
     ClinicalCase.status_published.where(setting: specialty)
   end
