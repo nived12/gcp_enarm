@@ -1,9 +1,12 @@
 class AnswersController < ApplicationController
+  include UpgradePath
+
   before_action :set_exam_question
 
   def create
     result = Exams::AnswerRecorder.call(@exam_question, answer_option_id: params[:answer_option_id])
     return respond_saved if result.success?
+    return redirect_to_upgrade(result) if daily_limit_reached?(result)
 
     # A late answer has just ended the exam; anything else leaves the student where they were.
     back = @exam.reload.status_completed? ? exam_path(@exam) : exam_question_path(@exam, @exam_question.position)

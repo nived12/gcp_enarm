@@ -23,7 +23,10 @@ module Exams
       return success(answer: change) if exam_question.answer
 
       access = exam.user.subscription_access_result
-      return failure(access[:message]) unless access[:allowed]
+      unless access[:allowed]
+        errors.add(:base, :daily_limit_reached, message: access[:message])
+        return failure
+      end
 
       answer = exam_question.create_answer!(
         answer_option: option, correct: option.correct?, answered_at: Time.current,
