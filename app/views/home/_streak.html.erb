@@ -1,0 +1,10 @@
+<%# The streak is the "today" signal: one line under the average, and the way into the
+    full stats page. Nothing more above the fold. %>
+<%= link_to stats_path, class: "mt-4 flex min-h-11 items-center gap-3 border-t border-line pt-4 text-sm" do %>
+  <%= render "stats/flame", lit: streak.current.positive? %>
+  <span class="min-w-0 flex-1">
+    <span class="text-ink"><%= streak.current.positive? ? t("home.dashboard.streak", count: streak.current) : t("home.dashboard.streak_none") %></span>
+    <span class="text-ink-faint">· <%= streak.today_done ? t("home.dashboard.streak_today_done") : t("home.dashboard.streak_today", answered: streak.today_questions, minimum: streak.minimum) %></span>
+  </span>
+  <span class="shrink-0 font-medium text-accent"><%= t("home.dashboard.streak_link") %></span>
+<% end %>

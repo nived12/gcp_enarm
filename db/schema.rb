@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_020100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -454,6 +454,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
     t.index ["slug"], name: "index_specialties_on_slug", unique: true
   end
 
+  create_table "study_days", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.integer "pearls_reviewed", default: 0, null: false
+    t.integer "questions_answered", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "date"], name: "index_study_days_on_user_id_and_date", unique: true
+  end
+
   create_table "topics", force: :cascade do |t|
     t.jsonb "aliases", default: [], null: false
     t.bigint "branch_id", null: false
@@ -476,6 +486,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
     t.string "name"
     t.string "password_digest", null: false
     t.string "role", default: "student", null: false
+    t.string "time_zone", default: "America/Mexico_City", null: false
     t.datetime "trial_ends_at"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -514,5 +525,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "study_days", "users"
   add_foreign_key "topics", "branches"
 end

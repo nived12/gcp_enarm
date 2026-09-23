@@ -30,5 +30,8 @@ Rails.application.routes.draw do
     resources :clinical_cases, only: %i[index show]
   end
 
+  # The student's own average, streak and coverage of the bank.
+  resource :stats, only: :show
+
   root "home#show"
 end

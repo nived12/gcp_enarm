@@ -102,4 +102,30 @@ RSpec.describe Exams::AnswerRecorder do
       expect(record(second, "Troponina I")).to be_failure
     end
   end
+
+  describe "the study day" do
+    it "counts each new answer on the student's own calendar, a changed one only once" do
+      exam.update!(feedback_timing: "at_end")
+
+      record(first, "Troponina I")
+      record(first, "Ecocardiograma")
+      record(second, "Troponina I")
+
+      expect(user.study_days.pluck(:date, :questions_answered)).to eq([[user.study_date, 2]])
+    end
+
+    it "is not counted when the answer is not saved" do
+      exam.pause!
+      record(first, "Troponina I")
+
+      expect(StudyDay.count).to eq(0)
+    end
+
+    it "keeps the answer and the count together, so neither is written alone" do
+      allow(StudyDay).to receive(:count_answer!).and_raise(ActiveRecord::StatementInvalid)
+
+      expect { record(first, "Troponina I") }.to raise_error(ActiveRecord::StatementInvalid)
+      expect(Answer.count).to eq(0)
+    end
+  end
 end
