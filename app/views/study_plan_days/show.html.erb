@@ -1,0 +1,58 @@
+<% content_for :title, plan_date(@date, :long) %>
+
+<%= link_to t("study_plans.back_to_calendar"), study_plan_path(month: @date.strftime("%Y-%m")),
+      class: "inline-flex min-h-11 items-center text-sm text-accent hover:text-accent-hover" %>
+
+<% if @day.nil? %>
+  <section class="mt-2">
+    <p class="eyebrow"><%= plan_date(@date, :long) %></p>
+    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("study_plans.day.rest") %></h1>
+    <p class="mt-3 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("study_plans.day.rest_body") %></p>
+  </section>
+<% else %>
+  <section class="mt-2 <%= plan_day_color_class(@day) %>">
+    <p class="eyebrow"><%= plan_date(@date, :long) %></p>
+    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("study_plans.kinds.#{@day.kind}") %></h1>
+    <p class="mt-2 flex items-center gap-2 text-sm text-ink-muted">
+      <span class="plan-swatch size-2.5 rounded-full" aria-hidden="true"></span>
+      <%= [@day.specialty&.name, t("study_plans.day.pass", number: @day.pass_number, total: @plan.pass_count)].compact.join(" · ") %>
+    </p>
+  </section>
+
+  <% if @day.kind_topics? %>
+    <% counts = ClinicalCase.status_published.where(topic_id: @day.topics.map(&:id)).group(:topic_id).count %>
+    <ol class="mt-6 divide-y divide-line border-y border-line">
+      <% @day.topics.each.with_index(1) do |topic, number| %>
+        <li class="flex items-baseline gap-3 py-3">
+          <span class="numeric w-5 shrink-0 text-sm text-ink-faint"><%= number %>.</span>
+          <span class="min-w-0 flex-1">
+            <span class="block text-base text-ink"><%= topic.name %></span>
+            <span class="mt-0.5 block text-xs text-ink-faint">
+              <%= counts[topic.id] ? t("study_plans.day.cases", count: counts[topic.id]) : t("study_plans.day.no_cases") %>
+            </span>
+          </span>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="mt-6 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("study_plans.day.about.#{@day.kind}") %></p>
+  <% end %>
+
+  <div class="mt-6">
+    <% if @day.done? %>
+      <p class="rounded-control bg-correct-soft px-4 py-3 text-sm font-medium text-correct"><%= t("study_plans.day.done") %></p>
+      <% if @day.exam %>
+        <%= link_to t("study_plans.day.see_results"), exam_path(@day.exam), class: "btn btn--ghost mt-3 w-full sm:w-auto" %>
+      <% end %>
+    <% elsif @day.exam&.unfinished? %>
+      <%= button_to t("study_plans.day.continue"), quiz_study_plan_day_path(@date), class: "btn btn--primary w-full sm:w-auto", form: { class: "contents" } %>
+    <% elsif @day.quiz? %>
+      <%= button_to t("study_plans.day.start.#{@day.kind}"), quiz_study_plan_day_path(@date), class: "btn btn--primary w-full sm:w-auto", form: { class: "contents" } %>
+    <% else %>
+      <% if @day.kind_topics? %>
+        <p class="mb-3 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("study_plans.day.reading") %></p>
+      <% end %>
+      <%= button_to t("study_plans.day.mark_done"), complete_study_plan_day_path(@date), method: :patch, class: "btn btn--ghost w-full sm:w-auto", form: { class: "contents" } %>
+    <% end %>
+  </div>
+<% end %>

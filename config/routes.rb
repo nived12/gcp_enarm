@@ -33,5 +33,16 @@ Rails.application.routes.draw do
   # The student's own average, streak and coverage of the bank.
   resource :stats, only: :show
 
+  # The study calendar: one plan per student, its days addressed by date.
+  resource :study_plan do
+    post :catch_up
+    resources :days, only: :show, controller: "study_plan_days", param: :date do
+      member do
+        post :quiz
+        patch :complete
+      end
+    end
+  end
+
   root "home#show"
 end
