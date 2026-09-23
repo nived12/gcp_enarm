@@ -321,3 +321,67 @@
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Specialty colours — the names Specialty::COLOR_TOKENS stores.
+
+   Sampled from Alan's own ramps like the rest of the palette. Alan has no magenta,
+   amber or violet, so those names take its pink, yellow and blue: the stored name
+   says which specialty, the value is whatever Alan ships nearest to it. Dark uses a
+   lighter step of the same ramp, as the accent does. Tints are mixed from these in
+   CSS rather than given hexes of their own.
+--------------------------------------------------------------------------- */
+
+:root {
+  --specialty-indigo: #5c59f3;  /* alan: indigo500 */
+  --specialty-green: #367940;   /* alan: green700 */
+  --specialty-magenta: #ffaac8; /* alan: pink300 */
+  --specialty-amber: #ff9d00;   /* alan: yellow700 */
+  --specialty-teal: #2aa79c;    /* alan: teal500 */
+  --specialty-red: #c9202e;     /* alan: red700 */
+  --specialty-violet: #0a70ff;  /* alan: blue700 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --specialty-indigo: #8c99fa;  /* alan: indigo300 */
+    --specialty-green: #7fca6c;   /* alan: green500 */
+    --specialty-magenta: #ffaac8; /* alan: pink300 */
+    --specialty-amber: #ffb619;   /* alan: yellow500 */
+    --specialty-teal: #81dfd7;    /* alan: teal300 */
+    --specialty-red: #ed4e4e;     /* alan: red500 */
+    --specialty-violet: #94c1ff;  /* alan: blue300 */
+  }
+}
+
+:root[data-theme="dark"] {
+  --specialty-indigo: #8c99fa;
+  --specialty-green: #7fca6c;
+  --specialty-magenta: #ffaac8;
+  --specialty-amber: #ffb619;
+  --specialty-teal: #81dfd7;
+  --specialty-red: #ed4e4e;
+  --specialty-violet: #94c1ff;
+}
+
+@layer components {
+  /* Written out rather than built from the token name, so Tailwind's scanner never
+     has to guess a class that only exists at runtime. */
+  .specialty-indigo { --specialty: var(--specialty-indigo); }
+  .specialty-green { --specialty: var(--specialty-green); }
+  .specialty-magenta { --specialty: var(--specialty-magenta); }
+  .specialty-amber { --specialty: var(--specialty-amber); }
+  .specialty-teal { --specialty: var(--specialty-teal); }
+  .specialty-red { --specialty: var(--specialty-red); }
+  .specialty-violet { --specialty: var(--specialty-violet); }
+  .specialty-none { --specialty: var(--line-strong); }
+
+  .plan-swatch {
+    background-color: var(--specialty);
+  }
+
+  .plan-tint {
+    background-color: color-mix(in srgb, var(--specialty) 14%, var(--surface));
+    box-shadow: inset 3px 0 0 var(--specialty);
+  }
+}

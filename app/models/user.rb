@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :question_reports, dependent: :destroy
   has_many :resolved_question_reports, class_name: "QuestionReport", foreign_key: :resolved_by_id,
     inverse_of: :resolved_by, dependent: :nullify
+  has_one :study_plan, dependent: :destroy
 
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 

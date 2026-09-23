@@ -1,0 +1,85 @@
+<% content_for :title, t("study_plans.show.title") %>
+<% first_month = @plan.starts_on.beginning_of_month %>
+<% last_month = @plan.exam_date.beginning_of_month %>
+<% previous_month = @month.prev_month %>
+<% next_month = @month.next_month %>
+
+<section>
+  <p class="eyebrow"><%= t("study_plans.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("study_plans.show.title") %></h1>
+  <p class="mt-2 text-sm text-ink-muted">
+    <%= t("study_plans.show.summary", exam_date: plan_date(@plan.exam_date, :long), count: (@plan.exam_date - @today).to_i) %>
+    · <%= link_to t("study_plans.show.change"), edit_study_plan_path, class: "text-accent underline underline-offset-2 hover:text-accent-hover" %>
+  </p>
+</section>
+
+<% if @missed.positive? %>
+  <%# Named plainly, with the way out beside it: the plan moves, the syllabus is not restarted. %>
+  <div class="mt-6 rounded-card bg-ground-tint px-5 py-4" data-testid="behind">
+    <p class="text-sm font-medium text-ink"><%= t("study_plans.show.behind", count: @missed) %></p>
+    <p class="mt-1 text-sm text-ink-muted"><%= t("study_plans.show.behind_body") %></p>
+    <%= button_to t("study_plans.show.catch_up"), catch_up_study_plan_path, class: "btn btn--ghost mt-3 w-full sm:w-auto", form: { class: "contents" } %>
+  </div>
+<% end %>
+
+<nav class="mt-8 flex items-center justify-between gap-2" aria-label="<%= t("study_plans.show.months") %>">
+  <% if previous_month >= first_month %>
+    <%= link_to "‹", study_plan_path(month: previous_month.strftime("%Y-%m")), class: "inline-flex size-11 items-center justify-center rounded-full text-lg text-ink-muted hover:bg-surface-sunk", aria: { label: t("study_plans.show.previous_month") } %>
+  <% else %>
+    <span class="size-11"></span>
+  <% end %>
+  <h2 class="text-base font-semibold capitalize text-ink"><%= plan_date(@month, :month) %></h2>
+  <% if next_month <= last_month %>
+    <%= link_to "›", study_plan_path(month: next_month.strftime("%Y-%m")), class: "inline-flex size-11 items-center justify-center rounded-full text-lg text-ink-muted hover:bg-surface-sunk", aria: { label: t("study_plans.show.next_month") } %>
+  <% else %>
+    <span class="size-11"></span>
+  <% end %>
+</nav>
+
+<% if @days.empty? %>
+  <div class="mt-4 rounded-card border border-dashed border-line-strong p-6 text-center text-sm text-ink-muted">
+    <%= t("study_plans.show.empty_month") %>
+  </div>
+<% else %>
+  <%# A phone gets the month as a list: seven columns at 375px leave no room to name a
+      topic, and naming the topics is the point. %>
+  <ol class="mt-4 divide-y divide-line border-y border-line sm:hidden">
+    <% @days.each_value do |day| %>
+      <li>
+        <%= link_to study_plan_day_path(day.date), class: "flex min-h-11 items-stretch gap-3 py-3 #{plan_day_color_class(day)}" do %>
+          <span class="plan-swatch w-1 shrink-0 rounded-full" aria-hidden="true"></span>
+          <span class="w-12 shrink-0">
+            <span class="block text-xs capitalize <%= day.date == @today ? "font-semibold text-accent" : "text-ink-faint" %>"><%= plan_date(day.date, :weekday) %></span>
+            <span class="numeric block text-lg <%= day.date == @today ? "text-accent" : "text-ink" %>"><%= day.date.day %></span>
+          </span>
+          <span class="min-w-0 flex-1 text-sm leading-snug text-ink"><%= plan_day_title(day) %></span>
+          <% if day.done? %>
+            <span class="shrink-0 self-center text-xs font-medium text-correct"><%= t("study_plans.done") %></span>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+
+  <div class="mt-4 hidden grid-cols-7 gap-1 sm:grid">
+    <% @month.beginning_of_week(:monday).step(@month.beginning_of_week(:monday) + 6).each do |weekday| %>
+      <p class="eyebrow pb-1 text-center"><%= plan_date(weekday, :weekday) %></p>
+    <% end %>
+    <% (@month.beginning_of_week(:monday)..@month.end_of_month.end_of_week(:monday)).each do |date| %>
+      <% day = @days[date] %>
+      <% if date.month != @month.month %>
+        <span aria-hidden="true"></span>
+      <% elsif day %>
+        <%= link_to study_plan_day_path(date), class: "plan-tint #{plan_day_color_class(day)} flex min-h-24 flex-col rounded-control p-1.5 text-left transition-shadow hover:ring-2 hover:ring-accent #{"ring-2 ring-accent" if date == @today}" do %>
+          <span class="flex items-center justify-between">
+            <span class="numeric text-xs text-ink-muted"><%= date.day %></span>
+            <% if day.done? %><span class="text-xs text-correct" aria-label="<%= t("study_plans.done") %>">✓</span><% end %>
+          </span>
+          <span class="mt-1 line-clamp-4 text-[0.6875rem] leading-tight text-ink"><%= plan_day_title(day) %></span>
+        <% end %>
+      <% else %>
+        <span class="flex min-h-24 rounded-control p-1.5 numeric text-xs text-ink-faint"><%= date.day %></span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,18 @@
+<%= form_with model: plan, url: study_plan_path, method: plan.persisted? ? :patch : :post, class: "mt-6 space-y-6" do |form| %>
+  <% if local_assigns[:error].present? %>
+    <p class="rounded-control bg-incorrect-soft px-4 py-3 text-sm text-incorrect" role="alert"><%= error %></p>
+  <% end %>
+
+  <div>
+    <%= form.label :exam_date, t("study_plans.form.exam_date"), class: "mb-1.5 block text-sm font-medium text-ink" %>
+    <%= form.date_field :exam_date, required: true, class: "input" %>
+    <p class="mt-2 text-xs leading-relaxed text-ink-faint"><%= t("study_plans.form.exam_date_hint") %></p>
+  </div>
+
+  <%= render "shared/pill_radios", legend: t("study_plans.form.template"), name: "study_plan[template]",
+        id_prefix: "study_plan_template", selected: plan.template,
+        options: StudyPlan.templates.keys.map { |key| [t("study_plans.templates.#{key}"), key] },
+        hint: t("study_plans.form.template_hint") %>
+
+  <%= form.submit submit, class: "btn btn--primary w-full sm:w-auto" %>
+<% end %>

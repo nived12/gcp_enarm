@@ -53,5 +53,16 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show update]
   end
 
+  # The study calendar: one plan per student, its days addressed by date.
+  resource :study_plan do
+    post :catch_up
+    resources :days, only: :show, controller: "study_plan_days", param: :date do
+      member do
+        post :quiz
+        patch :complete
+      end
+    end
+  end
+
   root "home#show"
 end
