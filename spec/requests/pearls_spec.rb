@@ -70,6 +70,23 @@ RSpec.describe "Pearls", type: :request do
     expect(response).to have_http_status(:unprocessable_content)
   end
 
+  it "says when today's new pearls are spent, and keeps the session where it was" do
+    stub_const("Pearl::NEW_PER_DAY", 1)
+    kase.questions.first.recommendation.update!(text: "La mayoría de los pacientes mejora sin tratamiento.")
+    other = create(
+      :recommendation, guideline_section: statement.guideline_section,
+      text: "Se recomienda vigilar la glucosa cada 4 horas en el posoperatorio."
+    )
+    grade(statement, step: 0)
+
+    get pearls_path(step: 1)
+    expect(response.body).to include(I18n.t("pearls.show.new_allowance_spent.title", limit: 1))
+
+    grade(other, step: 1)
+    expect(response).to redirect_to(pearls_path(step: 1))
+    expect(ReviewCard.pluck(:recommendation_id)).to eq([statement.id])
+  end
+
   it "ends the session after ten cards and says whether today now counts" do
     get pearls_path(step: 10)
     expect(response.body).to include(I18n.t("pearls.done.streak_pending"))

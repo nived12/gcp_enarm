@@ -65,6 +65,22 @@ RSpec.describe Pearls::CardPicker do
     expect(pick.recommendation.guideline).to eq(other.guideline)
   end
 
+  it "stops offering new pearls at the day's allowance, but never holds back a due one" do
+    stub_const("Pearl::NEW_PER_DAY", 1)
+    kase = quiet_case
+    statement(kase)
+    started = statement(kase, "Se recomienda vigilar la glucosa cada 4 horas en el posoperatorio.")
+    card = create(:review_card, user: user, recommendation: started, due_on: user.study_date + 1)
+
+    expect(pick).to be_nil
+
+    card.update!(due_on: user.study_date)
+    expect(pick.recommendation).to eq(started)
+
+    card.update!(created_at: user.study_day_times.begin - 1.second, due_on: user.study_date + 1)
+    expect(pick.recommendation).not_to eq(started)
+  end
+
   it "reads the pool in batches until one statement makes a pearl" do
     stub_const("#{described_class}::BATCH", 1)
     sit(user, quiet_case, [:wrong])

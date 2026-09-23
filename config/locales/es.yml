@@ -870,6 +870,7 @@ es:
 
   pearls:
     unknown_grade: "Esa calificación no existe."
+    new_allowance_spent: "Hoy ya agregaste tus %{limit} perlas nuevas."
     show:
       eyebrow: "Repaso"
       title: "Perlas"
@@ -878,6 +879,9 @@ es:
         title: "No hay perlas por ahora"
         body: "Las perlas salen de las guías que ya tienen casos publicados. Vuelve cuando el banco crezca."
         back: "Volver al inicio"
+      new_allowance_spent:
+        title: "Hoy ya viste tus %{limit} perlas nuevas"
+        body: "Así lo que te toca repasar no queda enterrado bajo lo nuevo. Las perlas pendientes de repaso siempre aparecen; mañana hay más nuevas."
     card:
       blank_label: "frase oculta"
       reveal: "Mostrar respuesta"

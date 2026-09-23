@@ -868,6 +868,7 @@ en:
 
   pearls:
     unknown_grade: "That rating does not exist."
+    new_allowance_spent: "You have already added your %{limit} new pearls today."
     show:
       eyebrow: "Review"
       title: "Pearls"
@@ -876,6 +877,9 @@ en:
         title: "No pearls for now"
         body: "Pearls come from guidelines that already have published cases. Come back when the bank grows."
         back: "Back home"
+      new_allowance_spent:
+        title: "You have seen your %{limit} new pearls for today"
+        body: "That way what is due for review is not buried under new ones. Pearls due for review always appear; there are new ones again tomorrow."
     card:
       blank_label: "hidden phrase"
       reveal: "Show answer"

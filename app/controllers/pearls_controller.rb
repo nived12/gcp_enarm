@@ -12,6 +12,7 @@ class PearlsController < ApplicationController
     end
 
     @pearl = Pearls::CardPicker.call(Current.user).payload
+    @new_allowance_spent = @pearl.nil? && Pearl.new_allowance_spent?(Current.user)
   end
 
   # Only a statement in the pool, or one the student already holds a card for, can be
@@ -22,9 +23,15 @@ class PearlsController < ApplicationController
     return head(:not_found) unless held || Pearl.pool.exists?(recommendation.id)
 
     result = Pearls::ReviewRecorder.call(Current.user, recommendation, grade: params[:grade])
-    return head(:unprocessable_content) if result.failure?
+    step = params[:step].to_i.clamp(0, SESSION_SIZE - 1)
+    # A new card left open in another tab after the day's allowance ran out: back to
+    # the same step, which now says so.
+    if result.failure?
+      return head(:unprocessable_content) unless result.errors.of_kind?(:base, :new_allowance_spent)
 
-    step = params[:step].to_i.clamp(0, SESSION_SIZE - 1) + 1
-    redirect_to pearls_path(step: step), status: :see_other
+      return redirect_to(pearls_path(step: step), status: :see_other)
+    end
+
+    redirect_to pearls_path(step: step + 1), status: :see_other
   end
 end
