@@ -32,8 +32,6 @@ class GenerationRun < ApplicationRecord
   end
 
   def tally_rejections!(reasons)
-    return if reasons.blank?
-
     merged = rejection_reasons.merge(reasons.transform_keys(&:to_s)) { |_reason, before, added| before + added }
     update!(rejection_reasons: merged)
   end

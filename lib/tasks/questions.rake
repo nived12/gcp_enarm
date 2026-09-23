@@ -191,4 +191,46 @@ namespace :questions do
          "descartadas=#{summary[:rejected]} en_el_banco=#{summary[:live]} costo=$#{summary[:cost_usd]}"
     puts "Respaldo final: #{summary[:backups].last}" if summary[:backups].any?
   end
+
+  desc "Estimate calls, tokens, dollars and yield for a run, with no network: rake questions:estimate[calls,order]"
+  task :estimate, %i[calls order] => :environment do |_task, args|
+    result = Questions::CostEstimator.call(
+      calls: args[:calls].presence&.to_i,
+      order: args[:order].presence || "by_specialty"
+    )
+    abort(result.errors.full_messages.to_sentence) if result.failure?
+
+    estimate = result.payload
+    measured = estimate[:measured]
+    number = ->(value) { ActiveSupport::NumberHelper.number_to_delimited(value) }
+
+    puts "Corpus: #{estimate[:guidelines]} guías, #{number[estimate[:one_pass_calls]]} llamadas para una pasada " \
+         "por cada enunciado sin citar. Estimación para #{number[estimate[:calls]]} llamadas."
+    puts "Medido en la corrida #{measured[:reference_run]} (#{measured[:reference_calls]} llamadas): " \
+         "#{measured[:cases_per_call]} casos/llamada, #{measured[:questions_per_case]} preguntas/caso, " \
+         "#{(measured[:rejection_share] * 100).round(1)}% preguntas descartadas, " \
+         "#{(measured[:stem_asks_question_share] * 100).round(1)}% viñetas con pregunta, " \
+         "#{(measured[:published_share] * 100).round(1)}% de casos verificados publicables."
+    puts "Tokens por llamada de generación: #{number[estimate[:per_call][:input]]} entrada / " \
+         "#{number[estimate[:per_call][:output]]} salida (con razones de distractores)."
+    per_case = estimate[:per_case]
+    puts "Tokens por caso verificado: respuestas #{per_case[:answers_input]}/#{per_case[:answers_output]}, " \
+         "razones #{per_case[:rationales_input]}/#{per_case[:rationales_output]} " \
+         "(+#{estimate[:pending_rationale_cases]} casos ya publicados con razones sin revisar)."
+    puts "\nModelo                      Generar    Verificar  Rol configurado"
+    estimate[:costs].each do |row|
+      puts format(
+        "%-26s  $%8.2f  $%8.2f  %s", row[:model], row[:generation], row[:verification],
+        row[:roles].join(", ")
+      )
+    end
+    yielded = estimate[:yield]
+    puts "\nRendimiento: #{number[yielded[:cases]]} casos, #{number[yielded[:questions]]} preguntas; " \
+         "publicables #{number[yielded[:published_cases]]} casos, " \
+         "#{number[yielded[:published_questions]]} preguntas. ~#{estimate[:generation_hours]} h de generación."
+    estimate[:targets].each do |target, plan|
+      puts "#{number[target]} preguntas publicadas: #{number[plan[:calls]]} llamadas, ~$#{plan[:cost_usd]} " \
+           "con los modelos configurados"
+    end
+  end
 end

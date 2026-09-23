@@ -19,7 +19,7 @@ module Questions
     FAILURES_IN_A_ROW = GenerationRunner::FAILURES_IN_A_ROW
 
     def initialize(calls:, budget_usd:, label: "full", chunk: CHUNK_CALLS, order: "by_specialty",
-                   backup_dir: Rails.root.join("tmp/backups"), on_progress: nil)
+                   backup_dir: Rails.root.join("tmp/backups"), on_progress: ->(_line) { })
       super()
       @calls = calls
       @budget_usd = budget_usd
@@ -176,7 +176,7 @@ module Questions
     end
 
     def progress(line)
-      on_progress&.call(line)
+      on_progress.call(line)
     end
 
     def summary(stopped)

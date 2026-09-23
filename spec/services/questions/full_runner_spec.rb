@@ -132,6 +132,16 @@ RSpec.describe Questions::FullRunner do
     expect(Questions::CaseGenerator).not_to have_received(:call)
   end
 
+  it "pays for nothing once the label has spent its cap, and reports to no one when not asked" do
+    guideline_with(8)
+    create(:generation_run, notes: "full_run:full", cost_usd: 1)
+
+    result = described_class.call(calls: 5, budget_usd: 1, backup_dir: backup_dir)
+
+    expect(result.payload).to include(stopped: :budget, calls: 0)
+    expect(Questions::CaseGenerator).not_to have_received(:call)
+  end
+
   it "judges the rationales of supported cases the pilot left unjudged" do
     kase = create(:published_case, questions_count: 1)
     allow(Questions::RationaleVerifier).to receive(:call) { Questions::RationaleVerifier.new(kase).success({}) }
