@@ -542,12 +542,17 @@ es:
       saved: "Cambios guardados."
       invalid_date: "La fecha no es válida."
   activerecord:
+    attributes:
+      clinical_case:
+        setting: "Contexto"
     errors:
       models:
         clinical_case:
           attributes:
             status:
               not_supported: "solo puede publicarse si la segunda opinión respaldó todas sus respuestas"
+            setting:
+              not_cross_cutting: "debe ser Salud Pública, Urgencias o Medicina Familiar"
         question:
           attributes:
             source_quote:

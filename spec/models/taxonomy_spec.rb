@@ -35,6 +35,36 @@ RSpec.describe "the taxonomy models" do
 
       expect { specialty.destroy }.to change(Topic, :count).by(-1).and change(Branch, :count).by(-1)
     end
+
+    describe ".for_setting_code" do
+      it "finds the context a generation prompt's setting code names, whatever its case or padding" do
+        emergency = create(:emergency_setting)
+        family = create(:family_medicine_setting)
+        public_health = create(:public_health_setting)
+
+        expect(described_class.for_setting_code("emergency")).to eq(emergency)
+        expect(described_class.for_setting_code(" Family_Medicine ")).to eq(family)
+        expect(described_class.for_setting_code(:public_health)).to eq(public_health)
+      end
+
+      it "leaves an unknown or missing code unknown" do
+        create(:emergency_setting)
+
+        expect(described_class.for_setting_code("hospital_ward")).to be_nil
+        expect(described_class.for_setting_code(nil)).to be_nil
+      end
+
+      it "never resolves to a troncal that happens to carry the slug" do
+        create(:specialty, slug: "urgencias", kind: "core")
+
+        expect(described_class.for_setting_code("emergency")).to be_nil
+      end
+    end
+
+    it "names its setting code, and a troncal has none" do
+      expect(build(:emergency_setting).setting_code).to eq("emergency")
+      expect(build(:specialty).setting_code).to be_nil
+    end
   end
 
   describe Branch do

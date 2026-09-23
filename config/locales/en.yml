@@ -540,12 +540,17 @@ en:
       saved: "Changes saved."
       invalid_date: "That date is not valid."
   activerecord:
+    attributes:
+      clinical_case:
+        setting: "Setting"
     errors:
       models:
         clinical_case:
           attributes:
             status:
               not_supported: "can only be published once the second opinion has supported every answer"
+            setting:
+              not_cross_cutting: "must be Public Health, Emergency or Family Medicine"
         question:
           attributes:
             source_quote:

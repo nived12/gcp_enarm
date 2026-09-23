@@ -52,4 +52,59 @@ RSpec.describe ClinicalCase do
     expect { question.clinical_case.destroy }.to change(described_class.all, :count).by(-1)
     expect(Question.exists?(question.id)).to be(false)
   end
+
+  describe "setting" do
+    it "is optional: a case nobody has classified yet has an unknown setting" do
+      expect(build(:clinical_case, setting: nil)).to be_valid
+    end
+
+    it "accepts one of the three cross-cutting contexts" do
+      expect(build(:clinical_case, setting: create(:emergency_setting))).to be_valid
+    end
+
+    it "refuses a troncal, which is what a case is about, never where it happens" do
+      kase = build(:clinical_case, setting: create(:specialty, kind: "core"))
+
+      expect(kase).not_to be_valid
+      expect(kase.errors.of_kind?(:setting, :not_cross_cutting)).to be(true)
+    end
+  end
+
+  describe "areas" do
+    let(:internal) { create(:specialty, kind: "core") }
+    let(:emergency) { create(:emergency_setting) }
+    let(:family) { create(:family_medicine_setting) }
+
+    let!(:internal_in_emergency) { create(:clinical_case, specialty: internal, setting: emergency) }
+    let!(:internal_unknown) { create(:clinical_case, specialty: internal, setting: nil) }
+    let!(:emergency_in_emergency) { create(:clinical_case, specialty: emergency, setting: emergency) }
+    let!(:emergency_in_family) { create(:clinical_case, specialty: emergency, setting: family) }
+    let!(:unfiled) { create(:clinical_case, specialty: nil, setting: nil) }
+
+    it "holds a case under its subject and under its setting" do
+      expect(described_class.in_area(internal)).to contain_exactly(internal_in_emergency, internal_unknown)
+      expect(described_class.in_area(emergency))
+        .to contain_exactly(internal_in_emergency, emergency_in_emergency, emergency_in_family)
+      expect(described_class.in_area(family)).to contain_exactly(emergency_in_family)
+    end
+
+    it "returns each case once when several areas are asked for together" do
+      cases = described_class.in_area([internal, emergency])
+
+      expect(cases.to_a.size).to eq(4)
+      expect(cases.count).to eq(4)
+    end
+
+    it "accepts ids as well as rows" do
+      expect(described_class.in_area([family.id])).to contain_exactly(emergency_in_family)
+    end
+
+    it "counts a case once in each area it belongs to, and once only when subject and setting agree" do
+      expect(described_class.count_by_area).to eq(internal.id => 2, emergency.id => 3, family.id => 1)
+    end
+
+    it "leaves out a case that has neither subject nor setting" do
+      expect(described_class.by_area.distinct.pluck(:id)).not_to include(unfiled.id)
+    end
+  end
 end
