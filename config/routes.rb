@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     # Addressed by position, the number the student sees ("Pregunta 3 de 10").
     resources :questions, only: :show, controller: "exam_questions", param: :position do
       resource :answer, only: %i[create update]
+      resource :report, only: :create, controller: "question_reports"
     end
   end
 

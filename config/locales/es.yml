@@ -326,6 +326,28 @@ es:
         ambiguous: "Otro modelo no pudo decidir al menos una pregunta con la recomendación citada. Revisa si la pregunta pide más de lo que la recomendación dice."
         unsupported: "Otro modelo eligió una opción distinta en al menos una pregunta. Revisa la respuesta marcada como correcta."
         unverified: "Este caso todavía no pasa por la segunda opinión."
+  question_reports:
+    reasons:
+      incorrect_answer: "La respuesta marcada como correcta está mal"
+      ambiguous: "La pregunta es ambigua"
+      outdated_guideline: "La guía ya cambió"
+      wrong_explanation: "La explicación o el porqué de una opción está mal"
+      typo: "Errata"
+      other: "Otro"
+    panel:
+      summary: "Sugerir cambios"
+      intro: "¿Algo no cuadra en esta pregunta? Cuéntanos y la revisaremos con la guía en la mano."
+      reason: "¿Qué encontraste?"
+      comment: "Comentario (opcional)"
+      comment_placeholder: "Por ejemplo: la edición 2021 de la guía recomienda otra cosa."
+      comment_hint: "Si eliges «Otro», dinos brevemente qué cambiarías."
+      submit: "Enviar sugerencia"
+      thanks: "Gracias por avisarnos. Revisaremos esta pregunta y la corregiremos si hace falta."
+      pending: "Ya nos enviaste una sugerencia sobre esta pregunta. La estamos revisando."
+      errors:
+        reason: "Elige qué encontraste."
+        comment_blank: "Cuéntanos brevemente qué cambiarías."
+        comment_too_long: "El comentario puede tener hasta %{count} caracteres."
   activerecord:
     errors:
       models:

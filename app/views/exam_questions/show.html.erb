@@ -28,6 +28,7 @@
       <% if answer && !answer.correct? %>
         <%= render "triage", answer: answer, exam: @exam, exam_question: @exam_question %>
       <% end %>
+      <%= render "question_reports/panel", exam: @exam, exam_question: @exam_question %>
     <% else %>
       <%= render "form", exam: @exam, exam_question: @exam_question %>
     <% end %>

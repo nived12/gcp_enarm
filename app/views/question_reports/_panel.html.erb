@@ -1,0 +1,47 @@
+<%# "Sugerir cambios", folded under the explanation: most students never need it, and the
+    ones who do should find it where they noticed the problem. Answered in place. %>
+<% question = exam_question.question %>
+<% report = local_assigns[:report] || Current.user.question_reports.status_open.find_by(question: question) || QuestionReport.new %>
+<%= turbo_frame_tag dom_id(question, :report) do %>
+  <section class="mt-8">
+    <% if report.persisted? %>
+      <p role="status" class="rounded-card bg-surface-sunk px-5 py-4 text-sm leading-relaxed text-ink-muted">
+        <%= report.previously_new_record? ? t("question_reports.panel.thanks") : t("question_reports.panel.pending") %>
+      </p>
+    <% else %>
+      <details class="rounded-card border border-line bg-surface" <%= "open" if report.errors.any? %>>
+        <summary class="flex min-h-11 cursor-pointer items-center px-5 text-sm font-medium text-ink-muted hover:text-accent">
+          <%= t("question_reports.panel.summary") %>
+        </summary>
+
+        <%= form_with model: report, url: exam_question_report_path(exam, exam_question.position), method: :post,
+              class: "border-t border-line px-5 py-5" do |form| %>
+          <p class="mb-5 text-sm leading-relaxed text-ink-muted"><%= t("question_reports.panel.intro") %></p>
+
+          <%= render "shared/pill_radios", legend: t("question_reports.panel.reason"), name: "question_report[reason]",
+                options: QuestionReport.reasons.keys.map { |reason| [t("question_reports.reasons.#{reason}"), reason] },
+                selected: report.reason, id_prefix: dom_id(question, :report_reason) %>
+          <% if report.errors.include?(:reason) %>
+            <p class="mt-2 text-xs font-medium text-incorrect"><%= t("question_reports.panel.errors.reason") %></p>
+          <% end %>
+
+          <div class="mt-6">
+            <%= form.label :comment, t("question_reports.panel.comment"), class: "mb-1.5 block text-sm font-medium text-ink" %>
+            <%= form.text_area :comment, rows: 3, maxlength: QuestionReport::COMMENT_LIMIT,
+                  placeholder: t("question_reports.panel.comment_placeholder"),
+                  aria: { describedby: dom_id(question, :report_comment_hint) }, class: "input py-3" %>
+            <p id="<%= dom_id(question, :report_comment_hint) %>" class="mt-2 text-xs text-ink-faint"><%= t("question_reports.panel.comment_hint") %></p>
+            <% if report.errors.include?(:comment) %>
+              <p class="mt-1 text-xs font-medium text-incorrect">
+                <%= report.errors.of_kind?(:comment, :blank) ? t("question_reports.panel.errors.comment_blank") :
+                      t("question_reports.panel.errors.comment_too_long", count: QuestionReport::COMMENT_LIMIT) %>
+              </p>
+            <% end %>
+          </div>
+
+          <%= form.button t("question_reports.panel.submit"), class: "btn btn--ghost mt-6 w-full sm:w-auto" %>
+        <% end %>
+      </details>
+    <% end %>
+  </section>
+<% end %>

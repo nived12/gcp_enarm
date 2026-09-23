@@ -324,6 +324,28 @@ en:
         ambiguous: "Another model could not decide at least one question from the cited recommendation. Check whether the question asks more than the recommendation says."
         unsupported: "Another model chose a different option on at least one question. Check the answer marked correct."
         unverified: "This case has not been through the second opinion yet."
+  question_reports:
+    reasons:
+      incorrect_answer: "The answer marked correct is wrong"
+      ambiguous: "The question is ambiguous"
+      outdated_guideline: "The guideline has changed"
+      wrong_explanation: "The explanation or an option's rationale is wrong"
+      typo: "Typo"
+      other: "Other"
+    panel:
+      summary: "Suggest changes"
+      intro: "Something off about this question? Tell us and we will check it against the guideline."
+      reason: "What did you find?"
+      comment: "Comment (optional)"
+      comment_placeholder: "For example: the 2021 edition of the guideline recommends something else."
+      comment_hint: "If you choose “Other”, tell us briefly what you would change."
+      submit: "Send suggestion"
+      thanks: "Thanks for letting us know. We will review this question and fix it if needed."
+      pending: "You already sent a suggestion about this question. We are reviewing it."
+      errors:
+        reason: "Choose what you found."
+        comment_blank: "Tell us briefly what you would change."
+        comment_too_long: "The comment can be up to %{count} characters."
   activerecord:
     errors:
       models:
