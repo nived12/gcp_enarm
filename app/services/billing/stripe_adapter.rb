@@ -25,6 +25,10 @@ module Billing
     # Prices travel inline as price_data rather than as dashboard Price ids, so the amount
     # charged is the one Plan shows on the pricing page and there is nothing to keep in
     # sync. No payment_method_types: the dashboard decides, which is where OXXO is enabled.
+    #
+    # No `locale` either, so Checkout follows the browser. stripe 19.6.2 (API
+    # 2026-08-26.dahlia) types it as a free String and lists no accepted values, so
+    # "es-419" could not be confirmed from the bundle; confirm it in Stripe's docs first.
     def create_checkout_session(user:, plan:, success_url:, cancel_url:)
       metadata = { user_id: user.id.to_s, plan_code: plan.code }
       session = client.v1.checkout.sessions.create(
