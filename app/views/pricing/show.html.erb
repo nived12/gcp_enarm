@@ -17,7 +17,10 @@
 <ul class="mt-8 grid gap-3 sm:grid-cols-2" aria-label="<%= t("pricing.plans_label") %>">
   <% @plans.each do |plan| %>
     <% best = plan.code == "twelve_months" %>
-    <li class="card flex flex-col px-5 py-5 <%= "ring-2 ring-accent" if best %>" data-plan="<%= plan.code %>">
+    <%# A plan chosen before signing up takes the emphasis the best value has otherwise. %>
+    <% highlighted = @chosen_plan ? plan.code == @chosen_plan : best %>
+    <li id="plan-<%= plan.code %>" class="card flex flex-col px-5 py-5 <%= "ring-2 ring-accent" if highlighted %>"
+        data-plan="<%= plan.code %>" <%= "data-chosen" if plan.code == @chosen_plan %>>
       <div class="flex items-center justify-between gap-3">
         <h2 class="text-base font-semibold text-ink"><%= t("billing.plans.#{plan.code}.name") %></h2>
         <% if best %>
@@ -39,9 +42,11 @@
         <% elsif signed_in %>
           <%# Turbo cannot follow a redirect to another origin, so this form is a plain submit. %>
           <%= button_to t("pricing.choose", plan: t("billing.plans.#{plan.code}.name")), checkouts_path(plan: plan.code),
-                class: "btn w-full #{best ? "btn--primary" : "btn--ghost"}", form: { data: { turbo: false } } %>
+                class: "btn w-full #{highlighted ? "btn--primary" : "btn--ghost"}", form: { data: { turbo: false } } %>
         <% else %>
-          <%= link_to t("pricing.sign_up_to_buy"), new_registration_path, class: "btn btn--ghost w-full" %>
+          <%= link_to t("pricing.sign_up_to_buy"),
+                new_registration_path(return_to: pricing_path(plan: plan.code, anchor: "plan-#{plan.code}")),
+                class: "btn btn--ghost w-full" %>
         <% end %>
       </div>
     </li>

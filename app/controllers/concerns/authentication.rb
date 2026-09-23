@@ -34,6 +34,16 @@ module Authentication
     redirect_to new_session_path
   end
 
+  # A page that sends a visitor to sign in or sign up can ask to get them back with
+  # ?return_to=. Only a path on this site is kept — url_from refuses other hosts,
+  # protocol-relative "//host" and anything URI cannot parse — so the parameter cannot
+  # be turned into an open redirect. An unsafe value is dropped, not reported.
+  def remember_return_to
+    location = params[:return_to]
+    location = location.is_a?(String) && url_from(location)
+    session[:return_to_after_authenticating] = location if location
+  end
+
   def after_authentication_url
     session.delete(:return_to_after_authenticating) || root_url
   end

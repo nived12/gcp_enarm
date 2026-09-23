@@ -6,6 +6,7 @@ class SessionsController < ApplicationController
   }
 
   def new
+    remember_return_to
   end
 
   def create

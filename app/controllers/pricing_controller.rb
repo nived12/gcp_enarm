@@ -6,5 +6,7 @@ class PricingController < ApplicationController
   def show
     @plans = Plan.all
     @checkout_available = Billing::StripeAdapter.checkout_available?
+    # The plan a visitor picked before signing up, brought back by return_to.
+    @chosen_plan = Plan.find(params[:plan])&.code
   end
 end

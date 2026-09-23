@@ -6,6 +6,7 @@ class RegistrationsController < ApplicationController
   }
 
   def new
+    remember_return_to
     @user = User.new
   end
 
@@ -14,7 +15,7 @@ class RegistrationsController < ApplicationController
 
     if @user.save
       start_new_session_for(@user)
-      redirect_to root_path, notice: t("registrations.create.welcome")
+      redirect_to after_authentication_url, notice: t("registrations.create.welcome")
     else
       render :new, status: :unprocessable_content
     end
