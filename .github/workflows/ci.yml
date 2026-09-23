@@ -63,6 +63,9 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build && yarn build:css
+      # The system specs drive Chromium; the npm package pins which build it needs.
+      - name: Install the Chromium that Playwright drives
+        run: npx playwright install --with-deps chromium
       - name: Run specs across all cores, with coverage
         run: COVERAGE=1 bin/ci-test
       - name: Check coverage against the committed floor
