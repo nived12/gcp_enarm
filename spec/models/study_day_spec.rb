@@ -25,10 +25,11 @@ RSpec.describe StudyDay do
   end
 
   describe ".qualifies?" do
-    it "takes ten questions, or one pearls session" do
+    it "takes ten questions, or one whole pearls session of ten cards" do
       expect(described_class.qualifies?(9, 0)).to be(false)
       expect(described_class.qualifies?(10, 0)).to be(true)
-      expect(described_class.qualifies?(0, 1)).to be(true)
+      expect(described_class.qualifies?(0, 9)).to be(false)
+      expect(described_class.qualifies?(0, 10)).to be(true)
     end
   end
 
@@ -41,6 +42,17 @@ RSpec.describe StudyDay do
 
       expect(user.study_days.order(:date).pluck(:date, :questions_answered))
         .to eq([[Date.new(2026, 9, 23), 2], [Date.new(2026, 9, 24), 1]])
+    end
+  end
+
+  describe ".count_pearl!" do
+    it "counts pearls on the same day row as answers, without touching the answers" do
+      at = Time.zone.local(2026, 9, 23, 12)
+
+      described_class.count_answer!(user, at: at)
+      2.times { described_class.count_pearl!(user, at: at) }
+
+      expect(user.study_days.pluck(:questions_answered, :pearls_reviewed)).to eq([[1, 2]])
     end
   end
 
