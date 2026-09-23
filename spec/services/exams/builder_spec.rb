@@ -156,6 +156,6 @@ RSpec.describe Exams::Builder do
   end
 
   it "refuses a mode it does not know" do
-    expect(build(mode: "weak_spots").errors.full_messages).to eq([I18n.t("exams.builder.unknown_mode")])
+    expect(build(mode: "no_such_mode").errors.full_messages).to eq([I18n.t("exams.builder.unknown_mode")])
   end
 end
