@@ -1,21 +1,20 @@
-*Última actualización: [FECHA]. [DECISIÓN DEL TITULAR: confirmar el plazo de 7 días propuesto abajo.]*
+*Última actualización: [FECHA]. [REVISIÓN LEGAL: confirmar que esta política es compatible con la Ley Federal de Protección al Consumidor para servicios digitales de pago único.]*
 
 ## En resumen
 
-Si compraste un periodo de acceso y decides que no es para ti, **te devolvemos el total dentro de los 7 días naturales siguientes a la compra**, sin preguntas.
+**No hacemos reembolsos por cambio de opinión.** Por eso puedes probar la plataforma completa antes de pagar: al crear tu cuenta tienes un periodo de prueba sin límite, y después sigues teniendo preguntas gratis cada día.
 
-## Cómo pedirlo
+## Nada se renueva solo
 
-Escríbenos a **[CORREO DE CONTACTO]** desde el correo de tu cuenta, indicando la fecha de la compra. No necesitas explicar el motivo.
+Cada periodo de acceso es un solo pago. No guardamos tu tarjeta y nunca te cobramos de nuevo sin que lo decidas, así que no hay nada que cancelar: tu acceso sigue completo hasta la fecha en que termina tu periodo, y después tu cuenta pasa al plan gratuito. Tus exámenes y estadísticas se conservan.
 
-## Qué pasa después
+## Cuándo sí te devolvemos el dinero
 
-- Hacemos el reembolso por Stripe al mismo medio de pago en un plazo de 5 días hábiles desde tu solicitud. Tu banco puede tardar unos días más en reflejarlo.
-- Si pagaste en efectivo, te pediremos los datos necesarios para devolverte el dinero.
-- Al reembolsarse, ese periodo deja de darte acceso en ese momento. Si ya habías comprado otro periodo para después, empieza de inmediato y conservas todos sus días; si no, tu cuenta vuelve al plan gratuito. Tus exámenes y estadísticas se conservan.
+- **Cobro duplicado:** si se te cobró dos veces el mismo periodo.
+- **Error nuestro:** si pagaste y no recibiste el acceso, o se te cobró un monto distinto al publicado.
 
-## Después de 7 días
+En esos casos escríbenos a **[CORREO DE CONTACTO]** desde el correo de tu cuenta, con la fecha del cobro. Lo devolvemos por Stripe al mismo medio de pago en un plazo de 5 días hábiles; tu banco puede tardar unos días más en reflejarlo. Si pagaste en efectivo, te pediremos los datos necesarios para devolvértelo.
 
-Pasado ese plazo no hacemos reembolsos parciales por el tiempo no usado, porque los periodos no se renuevan y nunca te cobraremos de nuevo sin que lo decidas. Si hubo un cobro duplicado o un error nuestro, te lo devolvemos siempre, sin importar la fecha.
+Un periodo reembolsado deja de darte acceso en ese momento. Si ya habías comprado otro para después, empieza de inmediato y conservas todos sus días.
 
 Esto no limita los derechos que te reconoce la Ley Federal de Protección al Consumidor.

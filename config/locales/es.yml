@@ -572,7 +572,7 @@ es:
       welcome: "Tu cuenta está lista. Te damos la bienvenida."
   time_zones:
     title: "Tu zona horaria"
-    hint: "Tu día de estudio termina a las 4 a. m. de esta hora: ahí cierran tu racha y tus preguntas gratuitas del día. Chihuahua usa la hora del centro."
+    hint: "Tu día termina a la medianoche de esta hora: ahí cierran tu racha y tus preguntas gratuitas del día. Chihuahua usa la hora del centro."
     option: "%{name} · %{time}"
     submit: "Guardar zona horaria"
     updated: "Zona horaria actualizada."
@@ -622,7 +622,7 @@ es:
       frozen:
         one: "Un protector cubrió el %{dates}."
         other: "Tus protectores cubrieron %{dates}."
-      rules: "Con %{minimum} preguntas al día la mantienes. Cada %{days} días de estudio ganas un protector, hasta %{max}, que se usa solo si un día no puedes, como en una guardia. El día termina a las 4 a. m."
+      rules: "Con %{minimum} preguntas al día la mantienes. Cada %{days} días de estudio ganas un protector, hasta %{max}, que se usa solo si un día no puedes, como en una guardia. El día termina a la medianoche."
     coverage:
       title: "Lo que has visto"
       intro: "Casos del banco que ya respondiste, por área. El ENARM enmarca sus casos en Salud Pública, Urgencias y Medicina Familiar, así que también cuentan."
@@ -717,7 +717,7 @@ es:
         answer: "En cuanto Stripe confirma el pago, normalmente en segundos. Si elegiste pagar en efectivo, se activa cuando el pago se acredita."
       refunds:
         question: "¿Puedo pedir un reembolso?"
-        answer: "Sí, en los términos de nuestra política de reembolsos."
+        answer: "No por cambio de opinión: por eso puedes probarla completa y gratis antes de pagar. Si te cobramos dos veces o hubo un error nuestro, te lo devolvemos siempre."
 
   landing:
     different:

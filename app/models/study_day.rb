@@ -1,13 +1,12 @@
 # What one student did on one day of their own calendar: the rollup the daily streak is
 # computed from.
 #
-# The day turns over at 4 a.m. in the student's time zone, not at midnight. Someone
-# answering questions at 1 a.m. after a guardia is still on the day they started, and a
-# boundary at midnight would ask them to stay up to keep yesterday alive.
+# The day turns over at midnight in the student's time zone. A 4 a.m. boundary was tried
+# for the student studying after a guardia, and dropped by the owner on 2026-09-23:
+# everyone reads 00:00 as a new day, so a count that carried on past it looked like a
+# bug in the free allowance, not a kindness.
 class StudyDay < ApplicationRecord
   belongs_to :user
-
-  DAY_STARTS_AT_HOUR = 4
 
   # Small on purpose: a two-minute session between consults keeps the streak. It rewards
   # showing up, not volume, so an intern on a 36-hour shift can still keep it without
@@ -16,20 +15,16 @@ class StudyDay < ApplicationRecord
 
   validates :date, presence: true, uniqueness: { scope: :user_id }
 
-  # Read off the wall clock rather than by subtracting four hours, so the boundary stays
-  # at 4 a.m. on the night a border zone changes its clocks.
   def self.date_for(time, time_zone)
-    local = time.in_time_zone(time_zone)
-    local.hour < DAY_STARTS_AT_HOUR ? local.to_date - 1 : local.to_date
+    time.in_time_zone(time_zone).to_date
   end
 
-  # The instants that belong to `date`, from its 4 a.m. to the next one, as a range a
+  # The instants that belong to `date`, from its midnight to the next, as a range a
   # timestamp index can serve. Anything counted per study day — the streak, the free
   # allowance — must use this and `date_for`, so the two never disagree about "today".
   def self.time_range(date, time_zone)
     zone = ActiveSupport::TimeZone[time_zone]
-    starts = ->(day) { zone.local(day.year, day.month, day.day, DAY_STARTS_AT_HOUR) }
-    starts.call(date)...starts.call(date + 1)
+    zone.local(date.year, date.month, date.day)...zone.local((date + 1).year, (date + 1).month, (date + 1).day)
   end
 
   # One pearls session: ten statements, about two minutes.

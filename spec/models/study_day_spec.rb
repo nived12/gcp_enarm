@@ -4,20 +4,15 @@ RSpec.describe StudyDay do
   let(:user) { create(:user) }
 
   describe ".date_for" do
-    it "keeps the small hours on the day before, until 4 a.m. where the student is" do
-      zone = "America/Mexico_City"
+    it "turns over at midnight where the student is" do
+      zone = Time.find_zone("America/Mexico_City")
 
-      expect(
-        described_class.date_for(
-          Time.find_zone(zone).local(2026, 9, 23, 3, 59),
-          zone
-        )
-      ).to eq(Date.new(2026, 9, 22))
-      expect(described_class.date_for(Time.find_zone(zone).local(2026, 9, 23, 4, 0), zone)).to eq(Date.new(2026, 9, 23))
+      expect(described_class.date_for(zone.local(2026, 9, 22, 23, 59), zone.name)).to eq(Date.new(2026, 9, 22))
+      expect(described_class.date_for(zone.local(2026, 9, 23, 0, 0), zone.name)).to eq(Date.new(2026, 9, 23))
     end
 
     it "reads the clock of the student's own zone, not the server's" do
-      instant = Time.utc(2026, 9, 23, 10, 30)
+      instant = Time.utc(2026, 9, 23, 6, 30)
 
       expect(described_class.date_for(instant, "America/Mexico_City")).to eq(Date.new(2026, 9, 23))
       expect(described_class.date_for(instant, "America/Tijuana")).to eq(Date.new(2026, 9, 22))
@@ -25,21 +20,21 @@ RSpec.describe StudyDay do
   end
 
   describe ".time_range" do
-    it "runs from the day's 4 a.m. to the next one, in the student's zone" do
+    it "runs from the day's midnight to the next, in the student's zone" do
       range = described_class.time_range(Date.new(2026, 9, 23), "America/Cancun")
 
-      expect(range).to eq(Time.utc(2026, 9, 23, 9)...Time.utc(2026, 9, 24, 9))
+      expect(range).to eq(Time.utc(2026, 9, 23, 5)...Time.utc(2026, 9, 24, 5))
       expect([range.begin, range.end - 1.second].map { |time| described_class.date_for(time, "America/Cancun") })
         .to eq([Date.new(2026, 9, 23)] * 2)
     end
 
-    it "keeps both ends at 4 a.m. across a change of clocks" do
+    it "keeps both ends at midnight across a change of clocks" do
       zone = "America/Tijuana"
-      range = described_class.time_range(Date.new(2026, 3, 7), zone)
+      range = described_class.time_range(Date.new(2026, 3, 8), zone)
 
       expect(range.end - range.begin).to eq(23.hours)
-      expect(described_class.date_for(range.end, zone)).to eq(Date.new(2026, 3, 8))
-      expect(described_class.date_for(range.end - 1.second, zone)).to eq(Date.new(2026, 3, 7))
+      expect(described_class.date_for(range.end, zone)).to eq(Date.new(2026, 3, 9))
+      expect(described_class.date_for(range.end - 1.second, zone)).to eq(Date.new(2026, 3, 8))
     end
   end
 
@@ -84,8 +79,8 @@ RSpec.describe StudyDay do
     it "gives the day the student is on" do
       user.update!(time_zone: "America/Cancun")
 
-      expect(user.study_date(Time.utc(2026, 9, 23, 9, 0))).to eq(Date.new(2026, 9, 23))
-      expect(user.study_date(Time.utc(2026, 9, 23, 8, 59))).to eq(Date.new(2026, 9, 22))
+      expect(user.study_date(Time.utc(2026, 9, 23, 5, 0))).to eq(Date.new(2026, 9, 23))
+      expect(user.study_date(Time.utc(2026, 9, 23, 4, 59))).to eq(Date.new(2026, 9, 22))
     end
   end
 end

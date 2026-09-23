@@ -6,7 +6,7 @@
 # * every seventh day studied within a streak earns a freeze, at most two banked, and a
 #   missed day spends one automatically. A day a freeze covered keeps the streak going
 #   but does not add to it or to the next freeze;
-# * today is never a missed day — there is time left until 4 a.m.;
+# * today is never a missed day — there is time left until midnight;
 # * a lost streak simply ends. The next day studied starts a new one and the best is kept.
 module Stats
   class StreakCalculator < ApplicationService

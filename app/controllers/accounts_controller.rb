@@ -7,7 +7,7 @@ class AccountsController < ApplicationController
   end
 
   # Only the time zone is edited here: the study day, the streak and the free allowance
-  # all end at 4 a.m. in it.
+  # all end at midnight in it.
   def update
     if Current.user.update(time_zone: params.expect(:time_zone))
       redirect_to account_path, notice: t("time_zones.updated"), status: :see_other

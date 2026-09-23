@@ -90,7 +90,7 @@ RSpec.describe SubscriptionAccess do
       expect(result[:message]).to eq(I18n.t("exams.denied.daily_limit_reached", limit: 20))
     end
 
-    it "counts the student's study day, which runs past midnight to 4 a.m. where they are" do
+    it "counts the student's own calendar day, which ends at midnight where they are" do
       user = create(:user, :trial_expired, time_zone: "America/Tijuana")
       kase = create(:published_case, questions_count: 3)
       exam = create(:exam, user: user)
@@ -99,13 +99,13 @@ RSpec.describe SubscriptionAccess do
             .create_answer!(answered_at: time)
       end
       zone = Time.find_zone("America/Tijuana")
-      answer_at.call(0, zone.local(2026, 9, 23, 3, 59))
-      answer_at.call(1, zone.local(2026, 9, 23, 22))
-      answer_at.call(2, zone.local(2026, 9, 24, 1, 30))
+      answer_at.call(0, zone.local(2026, 9, 22, 23, 59))
+      answer_at.call(1, zone.local(2026, 9, 23, 8))
+      answer_at.call(2, zone.local(2026, 9, 23, 22))
       allow(SubscriptionAccess).to receive(:free_daily_questions).and_return(2)
 
-      travel_to(zone.local(2026, 9, 24, 3, 0)) { expect(user.subscription_access_result[:allowed]).to be(false) }
-      travel_to(zone.local(2026, 9, 24, 4, 0)) { expect(user.subscription_access_result[:allowed]).to be(true) }
+      travel_to(zone.local(2026, 9, 23, 23, 59)) { expect(user.subscription_access_result[:allowed]).to be(false) }
+      travel_to(zone.local(2026, 9, 24, 0, 0)) { expect(user.subscription_access_result[:allowed]).to be(true) }
     end
 
     it "takes the message from the scope the caller names" do

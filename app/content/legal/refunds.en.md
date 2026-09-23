@@ -1,21 +1,20 @@
-*Last updated: [DATE]. [OWNER DECISION: confirm the 7-day period proposed below.] The Spanish version governs.*
+*Last updated: [DATE]. [LEGAL REVIEW: confirm this policy is compatible with Mexico's Federal Consumer Protection Law for single-payment digital services.] The Spanish version governs.*
 
 ## In short
 
-If you bought an access window and decide it is not for you, **we refund the full amount within 7 calendar days of the purchase**, no questions asked.
+**We don't refund a change of mind.** That is why you can try the whole platform before paying: a new account gets an unlimited trial, and free questions every day after it.
 
-## How to ask
+## Nothing renews by itself
 
-Write to **[CONTACT EMAIL]** from your account's email address with the date of the purchase. You do not need to give a reason.
+Each access window is a single payment. We don't store your card and never charge you again unless you decide to, so there is nothing to cancel: your access stays complete until your window's end date, and then your account moves to the free plan. Your exams and stats are kept.
 
-## What happens next
+## When we do refund
 
-- We refund through Stripe to the same payment method within 5 business days of your request. Your bank may take a few more days to show it.
-- If you paid in cash, we will ask you for the details needed to return the money.
-- Once refunded, that window stops granting access right away. If you had already bought another window to follow it, that one starts immediately and keeps all its days; otherwise your account returns to the free plan. Your exams and statistics are kept.
+- **Duplicate charge:** you were charged twice for the same window.
+- **Our mistake:** you paid and did not get access, or were charged an amount other than the published price.
 
-## After 7 days
+In those cases write to **[CONTACT EMAIL]** from your account's email, with the date of the charge. We refund through Stripe to the same payment method within 5 business days; your bank may take a few more days to show it. If you paid in cash, we will ask for the details needed to return it.
 
-After that period we do not give partial refunds for unused time, because windows never renew and we will never charge you again unless you decide to buy. A duplicate charge or a mistake on our side is always refunded, whatever the date.
+A refunded window stops giving access at that moment. If you had already bought another one for afterwards, it starts at once and keeps all its days.
 
 This does not limit your rights under Mexico's Federal Consumer Protection Law.

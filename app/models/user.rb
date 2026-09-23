@@ -37,7 +37,7 @@ class User < ApplicationRecord
     password_salt&.last(10)
   end
 
-  # The day the student is on, by the study calendar's 4 a.m. boundary.
+  # The day the student is on, in their own time zone.
   def study_date(time = Time.current)
     StudyDay.date_for(time, time_zone)
   end

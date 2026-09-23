@@ -70,8 +70,7 @@ module SubscriptionAccess
 
   private
 
-  # Today is the study day, which ends at 4 a.m. where the student is, so the allowance
-  # does not run out at midnight in the middle of a session the streak still counts.
+  # Today is the student's own calendar day, where they are, the same day the streak counts.
   def questions_answered_today
     Answer.joins(exam_question: :exam).where(exams: { user_id: id }, answered_at: study_day_times).count
   end

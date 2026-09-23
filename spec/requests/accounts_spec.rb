@@ -90,7 +90,7 @@ RSpec.describe "Account", type: :request do
 
       expect(response).to redirect_to(account_path)
       expect(flash[:notice]).to eq(I18n.t("time_zones.updated"))
-      expect(student.reload.study_date(Time.utc(2026, 9, 23, 10, 30))).to eq(Date.new(2026, 9, 22))
+      expect(student.reload.study_date(Time.utc(2026, 9, 23, 6, 30))).to eq(Date.new(2026, 9, 22))
     end
 
     it "refuses a zone that does not exist" do

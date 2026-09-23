@@ -5,7 +5,7 @@ RSpec.describe "Study plans", type: :request do
   let(:today) { Date.new(2026, 10, 5) }
   let!(:syllabus) { create_syllabus }
 
-  # Noon in Mexico City, well clear of the 4 a.m. day boundary.
+  # Noon in Mexico City, well clear of the midnight day boundary.
   around { |example| travel_to(Time.find_zone("America/Mexico_City").local(2026, 10, 5, 12)) { example.run } }
 
   before { post session_path, params: { email: student.email, password: "contrasena-segura" } }

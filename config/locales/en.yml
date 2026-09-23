@@ -570,7 +570,7 @@ en:
       welcome: "Your account is ready. Welcome."
   time_zones:
     title: "Your time zone"
-    hint: "Your study day ends at 4 a.m. in this zone: that is when your streak and your free questions for the day close. Chihuahua keeps central time."
+    hint: "Your day ends at midnight in this zone: that is when your streak and your free questions for the day close. Chihuahua keeps central time."
     option: "%{name} · %{time}"
     submit: "Save time zone"
     updated: "Time zone updated."
@@ -620,7 +620,7 @@ en:
       frozen:
         one: "A freeze covered %{dates}."
         other: "Your freezes covered %{dates}."
-      rules: "%{minimum} questions a day keeps it. Every %{days} days of study earns a freeze, up to %{max}, spent only on a day you cannot study, like a night shift. The day ends at 4 a.m."
+      rules: "%{minimum} questions a day keeps it. Every %{days} days of study earns a freeze, up to %{max}, spent only on a day you cannot study, like a night shift. The day ends at midnight."
     coverage:
       title: "What you have seen"
       intro: "Cases from the bank you have already answered, by area. The ENARM frames its cases in Public Health, Emergency and Family Medicine, so those count too."
@@ -715,7 +715,7 @@ en:
         answer: "As soon as Stripe confirms the payment, usually within seconds. If you chose to pay in cash, it starts when the payment clears."
       refunds:
         question: "Can I get a refund?"
-        answer: "Yes, under the terms of our refund policy."
+        answer: "Not for a change of mind: that is why you can try all of it free before paying. If we charged you twice or made a mistake, we always refund it."
 
   landing:
     different:
