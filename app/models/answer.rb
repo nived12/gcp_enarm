@@ -21,8 +21,6 @@ class Answer < ApplicationRecord
   validates :exam_question_id, uniqueness: true
   validate :option_belongs_to_the_question
 
-  scope :answered_on, ->(day) { where(answered_at: day.all_day) }
-
   # A new answer, a changed one and a reason given later all move the case's review
   # schedule, which is replayed from the answers rather than kept alongside them.
   after_commit :reschedule_review, on: %i[create update]

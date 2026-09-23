@@ -16,8 +16,20 @@ class StudyDay < ApplicationRecord
 
   validates :date, presence: true, uniqueness: { scope: :user_id }
 
+  # Read off the wall clock rather than by subtracting four hours, so the boundary stays
+  # at 4 a.m. on the night a border zone changes its clocks.
   def self.date_for(time, time_zone)
-    (time.in_time_zone(time_zone) - DAY_STARTS_AT_HOUR.hours).to_date
+    local = time.in_time_zone(time_zone)
+    local.hour < DAY_STARTS_AT_HOUR ? local.to_date - 1 : local.to_date
+  end
+
+  # The instants that belong to `date`, from its 4 a.m. to the next one, as a range a
+  # timestamp index can serve. Anything counted per study day — the streak, the free
+  # allowance — must use this and `date_for`, so the two never disagree about "today".
+  def self.time_range(date, time_zone)
+    zone = ActiveSupport::TimeZone[time_zone]
+    starts = ->(day) { zone.local(day.year, day.month, day.day, DAY_STARTS_AT_HOUR) }
+    starts.call(date)...starts.call(date + 1)
   end
 
   # One pearls session: ten statements, about two minutes.

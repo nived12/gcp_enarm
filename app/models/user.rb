@@ -30,4 +30,8 @@ class User < ApplicationRecord
   def study_date(time = Time.current)
     StudyDay.date_for(time, time_zone)
   end
+
+  def study_day_times(date = study_date)
+    StudyDay.time_range(date, time_zone)
+  end
 end
