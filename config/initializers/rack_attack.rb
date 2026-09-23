@@ -28,6 +28,12 @@ class Rack::Attack
     request.ip if request.post? && request.path == "/registration"
   end
 
+  # Starting a Google sign-in, the return from Google and the failure page: each start
+  # costs Google a consent screen and each return a token exchange.
+  throttle("sign-in with a provider per ip", limit: 20, period: 5.minutes) do |request|
+    request.ip if request.path.start_with?("/auth/")
+  end
+
   throttle("password reset per ip", limit: 10, period: 15.minutes) do |request|
     request.ip if request.path.start_with?("/passwords") && !request.get?
   end

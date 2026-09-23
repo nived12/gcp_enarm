@@ -83,6 +83,13 @@ gem "stripe"
 # Transactional email
 gem "resend"
 
+# "Continuar con Google". The request phase is POST-only (OmniAuth 2's default) and
+# omniauth-rails_csrf_protection checks Rails' authenticity token on it, so a third-party
+# page cannot start a sign-in in the student's browser.
+gem "omniauth", "~> 2.1"
+gem "omniauth-google-oauth2", "~> 1.2"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
+
 # Rate limiting
 gem "rack-attack"
 

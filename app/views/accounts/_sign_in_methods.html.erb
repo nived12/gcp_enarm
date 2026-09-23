@@ -1,0 +1,24 @@
+<% google = user.identities.find(&:provider_google?) %>
+<section class="card mt-6 px-5 py-5">
+  <p class="eyebrow"><%= t("identities.account.title") %></p>
+  <dl class="mt-3 divide-y divide-line text-sm">
+    <div class="py-3">
+      <dt class="font-medium text-ink"><%= t("identities.account.google") %></dt>
+      <dd class="mt-1 break-all text-ink-muted">
+        <%= google ? t("identities.account.google_linked", email: google.email) : t("identities.account.google_unlinked") %>
+      </dd>
+    </div>
+    <div class="py-3">
+      <dt class="font-medium text-ink"><%= t("attributes.password") %></dt>
+      <dd class="mt-1 text-ink-muted">
+        <% if user.password? %>
+          <%= t("identities.account.password_set") %>
+        <% else %>
+          <%= t("identities.account.password_missing") %>
+          <%= link_to t("identities.account.set_password"), new_password_path,
+                class: "inline-flex min-h-11 items-center text-accent underline underline-offset-2 hover:text-accent-hover" %>
+        <% end %>
+      </dd>
+    </div>
+  </dl>
+</section>

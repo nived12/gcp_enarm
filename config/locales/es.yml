@@ -577,6 +577,8 @@ es:
           attributes:
             email:
               taken: "ya tiene una cuenta"
+            password:
+              password_too_long: "es demasiado larga"
 
   attributes:
     first_name: "Nombre(s)"
@@ -592,6 +594,29 @@ es:
       have_account: "¿Ya tienes cuenta?"
     create:
       welcome: "Tu cuenta está lista. Te damos la bienvenida."
+  identities:
+    google:
+      continue: "Continuar con Google"
+      or: "o"
+    outcomes:
+      returning: "Entraste con Google."
+      linked: "Tu cuenta de Google quedó vinculada. Desde ahora puedes entrar con ella."
+      created: "Tu cuenta está lista. Te damos la bienvenida."
+    unverified:
+      link: "Ya hay una cuenta con ese correo, pero Google no lo ha verificado, así que no podemos vincularlas. Entra con tu contraseña."
+      create: "Google no ha verificado el correo de esa cuenta. Crea tu cuenta con correo y contraseña, o usa otra cuenta de Google."
+    already_linked: "Tu cuenta ya está vinculada con otra cuenta de Google. Entra con esa, o con tu contraseña."
+    failure:
+      cancelled: "Cancelaste el inicio de sesión con Google. Puedes intentarlo de nuevo o entrar con tu correo."
+      failed: "No pudimos iniciar sesión con Google. Intenta de nuevo o entra con tu correo."
+    account:
+      title: "Formas de entrar"
+      google: "Google"
+      google_linked: "Vinculada con %{email}"
+      google_unlinked: "Sin vincular. Si entras con Google usando este mismo correo, se vincula sola."
+      password_set: "Tienes una contraseña."
+      password_missing: "Aún no tienes contraseña; entras con Google."
+      set_password: "Crear una contraseña"
   account_names:
     title: "Tu nombre"
     hint: "Así te saludamos. Si tu nombre o tus apellidos quedaron en el campo equivocado, corrígelos aquí."

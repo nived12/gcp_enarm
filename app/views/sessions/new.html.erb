@@ -1,6 +1,8 @@
 <% content_for :title, t("sessions.new.title") %>
 
 <%= render layout: "shared/auth_panel", locals: { title: t("sessions.new.title") } do %>
+  <%= render "shared/google_button" %>
+
   <%= form_with url: session_path do |form| %>
     <%= render "shared/field", form: form, name: :email, type: :email,
           label: t("attributes.email"), autocomplete: "username",

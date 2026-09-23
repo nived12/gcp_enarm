@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -256,6 +256,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_160000) do
     t.index ["institution"], name: "index_guidelines_on_institution"
     t.index ["specialty_labels"], name: "index_guidelines_on_specialty_labels", using: :gin
     t.index ["year"], name: "index_guidelines_on_year"
+  end
+
+  create_table "identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
+    t.index ["user_id", "provider"], name: "index_identities_on_user_id_and_provider", unique: true
   end
 
   create_table "question_reports", force: :cascade do |t|
@@ -580,7 +591,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_160000) do
     t.datetime "granted_premium_until"
     t.string "last_name"
     t.string "locale", default: "es", null: false
-    t.string "password_digest", null: false
+    t.string "password_digest"
     t.string "role", default: "student", null: false
     t.string "time_zone", default: "America/Mexico_City", null: false
     t.datetime "trial_ends_at"
@@ -620,6 +631,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_160000) do
   add_foreign_key "guideline_sections", "guidelines"
   add_foreign_key "guideline_topics", "guidelines"
   add_foreign_key "guideline_topics", "topics"
+  add_foreign_key "identities", "users"
   add_foreign_key "question_reports", "questions"
   add_foreign_key "question_reports", "users"
   add_foreign_key "question_reports", "users", column: "resolved_by_id"

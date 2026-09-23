@@ -2,6 +2,12 @@ Rails.application.routes.draw do
   resource :session
   resource :registration, only: %i[new create]
   resources :passwords, param: :token
+
+  # OmniAuth's middleware answers POST /auth/:provider itself and hands the callback on
+  # with the provider's answer in request.env["omniauth.auth"].
+  get "auth/:provider/callback" => "omniauth_callbacks#create", as: :omniauth_callback,
+    constraints: { provider: /google_oauth2/ }
+  get "auth/failure" => "omniauth_callbacks#failure", as: :omniauth_failure
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

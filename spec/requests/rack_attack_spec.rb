@@ -41,6 +41,12 @@ RSpec.describe "Rack::Attack", type: :request do
     expect(response).to have_http_status(:too_many_requests)
   end
 
+  it "throttles one address starting sign-ins with Google" do
+    21.times { post "/auth/google_oauth2" }
+
+    expect(response).to have_http_status(:too_many_requests)
+  end
+
   it "throttles one address hammering the app" do
     301.times { get legal_path("terms") }
 

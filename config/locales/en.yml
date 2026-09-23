@@ -575,6 +575,8 @@ en:
           attributes:
             email:
               taken: "already has an account"
+            password:
+              password_too_long: "is too long"
 
   attributes:
     first_name: "First name(s)"
@@ -590,6 +592,29 @@ en:
       have_account: "Already have an account?"
     create:
       welcome: "Your account is ready. Welcome."
+  identities:
+    google:
+      continue: "Continue with Google"
+      or: "or"
+    outcomes:
+      returning: "Signed in with Google."
+      linked: "Your Google account is now linked. You can sign in with it from now on."
+      created: "Your account is ready. Welcome."
+    unverified:
+      link: "There is already an account with that email, but Google has not verified it, so we cannot link them. Sign in with your password."
+      create: "Google has not verified that account's email. Sign up with email and password, or use another Google account."
+    already_linked: "Your account is already linked to a different Google account. Sign in with that one, or with your password."
+    failure:
+      cancelled: "You cancelled signing in with Google. Try again or sign in with your email."
+      failed: "We could not sign you in with Google. Try again or sign in with your email."
+    account:
+      title: "Ways to sign in"
+      google: "Google"
+      google_linked: "Linked to %{email}"
+      google_unlinked: "Not linked. Sign in with Google using this same email and it links itself."
+      password_set: "You have a password."
+      password_missing: "You have no password yet; you sign in with Google."
+      set_password: "Create a password"
   account_names:
     title: "Your name"
     hint: "This is how we greet you. If your first name or surnames ended up in the wrong field, fix them here."

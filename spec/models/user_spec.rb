@@ -30,6 +30,22 @@ RSpec.describe User do
     end
   end
 
+  describe "passwords" do
+    it "lets an account exist without one, and never authenticates it" do
+      user = create(:user, email: "solo.google@gmail.com", password: nil)
+
+      expect(user).to be_valid
+      expect(user.update(time_zone: "America/Tijuana")).to be(true)
+      expect(User.authenticate_by(email: "solo.google@gmail.com", password: "cualquiera")).to be_nil
+    end
+
+    it "requires one at sign-up and reset, confirmed" do
+      expect(build(:user, password: nil).valid?(:sign_up)).to be(false)
+      expect(build(:user, password: nil).valid?(:password_reset)).to be(false)
+      expect(build(:user, password: "una", password_confirmation: "otra")).not_to be_valid
+    end
+  end
+
   describe "#full_name" do
     it "joins given names and surnames, and stands alone without surnames" do
       expect(build(:user, first_name: "María José", last_name: "Pérez López").full_name).to eq("María José Pérez López")
