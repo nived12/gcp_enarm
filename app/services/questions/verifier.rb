@@ -17,6 +17,10 @@ module Questions
     # answer another family disputes holds the whole case back.
     SEVERITY = %w[unsupported ambiguous supported].freeze
 
+    # Options go out lettered, as on the real exam. Numbered options were answered
+    # zero-based often enough to record a verifier that agreed as one that disputed.
+    LETTERS = %w[A B C D].freeze
+
     def initialize(clinical_case, run: nil)
       super()
       @clinical_case = clinical_case
@@ -63,16 +67,16 @@ module Questions
         #{clinical_case.stem}
 
         #{questions.map.with_index(1) { |question, index| block_for(question, index) }.join("\n")}
-        Para cada pregunta devuelve el número de la opción que la recomendación respalda, y
+        Para cada pregunta devuelve la letra de la opción que la recomendación respalda, y
         si la recomendación alcanza para decidirla.
 
         Devuelve SOLO JSON, sin markdown:
-        {"questions":[{"question":1,"option":2,"decidable":true,"note":"..."}]}
+        {"questions":[{"question":1,"option":"B","decidable":true,"note":"..."}]}
       TEXT
     end
 
     def block_for(question, index)
-      options = question.answer_options.map.with_index(1) { |option, number| "  #{number}. #{option.text}" }
+      options = question.answer_options.each_with_index.map { |option, index| "  #{LETTERS[index]}) #{option.text}" }
 
       <<~TEXT
         Pregunta #{index}: #{question.text}
@@ -110,6 +114,10 @@ module Questions
 
     # A question the verifier never answered is not a pass. Silence from the second
     # opinion is not assent, and the case waits rather than going live unexamined.
+    #
+    # Only a readable choice of a different option is a dispute. A verifier that says the
+    # statement cannot settle the question has guessed its option, and one whose answer
+    # cannot be read has said nothing; both leave the case ambiguous, for a person to read.
     def judge(judgement)
       question = questions[judgement["question"].to_i - 1]
       return if question.nil?
@@ -117,21 +125,15 @@ module Questions
       chosen = option_at(question, judgement["option"])
       note = ["#{question.position}.", judgement["note"]].compact_blank.join(" ")
 
-      return ["unsupported", note] unless chosen&.correct?
-      return ["ambiguous", note] unless judgement["decidable"]
+      return ["ambiguous", note] if !judgement["decidable"] || chosen.nil?
+      return ["unsupported", note] unless chosen.correct?
 
       ["supported", nil]
     end
 
-    # Ruby indexes from the end on a negative number, so a reply with no option number —
-    # or a zero — would silently select the LAST option and read as a disagreement. That
-    # happened on a live batch: the verifier agreed in its own note and was recorded as
-    # disputing the answer.
-    def option_at(question, number)
-      position = number.to_i
-      return unless position.positive?
-
-      question.answer_options[position - 1]
+    def option_at(question, letter)
+      index = LETTERS.index(letter.to_s.strip.upcase)
+      question.answer_options[index] if index
     end
 
     def record(usage)

@@ -30,7 +30,7 @@ RSpec.describe Questions::Verifier do
     )
   end
 
-  def judgement(question: 1, option: 1, decidable: true, note: "Lo dice la recomendación.")
+  def judgement(question: 1, option: "A", decidable: true, note: "Lo dice la recomendación.")
     { "question" => question, "option" => option, "decidable" => decidable, "note" => note }
   end
 
@@ -49,7 +49,7 @@ RSpec.describe Questions::Verifier do
   # it; one asked to choose has to disagree out loud.
   it "marks a case unsupported when the other family chooses a different option" do
     build_question(correct_at: 1)
-    stub_verifier("questions" => [judgement(option: 2, note: "La recomendación indica lo contrario.")])
+    stub_verifier("questions" => [judgement(option: "B", note: "La recomendación indica lo contrario.")])
 
     expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
     expect(clinical_case.reload.verification_notes).to include("La recomendación indica lo contrario")
@@ -76,20 +76,38 @@ RSpec.describe Questions::Verifier do
   it "takes the worst verdict across a case, because exams select whole cases" do
     build_question(position: 1)
     build_question(position: 2, correct_at: 1)
-    stub_verifier("questions" => [judgement, judgement(question: 2, option: 2)])
+    stub_verifier("questions" => [judgement, judgement(question: 2, option: "B")])
 
     expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
   end
 
-  # Ruby indexes from the end on a negative number, so this used to select the last
-  # option and read as a disagreement — on a live batch the verifier agreed in its note
-  # and was recorded as disputing the answer.
-  it "does not read a missing option number as a vote for the last option" do
+  # Numbered options were answered zero-based: on the pilot the verifier agreed in its
+  # own note and was recorded as disputing the answer.
+  it "reads an answer it cannot place as ambiguous, not as a dispute" do
     build_question(correct_at: 1)
-    stub_verifier("questions" => [judgement(option: 0)])
 
-    expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
+    [0, "E"].each do |unreadable|
+      stub_verifier("questions" => [judgement(option: unreadable)])
+
+      expect(described_class.call(clinical_case).payload[:verdict]).to eq("ambiguous")
+    end
     expect(clinical_case.reload.verification_notes).to be_present
+  end
+
+  it "accepts a lower-case letter" do
+    build_question(correct_at: 2)
+    stub_verifier("questions" => [judgement(option: " b ")])
+
+    expect(described_class.call(clinical_case).payload[:verdict]).to eq("supported")
+  end
+
+  # Told the statement cannot settle it, the model still has to fill in an option, and
+  # a guess that misses is not a finding against the answer.
+  it "records a question the statement cannot settle as ambiguous, whatever option it guessed" do
+    build_question(correct_at: 1)
+    stub_verifier("questions" => [judgement(option: "C", decidable: false, note: "No alcanza para decidir.")])
+
+    expect(described_class.call(clinical_case).payload[:verdict]).to eq("ambiguous")
   end
 
   it "ignores a judgement about a question that does not exist" do
@@ -168,7 +186,7 @@ RSpec.describe Questions::Verifier do
     it "never reveals which option the generator marked correct" do
       build_question(correct_at: 2)
 
-      expect(prompt_sent).to include("1. Opción 1", "2. Opción 2")
+      expect(prompt_sent).to include("A) Opción 1", "B) Opción 2")
       expect(prompt_sent).not_to match(/correcta|correct/i)
     end
 
