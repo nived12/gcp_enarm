@@ -53,10 +53,26 @@ RSpec.describe "Admin costs and ingestion", type: :request do
       expect(body).to include("Pediatría", I18n.t("admin.ingestion.unfiled"))
     end
 
+    it "shows how the published cases spread over the three contexts, and how many have none" do
+      emergency = create(:emergency_setting)
+      create_list(:published_case, 2, setting: emergency)
+      create(:published_case, setting: nil)
+      create(:clinical_case, setting: emergency)
+
+      get admin_ingestion_path
+
+      row = Nokogiri::HTML(response.body).css("tr").find { |tr| tr.at_css("th")&.text == "Urgencias" }
+      expect(row.css("td").map(&:text)).to eq(%w[0 0 2])
+      expect(response.body).to include(I18n.t("admin.ingestion.no_setting", count: 1))
+    end
+
     it "leaves out the unfiled row when every case has a specialty" do
       get admin_ingestion_path
 
-      expect(response.body).not_to include(I18n.t("admin.ingestion.unfiled"))
+      expect(response.body).not_to include(
+        I18n.t("admin.ingestion.unfiled"),
+        I18n.t("admin.ingestion.no_setting", count: 0)
+      )
       expect(response.body).to include(I18n.t("admin.ingestion.with_statements", count: 0, total: 0))
     end
   end

@@ -434,6 +434,11 @@ en:
         flag: "Case flagged. Status: %{status}."
         retire: "Case retired. Status: %{status}."
         restore: "Case restored. Status: %{status}."
+      setting:
+        title: "Setting"
+        hint: "Where the case happens. It counts in that area as well as in its specialty."
+        unknown: "Unknown"
+        done: "Case setting: %{setting}."
     question_reports:
       title: "Suggestions"
       subtitle: "What students sent through “Suggest changes”. Review the case, act on it, and close the suggestion with a note."
@@ -506,7 +511,11 @@ en:
         specialty: "Specialty"
         cases: "Cases"
         published: "Published"
+        set_here: "Published set here"
       unfiled: "No specialty"
+      no_setting:
+        one: "1 published case with no known setting: run questions:classify_settings or correct it on the review screen."
+        other: "%{count} published cases with no known setting: run questions:classify_settings or correct them on the review screen."
     users:
       title: "Users"
       subtitle: "Look up an account by email to handle a support request."

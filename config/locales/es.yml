@@ -436,6 +436,11 @@ es:
         flag: "Caso señalado. Estado: %{status}."
         retire: "Caso retirado. Estado: %{status}."
         restore: "Caso restaurado. Estado: %{status}."
+      setting:
+        title: "Contexto"
+        hint: "Dónde ocurre el caso. Cuenta en esa área además de en su especialidad."
+        unknown: "Sin identificar"
+        done: "Contexto del caso: %{setting}."
     question_reports:
       title: "Sugerencias"
       subtitle: "Lo que estudiantes enviaron desde «Sugerir cambios». Revisa el caso, actúa sobre él y cierra la sugerencia con una nota."
@@ -508,7 +513,11 @@ es:
         specialty: "Especialidad"
         cases: "Casos"
         published: "Publicados"
+        set_here: "Publicados que ocurren aquí"
       unfiled: "Sin especialidad"
+      no_setting:
+        one: "1 caso publicado sin contexto identificado: corre questions:classify_settings o corrígelo en la pantalla de revisión."
+        other: "%{count} casos publicados sin contexto identificado: corre questions:classify_settings o corrígelos en la pantalla de revisión."
     users:
       title: "Usuarios"
       subtitle: "Busca una cuenta por correo para atender una solicitud de soporte."

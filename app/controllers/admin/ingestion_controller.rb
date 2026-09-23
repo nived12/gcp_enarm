@@ -18,6 +18,9 @@ module Admin
       @specialties = Specialty.in_reading_order
       @cases_by_specialty = ClinicalCase.group(:specialty_id).count
       @published_by_specialty = ClinicalCase.status_published.group(:specialty_id).count
+      # Beside the subject columns rather than folded into them, so these still add up to
+      # the bank; this column says how the published cases spread over the three contexts.
+      @published_by_setting = ClinicalCase.status_published.group(:setting_id).count
     end
   end
 end
