@@ -44,7 +44,7 @@ RSpec.describe "Quiz Express", type: :system, viewport: :phone do
 
     # Any question is one tap away, to reread a miss before finishing.
     find("summary", text: I18n.t("exams.question.map.title")).click
-    within("details[open]") { click_link "1", exact_text: true }
+    find("details[open] a[href$='/questions/1']").click
     expect(page).to have_text(I18n.t("exams.bar.position", position: 1, total: 3))
     expect(page).to have_text(I18n.t("exams.question.wrong"))
     expect(page).to have_text("Troponina I no es el estudio inicial")
