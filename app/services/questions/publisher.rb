@@ -4,13 +4,25 @@
 # bank a student sees. A case walks through it when a second model family supported every
 # one of its answers and nobody has withdrawn it; a published case that has since lost
 # either goes back to draft.
+#
+# `cases` narrows the pass to some cases — the admin's restore button republishes the one
+# case it restored, not every draft that happens to qualify.
 module Questions
   class Publisher < ApplicationService
+    def initialize(cases: ClinicalCase.all)
+      super()
+      @cases = cases
+    end
+
     def call
-      withdrawn = ClinicalCase.status_published.where.not(id: ClinicalCase.publishable).update_all(status: "draft")
-      published = ClinicalCase.status_draft.publishable.update_all(status: "published")
+      withdrawn = cases.status_published.where.not(id: ClinicalCase.publishable).update_all(status: "draft")
+      published = cases.status_draft.publishable.update_all(status: "published")
 
       success(published: published, withdrawn: withdrawn, live: ClinicalCase.status_published.count)
     end
+
+    private
+
+    attr_reader :cases
   end
 end
