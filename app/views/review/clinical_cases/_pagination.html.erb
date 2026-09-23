@@ -1,7 +1,7 @@
 <% if @pagy.last > 1 %>
   <nav class="mt-8 flex items-center justify-between gap-4 border-t border-line pt-6">
     <% if @pagy.previous %>
-      <%= link_to t("review.pagination.previous"), review_clinical_cases_path(page: @pagy.previous),
+      <%= link_to t("review.pagination.previous"), review_clinical_cases_path(filters.merge(page: @pagy.previous)),
             class: "inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm text-ink hover:border-accent" %>
     <% else %>
       <span></span>
@@ -12,7 +12,7 @@
     </span>
 
     <% if @pagy.next %>
-      <%= link_to t("review.pagination.next"), review_clinical_cases_path(page: @pagy.next),
+      <%= link_to t("review.pagination.next"), review_clinical_cases_path(filters.merge(page: @pagy.next)),
             class: "inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm text-ink hover:border-accent" %>
     <% else %>
       <span></span>

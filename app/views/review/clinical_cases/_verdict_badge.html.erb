@@ -1,0 +1,4 @@
+<% verdict = verdict_of(clinical_case) %>
+<span class="rounded-full border px-2 py-0.5 <%= verdict_classes(verdict) %>">
+  <%= t("review.verdicts.#{verdict}") %>
+</span>

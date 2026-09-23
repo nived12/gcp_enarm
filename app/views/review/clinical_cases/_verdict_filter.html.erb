@@ -1,0 +1,17 @@
+<%# The disputed cases are where a reviewer's time goes first, so they are one tap away.
+    Counts are for the whole run, whichever filter is active. %>
+<nav class="mt-10 flex flex-wrap gap-2 text-sm" aria-label="<%= t("review.index.filter_label") %>">
+  <% active = filters[:verdict] %>
+  <%= link_to review_clinical_cases_path(filters.except(:verdict)),
+        class: "inline-flex min-h-11 items-center rounded-full border px-4 #{active.nil? ? "border-accent text-ink" : "border-line text-ink-muted hover:border-accent"}",
+        aria: { current: active.nil? ? "page" : nil } do %>
+    <%= t("review.index.all", count: @verdict_counts.values.sum) %>
+  <% end %>
+  <% @verdict_counts.each do |verdict, count| %>
+    <%= link_to review_clinical_cases_path(filters.merge(verdict: verdict)),
+          class: "inline-flex min-h-11 items-center rounded-full border px-4 #{active == verdict ? "border-accent text-ink" : "border-line text-ink-muted hover:border-accent"}",
+          aria: { current: active == verdict ? "page" : nil } do %>
+      <%= t("review.verdicts.#{verdict}") %> · <%= count %>
+    <% end %>
+  <% end %>
+</nav>

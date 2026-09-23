@@ -90,6 +90,95 @@ RSpec.describe "Review::ClinicalCases", type: :request do
     end
   end
 
+  describe "the second opinion" do
+    let!(:disputed) do
+      create(
+        :clinical_case, verification_verdict: "unsupported", stem: "Caso que el verificador disputó.",
+        verification_notes: "2. La recomendación indica otra conducta."
+      )
+    end
+
+    before { clinical_case.update!(verification_verdict: "supported") }
+
+    it "shows each case's verdict in words on the list" do
+      sign_in(reviewer)
+
+      get review_clinical_cases_path
+
+      expect(response.body).to include(I18n.t("review.verdicts.supported"), I18n.t("review.verdicts.unsupported"))
+    end
+
+    it "narrows to one verdict, counting every verdict in the run" do
+      create(:clinical_case, stem: "Caso sin verificar.")
+      sign_in(reviewer)
+
+      get review_clinical_cases_path(verdict: "unsupported")
+
+      expect(response.body).to include(disputed.stem)
+      expect(response.body).not_to include(clinical_case.stem.truncate(180))
+      expect(response.body).to include("#{I18n.t("review.verdicts.unverified")} · 1")
+      expect(response.body).to include(I18n.t("review.index.all", count: 3))
+    end
+
+    it "finds the cases the verifier has not read yet" do
+      unread = create(:clinical_case, stem: "Caso sin verificar.")
+      sign_in(reviewer)
+
+      get review_clinical_cases_path(verdict: "unverified")
+
+      expect(response.body).to include(unread.stem)
+      expect(response.body).not_to include(disputed.stem)
+    end
+
+    it "ignores a verdict it does not know rather than showing nothing" do
+      sign_in(reviewer)
+
+      get review_clinical_cases_path(verdict: "inventado")
+
+      expect(response.body).to include(disputed.stem, clinical_case.stem.truncate(180))
+    end
+
+    it "says so when a filter holds no cases, without claiming nothing was generated" do
+      sign_in(reviewer)
+
+      get review_clinical_cases_path(verdict: "ambiguous")
+
+      expect(response.body).to include(I18n.t("review.index.empty_filter.title"))
+      expect(response.body).not_to include(I18n.t("review.index.empty.title"))
+    end
+
+    it "explains the verdict on the case and lists the verifier's notes" do
+      sign_in(reviewer)
+
+      get review_clinical_case_path(disputed)
+
+      expect(response.body).to include(I18n.t("review.show.second_opinion"))
+      expect(response.body).to include(I18n.t("review.show.verdict_meaning.unsupported"))
+      expect(response.body).to include("2. La recomendación indica otra conducta.")
+    end
+
+    # Page two of a filtered list, the next case and the way back all used to drop the
+    # filter and wander into cases the reviewer had not asked for.
+    it "keeps the filter on every link out of a filtered screen" do
+      run = create(:generation_run)
+      create_list(
+        :clinical_case, Review::ClinicalCasesController::PER_PAGE + 1,
+        generation_run: run, verification_verdict: "ambiguous"
+      )
+      sign_in(reviewer)
+
+      get review_clinical_cases_path(run_id: run.id, verdict: "ambiguous")
+      page_two = review_clinical_cases_path(run_id: run.id, verdict: "ambiguous", page: 2)
+      expect(response.body).to include(ERB::Util.h(page_two))
+
+      shown = run.clinical_cases.order(created_at: :desc, id: :desc).first
+      get review_clinical_case_path(shown, run_id: run.id, verdict: "ambiguous")
+      filtered = ERB::Util.h(review_clinical_cases_path(run_id: run.id, verdict: "ambiguous"))
+      expect(response.body).to include(%(href="#{filtered}"))
+      expect(response.body).to match(%r{href="/review/clinical_cases/\d+\?run_id=#{run.id}&amp;verdict=ambiguous"})
+    end
+  end
+
   describe "moving through the batch" do
     it "offers the next case so a reviewer does not go back to the list each time" do
       older = create(:clinical_case, created_at: 1.hour.ago, stem: "Caso anterior.")
@@ -178,6 +267,17 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include("MARCADORES DE CONGESTIÓN")
       # The licence asks for it, so it is on the page and not only in the database.
       expect(response.body).to include("GPC SS-219-24 · 2024")
+    end
+
+    # Guideline figures are drawn for a printed page and are unreadable at phone width.
+    it "opens the figure full size, where it can be zoomed" do
+      clinical_case.update!(clinical_image: create(:clinical_image, :stored))
+      sign_in(reviewer)
+
+      get review_clinical_case_path(clinical_case)
+
+      expect(response.body).to include(I18n.t("review.show.open_figure"))
+      expect(response.body).to match(%r{href="[^"]*/rails/active_storage/blobs/[^"]*cuadro_2\.png"})
     end
 
     it "warns when the guideline behind the case is out of date" do

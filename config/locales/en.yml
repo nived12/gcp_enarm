@@ -93,6 +93,11 @@ en:
   review:
     denied: "This section is for clinical review only."
     expired: "%{year} guideline"
+    verdicts:
+      supported: "Supported"
+      ambiguous: "Ambiguous"
+      unsupported: "Not supported"
+      unverified: "Not verified"
     question_count:
       one: "1 question"
       other: "%{count} questions"
@@ -103,6 +108,11 @@ en:
       showing: "Showing %{from}–%{to} of %{total}"
       expired_flag: "Out of date"
       figure_flag: "With %{label}"
+      filter_label: "Filter by second opinion"
+      all: "All · %{count}"
+      empty_filter:
+        title: "No cases with this verdict"
+        body: "Pick another filter or go back to all cases."
       empty:
         title: "No generated cases yet"
         body: "Run generation and they will appear here for review."
@@ -126,6 +136,13 @@ en:
       open_guideline: "Open the guideline ↗"
       undated: "undated"
       expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."
+      second_opinion: "Second opinion"
+      open_figure: "Open the full figure ↗"
+      verdict_meaning:
+        supported: "Another model answered every question from the cited recommendation alone and chose the same option."
+        ambiguous: "Another model could not decide at least one question from the cited recommendation. Check whether the question asks more than the recommendation says."
+        unsupported: "Another model chose a different option on at least one question. Check the answer marked correct."
+        unverified: "This case has not been through the second opinion yet."
   activerecord:
     errors:
       models:

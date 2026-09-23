@@ -17,6 +17,24 @@ module ReviewHelper
     safe_join([match.pre_match, tag.mark(match[0]), match.post_match])
   end
 
+  # The second opinion's verdict on a case, naming the cases it has not read yet too.
+  def verdict_of(clinical_case)
+    clinical_case.verification_verdict || "unverified"
+  end
+
+  # Words carry the verdict; colour only agrees with them, as it does for answers. A
+  # dispute is the one that must stand out, and "not read yet" the one that should not.
+  VERDICT_CLASSES = {
+    "supported" => "border-correct text-correct",
+    "ambiguous" => "border-line-strong text-ink",
+    "unsupported" => "border-incorrect bg-incorrect-soft text-incorrect",
+    "unverified" => "border-line text-ink-faint"
+  }.freeze
+
+  def verdict_classes(verdict)
+    VERDICT_CLASSES.fetch(verdict)
+  end
+
   private
 
   def pattern_for(quote)

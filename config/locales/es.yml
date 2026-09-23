@@ -93,6 +93,11 @@ es:
   review:
     denied: "Esta sección es solo para revisión clínica."
     expired: "Guía de %{year}"
+    verdicts:
+      supported: "Respaldado"
+      ambiguous: "Ambiguo"
+      unsupported: "No respaldado"
+      unverified: "Sin verificar"
     question_count:
       one: "1 pregunta"
       other: "%{count} preguntas"
@@ -103,6 +108,11 @@ es:
       showing: "Mostrando %{from}–%{to} de %{total}"
       expired_flag: "Fuera de vigencia"
       figure_flag: "Con %{label}"
+      filter_label: "Filtrar por segunda opinión"
+      all: "Todos · %{count}"
+      empty_filter:
+        title: "Ningún caso con este veredicto"
+        body: "Elige otro filtro o vuelve a ver todos los casos."
       empty:
         title: "Todavía no hay casos generados"
         body: "Corre la generación y aparecerán aquí para revisarlos."
@@ -126,6 +136,13 @@ es:
       open_guideline: "Abrir la guía ↗"
       undated: "sin año"
       expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
+      second_opinion: "Segunda opinión"
+      open_figure: "Abrir la figura completa ↗"
+      verdict_meaning:
+        supported: "Otro modelo respondió cada pregunta usando solo la recomendación citada y eligió la misma opción."
+        ambiguous: "Otro modelo no pudo decidir al menos una pregunta con la recomendación citada. Revisa si la pregunta pide más de lo que la recomendación dice."
+        unsupported: "Otro modelo eligió una opción distinta en al menos una pregunta. Revisa la respuesta marcada como correcta."
+        unverified: "Este caso todavía no pasa por la segunda opinión."
   activerecord:
     errors:
       models:

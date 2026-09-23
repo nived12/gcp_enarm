@@ -20,8 +20,15 @@ module Review
 
     PER_PAGE = 10
 
+    # The second opinion's verdicts, plus the cases it has not read yet. A reviewer starts
+    # with the ones it disputed, so the list filters by them.
+    VERDICTS = [*ClinicalCase.verification_verdicts.keys, "unverified"].freeze
+
+    helper_method :filters
+
     def index
       @pagy, @cases = pagy(ordered.includes(:guideline, :topic, :questions, :clinical_image), limit: PER_PAGE)
+      @verdict_counts = verdict_counts
       @runs = GenerationRun.recent.limit(5)
     end
 
@@ -36,10 +43,32 @@ module Review
 
     private
 
+    # The run and verdict a reviewer narrowed to. Every link on these screens carries them,
+    # so paging, the next case and the way back all stay inside the same selection.
+    def filters
+      params.permit(:run_id, :verdict).to_h.compact_blank.symbolize_keys
+    end
+
     def scope
+      in_run.then { |cases| with_verdict(cases) }
+    end
+
+    def in_run
       cases = ClinicalCase.all
       cases = cases.where(generation_run_id: params[:run_id]) if params[:run_id].present?
       cases
+    end
+
+    def with_verdict(cases)
+      return cases unless VERDICTS.include?(params[:verdict])
+
+      cases.where(verification_verdict: params[:verdict] == "unverified" ? nil : params[:verdict])
+    end
+
+    # Counted inside the run, not inside the verdict, so each filter shows what it holds.
+    def verdict_counts
+      counts = in_run.group(:verification_verdict).count.transform_keys { |verdict| verdict || "unverified" }
+      VERDICTS.index_with { |verdict| counts.fetch(verdict, 0) }
     end
 
     # Newest first, with id as the tie-break: cases generated in the same batch share a
