@@ -46,7 +46,7 @@ module Pearls
 
     def priority
       missed_cases = ReviewCard.where(user: user).cases.select(:clinical_case_id)
-      seen_cases = ExamQuestion.joins(:exam).where(exams: { user_id: user.id }).select(:clinical_case_id)
+      seen_cases = ExamQuestion.answered_by(user).select(:clinical_case_id)
       missed = ClinicalCase.where(id: missed_cases).select(:guideline_id)
       seen = ClinicalCase.where(id: seen_cases).select(:guideline_id)
       Arel.sql(ActiveRecord::Base.sanitize_sql_array([<<~SQL.squish, Guideline.oldest_valid_year, user.id]))

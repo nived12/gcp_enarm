@@ -55,6 +55,16 @@ RSpec.describe Pearls::CardPicker do
     expect(guidelines).to eq([missed, seen, other].map(&:guideline))
   end
 
+  it "does not count a case only drawn into an exam as met" do
+    drawn, other = Array.new(2) { quiet_case }
+    drawn.guideline.update!(year: 2001)
+    other.guideline.update!(year: Date.current.year)
+    sit(user, drawn, [nil])
+    [drawn, other].each { |kase| statement(kase) }
+
+    expect(pick.recommendation.guideline).to eq(other.guideline)
+  end
+
   it "reads the pool in batches until one statement makes a pearl" do
     stub_const("#{described_class}::BATCH", 1)
     sit(user, quiet_case, [:wrong])

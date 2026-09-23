@@ -138,6 +138,17 @@ RSpec.describe Exams::Builder do
       expect(cases_in(build(filters: { previously_wrong_only: "1" }).payload[:exam])).to eq([seen])
     end
 
+    it "counts a case as seen once answered, not once drawn, discarded exams included" do
+      drawn = create(:published_case, questions_count: 1)
+      sit(user, drawn, [nil], finish: true)
+      discarded = create(:published_case, questions_count: 1)
+      sit(user, discarded, [:wrong]).discard!
+
+      expect(cases_in(build(filters: { unseen_only: "1" }).payload[:exam])).to contain_exactly(unseen, drawn)
+      expect(cases_in(build(filters: { previously_wrong_only: "1" }).payload[:exam]))
+        .to contain_exactly(seen, discarded)
+    end
+
     it "is the student's history, not anyone else's" do
       other = described_class.call(user: create(:user), mode: "custom", filters: { unseen_only: "1" })
 
