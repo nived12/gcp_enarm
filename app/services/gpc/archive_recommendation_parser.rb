@@ -32,6 +32,15 @@ module Gpc
 
     PRIVATE_USE = /[\u{E000}-\u{F8FF}]/
 
+    # In a document whose glyphs lost letters, a statement with two word fragments of one
+    # or two lower-case letters that are not Spanish words ("dá c nr prima o de h u so")
+    # lost them too. Measured over the forty such documents: about one statement in six.
+    # Only there, because elsewhere the same test mostly catches p-values and English.
+    SHORT_WORDS = %w[a y o e u de la el en se lo al un su es no le me te mi tu si ni ya ha he va da ve fe vi
+                     ti os ir mg kg dl ml cm mm g h l m x vs].to_set.freeze
+    FRAGMENT = /(?<![\p{L}\d.\-\/])\p{Ll}{1,2}(?![\p{L}\d])/
+    FRAGMENTS_ALLOWED = 1
+
     def initialize(text)
       super()
       @text = text.to_s
@@ -46,8 +55,11 @@ module Gpc
     attr_reader :text
 
     def statements
-      region = ArchiveTable::Region.new(text).lines
+      finder = ArchiveTable::Region.new(text)
+      region = finder.lines
       return [] if region.empty?
+
+      @letters_lost = finder.letters_lost?
 
       layout = ArchiveTable::Layout.new(region)
       return [] unless layout.readable?
@@ -104,7 +116,11 @@ module Gpc
     def damaged?(statement)
       text = statement[:text]
       statement[:garbled] || text.length < SHORTEST_STATEMENT || text.match?(/\A\p{Ll}/) ||
-        text.match?(BLED_CITATION) || text.match?(WELDED)
+        text.match?(BLED_CITATION) || text.match?(WELDED) || lost_letters?(text)
+    end
+
+    def lost_letters?(text)
+      @letters_lost && text.scan(FRAGMENT).count { |word| SHORT_WORDS.exclude?(word) } > FRAGMENTS_ALLOWED
     end
   end
 end

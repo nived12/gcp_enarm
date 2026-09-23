@@ -69,7 +69,7 @@ module Gpc
       end
 
       def classify(raw, index)
-        return Line.new(index: index) if raw.blank? || raw.match?(Region::TABLE_HEADER)
+        return Line.new(index: index) if raw.blank? || Region.table_header?(raw)
 
         segments = segments(raw)
         in_marker_column = segments.first.first < text_column - 1
@@ -119,7 +119,7 @@ module Gpc
       end
 
       def statement_line?(line)
-        line.split.size >= 4 && !line.match?(Region::TABLE_HEADER)
+        line.split.size >= 4 && !Region.table_header?(line)
       end
 
       # Where statements end. Justified text ends on one column, so the most common end

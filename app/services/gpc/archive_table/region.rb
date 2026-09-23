@@ -6,9 +6,19 @@ module Gpc
     class Region
       TABLE_HEADER = %r{Evidencia\s*/\s*Recomendaci|Nivel\s*/\s*Grado}i
 
+      # The same header with letters missing: "Ev idcia / eRomend c óa i n     Nivel/ G rado".
+      # About forty IMSS guidelines of 2010–2013 set it, and their citations, in a bold
+      # font whose glyphs extract only in part. After the "E", only the letters of "Nivel
+      # / Grado" may appear, in order, so no statement line can pass for it.
+      DAMAGED_TABLE_HEADER = %r{\A\s*E[^\n]{5,45}?\s{3,}N[\sivel/]{2,10}G[\srado]{1,8}\s*\z}i
+
+      def self.table_header?(line)
+        line.match?(TABLE_HEADER) || line.match?(DAMAGED_TABLE_HEADER)
+      end
+
       # Every guideline explains its own grading with the same two sample rows before the
       # first real table. They are laid out exactly like the real thing.
-      SAMPLE_ROWS = /zanamivir|escala de Braden|Matheson/i
+      SAMPLE_ROWS = /zanamivir|escala de\W{0,3}Braden|Matheson/i
 
       # The chapter that follows the graded statements. Only a whole line counts, so a
       # statement that mentions an algorithm does not end the table.
@@ -26,12 +36,20 @@ module Gpc
       # Empty when the text holds no table.
       def lines
         lines = without_page_furniture(text.split("\n").map { |line| line.gsub("\t", "    ").rstrip })
-        start = lines.each_index.find { |i| lines[i].match?(TABLE_HEADER) && !sample?(lines, i) }
+        start = lines.each_index.find { |i| self.class.table_header?(lines[i]) && !sample?(lines, i) }
         return [] if start.nil?
+
+        @letters_lost = !lines[start].match?(TABLE_HEADER)
 
         start = headings_above(lines, start)
         finish = (start...lines.size).find { |i| chapter_end?(lines[i]) } || lines.size
         lines[start...finish]
+      end
+
+      # True when the table was found by its damaged header, which says the document's
+      # bold glyphs lost letters — and bold runs through statements too.
+      def letters_lost?
+        @letters_lost == true
       end
 
       private
