@@ -1,0 +1,16 @@
+<%# The weak-spot preset: a quiz from the topics where the student does worse than their
+    own average. Outside the custom form, which it does not use. %>
+<% result = Stats::WeakSpotCalculator.call(Current.user).payload %>
+<section class="card mb-3 px-5 py-5 sm:px-6" aria-labelledby="weak-spots-title">
+  <h2 id="weak-spots-title" class="text-sm font-medium text-ink"><%= t("weak_spots.preset.title") %></h2>
+  <% if result.spots.any? %>
+    <p class="mt-1 text-xs leading-relaxed text-ink-faint"><%= t("weak_spots.preset.body") %></p>
+    <p class="mt-3 text-sm text-ink"><%= result.spots.first(3).map { |spot| spot.topic.name }.to_sentence %></p>
+    <%= button_to t("weak_spots.preset.start", count: Exam::QUESTION_COUNTS["weak_spots"]), exams_path(mode: "weak_spots"),
+          class: "btn btn--primary mt-4 w-full sm:w-auto", form: { class: "contents" } %>
+  <% else %>
+    <p class="mt-1 text-xs leading-relaxed text-ink-faint">
+      <%= result.enough_data? ? t("weak_spots.preset.none") : t("weak_spots.preset.not_enough", minimum: Stats::WeakSpotCalculator::MINIMUM_ANSWERED) %>
+    </p>
+  <% end %>
+</section>

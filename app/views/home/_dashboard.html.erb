@@ -31,6 +31,7 @@
       <p class="mt-1 text-sm text-ink-muted"><%= t("home.dashboard.no_average") %></p>
     <% end %>
     <%= render "home/streak", streak: Stats::StreakCalculator.call(Current.user).payload %>
+    <%= render "home/due" %>
   </section>
 
   <% if unfinished %>

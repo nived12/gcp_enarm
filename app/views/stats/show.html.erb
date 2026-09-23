@@ -6,6 +6,7 @@
 </section>
 
 <div class="mt-8"><%= render "stats/streak", streak: @streak %></div>
+<%= render "reviews/summary", summary: Reviews::DueSummary.for(Current.user) %>
 
 <% if @performance.empty? %>
   <div class="mt-6 rounded-card border border-dashed border-line-strong p-6 text-center">

@@ -1,0 +1,14 @@
+<% content_for :title, t("pearls.done.title") %>
+
+<section class="card mt-2 px-6 py-6 text-center">
+  <div class="flex justify-center"><%= render "stats/flame", lit: @streak.current.positive?, size: "size-9" %></div>
+  <h1 class="mt-3 text-2xl font-semibold tracking-tight text-ink"><%= t("pearls.done.title") %></h1>
+  <p class="mt-2 text-sm text-ink-muted">
+    <%= @streak.today_done ? t("pearls.done.streak_kept", count: @streak.current) : t("pearls.done.streak_pending") %>
+  </p>
+</section>
+
+<div class="mt-6 flex flex-col gap-3 sm:flex-row">
+  <%= link_to t("pearls.done.again"), pearls_path, class: "btn btn--primary" %>
+  <%= link_to t("pearls.done.home"), root_path, class: "btn btn--ghost" %>
+</div>
