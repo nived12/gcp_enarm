@@ -41,6 +41,30 @@ RSpec.describe "Exams", type: :request do
       expect(response.body).to include(I18n.t("exams.new.bank", count: 1), "Pediatría", "Bronquiolitis")
     end
 
+    # The number beside a box is what ticking it adds to the pool: for a context, the
+    # cases about it and the cases set in it.
+    it "counts each specialty as the builder draws it, the cases set in a context included" do
+      internal = create(:specialty, name: "Medicina Interna", position: 1)
+      family = create(:family_medicine_setting, position: 7)
+      create_list(:published_case, 2, specialty: internal, setting: family)
+      create(:published_case, specialty: internal, setting: nil)
+
+      get new_exam_path
+
+      page = Nokogiri::HTML(response.body)
+      count_of = ->(specialty) { page.at_css("label:has(#filters_specialty_#{specialty.id}) .numeric").text.to_i }
+      expect([count_of.call(internal), count_of.call(family)]).to eq([3, 2])
+    end
+
+    it "offers no box for a context with nothing about it or set in it" do
+      create(:published_case, specialty: create(:specialty, name: "Pediatría"))
+      family = create(:family_medicine_setting)
+
+      get new_exam_path
+
+      expect(response.body).not_to include("filters_specialty_#{family.id}")
+    end
+
     it "says so plainly when nothing is published yet" do
       get new_exam_path
 
@@ -340,6 +364,17 @@ RSpec.describe "Exams", type: :request do
       get exam_path(exam)
 
       expect(response.body).to include(I18n.t("exams.results.by_specialty"), "Pediatría", "Cirugía General")
+      expect(response.body).not_to include(I18n.t("exams.results.by_specialty_overlap"))
+    end
+
+    it "says why the specialty rows add up to more than the exam when a case counts in two" do
+      emergency = create(:emergency_setting)
+      cases.each { |kase| kase.update!(specialty: create(:specialty), setting: emergency) }
+      patch complete_exam_path(exam)
+
+      get exam_path(exam)
+
+      expect(response.body).to include("Urgencias", I18n.t("exams.results.by_specialty_overlap"))
     end
 
     it "goes one question at a time when the student asks for explanations as they answer" do

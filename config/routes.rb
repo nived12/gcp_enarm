@@ -46,7 +46,9 @@ Rails.application.routes.draw do
   # reports, admins everything.
   namespace :admin do
     root "dashboard#show"
-    resources :clinical_cases, only: %i[index update]
+    resources :clinical_cases, only: %i[index update] do
+      resource :setting, only: :update, controller: "clinical_case_settings"
+    end
     resources :question_reports, only: %i[index update]
     resource :costs, only: :show
     resource :ingestion, only: :show, controller: "ingestion"

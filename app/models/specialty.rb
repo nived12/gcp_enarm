@@ -16,4 +16,24 @@ class Specialty < ApplicationRecord
   validates :color_token, inclusion: { in: COLOR_TOKENS }
 
   scope :in_reading_order, -> { order(:position) }
+
+  # The code a generation prompt asks the model for, by the slug of the setting it names.
+  # A fixed English code rather than the name: the model answers in whatever language the
+  # case is in, and "Urgencias", "urgencias médicas" and "emergency" must all mean one row.
+  SETTING_SLUGS = {
+    "family_medicine" => "medicina-familiar",
+    "emergency" => "urgencias",
+    "public_health" => "salud-publica"
+  }.freeze
+
+  # Nil for a code that is not one of the three, and for a taxonomy that lacks the row:
+  # an unknown setting is left unknown rather than guessed.
+  def self.for_setting_code(code)
+    slug = SETTING_SLUGS[code.to_s.strip.downcase]
+    kind_cross_cutting.find_by(slug: slug) if slug
+  end
+
+  def setting_code
+    SETTING_SLUGS.key(slug)
+  end
 end

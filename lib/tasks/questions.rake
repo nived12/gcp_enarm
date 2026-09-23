@@ -57,6 +57,20 @@ namespace :questions do
     puts "casos reubicados: #{Questions::Refiler.call.payload[:moved]}"
   end
 
+  desc "Read the setting of every case that has none from its vignette, without a model: " \
+       "rake questions:classify_settings[dry_run] (any value for dry_run only counts)"
+  task :classify_settings, [:dry_run] => :environment do |_task, args|
+    dry_run = args[:dry_run].present?
+    result = Questions::SettingClassifier.call(dry_run: dry_run).payload
+
+    puts "#{"Simulación: nada se guardó. " if dry_run}Contextos asignados:"
+    Specialty.kind_cross_cutting.in_reading_order.each do |setting|
+      puts "  #{setting.name}: #{result[:classified].fetch(setting.slug, 0)}"
+    end
+    puts "Sin contexto reconocible: #{result[:unclassified].size}"
+    puts "  ids: #{result[:unclassified].join(", ")}" if result[:unclassified].any?
+  end
+
   desc "Have a second model family judge unverified cases: rake questions:verify[count]"
   task :verify, [:count] => :environment do |_task, args|
     count = (args[:count] || 10).to_i

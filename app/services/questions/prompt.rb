@@ -23,13 +23,18 @@ module Questions
     # contexts are where a case happens, the four troncales are what it is about. The
     # model picks the setting that fits the recommendation; a fixed rotation would put a
     # neonatal resuscitation in a family-medicine consult.
+    #
+    # It also names the one it chose, as a fixed code (Specialty::SETTING_SLUGS), so the
+    # case is filed under that context as well as under its subject without anyone
+    # reading the vignette to find out. Questions::CaseBuilder stores it.
     SETTING_INSTRUCTIONS = <<~TEXT.strip
       Sitúa cada caso en uno de los tres contextos del examen: la consulta de medicina
       familiar en el primer nivel, un servicio de urgencias, o una situación de salud
       pública (tamizaje, vacunación, brote, vigilancia epidemiológica, prevención en la
       comunidad). Elige el que encaje con la recomendación, y si escribes dos casos, que no
       ocurran en el mismo contexto cuando el tema lo permita. No sitúes el caso en una sala
-      de hospitalización genérica.
+      de hospitalización genérica. En el campo "setting" de cada caso escribe el contexto
+      que elegiste, con uno de estos códigos exactos: #{Specialty::SETTING_SLUGS.keys.join(", ")}.
     TEXT
 
     # Asked for after a student chose a distractor and could not tell why it was wrong: the
@@ -99,7 +104,8 @@ module Questions
         es largo, cita una parte contigua más corta.
         #{language_instructions}
         Devuelve SOLO JSON, sin markdown ni texto alrededor. Las llaves van en inglés:
-        {"cases":[{"stem":"...","questions":[{"text":"...","explanation":"...",
+        {"cases":[{"stem":"...","setting":"#{Specialty::SETTING_SLUGS.keys.join("|")}",
+        "questions":[{"text":"...","explanation":"...",
         "recommendation":1,"quote":"...","options":[{"text":"...","correct":true},
         {"text":"...","correct":false,"rationale":"..."},{"text":"...","correct":false,"rationale":"..."},
         {"text":"...","correct":false,"rationale":"..."}]}]}]}

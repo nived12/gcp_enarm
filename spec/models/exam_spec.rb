@@ -123,6 +123,17 @@ RSpec.describe Exam do
     expect(exam.tally_by_specialty).to eq([[internal, 1, 2], [pediatrics, 1, 1]])
   end
 
+  it "tallies a question under its case's setting too, and once where subject and setting agree" do
+    exam = build_exam(question_count: 2)
+    internal = create(:specialty, name: "Medicina Interna", position: 1)
+    emergency = create(:emergency_setting, position: 6)
+    answer(exam, position: 1, correct: true, specialty: internal)
+    answer(exam, position: 2, correct: false, specialty: emergency)
+    exam.exam_questions.each { |exam_question| exam_question.clinical_case.update!(setting: emergency) }
+
+    expect(exam.tally_by_specialty).to eq([[internal, 1, 1], [emergency, 1, 2]])
+  end
+
   it "knows where the student is: the first question without an answer" do
     exam = build_exam(question_count: 2)
     answer(exam, position: 1, correct: true)

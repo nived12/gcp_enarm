@@ -34,6 +34,11 @@
         </li>
       <% end %>
     </ol>
+    <% if (setting_count = @day.setting_cases.count).positive? %>
+      <p class="mt-3 max-w-prose text-sm leading-relaxed text-ink-muted">
+        <%= t("study_plans.day.setting_cases", count: setting_count, setting: @day.specialty.name) %>
+      </p>
+    <% end %>
   <% else %>
     <p class="mt-6 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("study_plans.day.about.#{@day.kind}") %></p>
   <% end %>

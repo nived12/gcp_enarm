@@ -1,0 +1,16 @@
+<%# Where the case happens, and one tap to correct it. The current choice is marked by
+    aria-pressed and by weight, not by colour alone. %>
+<% current = clinical_case.setting_id %>
+<section class="mt-6" aria-labelledby="setting-title-<%= clinical_case.id %>">
+  <p id="setting-title-<%= clinical_case.id %>" class="eyebrow"><%= t("admin.clinical_cases.setting.title") %></p>
+  <p class="mt-1 text-xs text-ink-faint"><%= t("admin.clinical_cases.setting.hint") %></p>
+  <div class="mt-2 flex flex-wrap gap-2">
+    <% [*Specialty.kind_cross_cutting.in_reading_order, nil].each do |setting| %>
+      <% chosen = setting&.id == current %>
+      <%= button_to setting&.name || t("admin.clinical_cases.setting.unknown"), admin_clinical_case_setting_path(clinical_case),
+            method: :patch, params: { setting_id: setting&.id.to_s },
+            "aria-pressed": chosen,
+            class: "min-h-11 rounded-full border px-4 text-sm #{chosen ? "border-accent bg-accent-soft font-medium text-ink" : "border-line-strong text-ink-muted hover:border-accent hover:text-accent"}" %>
+    <% end %>
+  </div>
+</section>

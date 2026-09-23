@@ -97,6 +97,22 @@ RSpec.describe "Study plan days", type: :request do
       expect(first_day.reload.exam).to eq(exam)
     end
 
+    # The bank files cases by subject, so a context's topics hold almost none; its days
+    # quiz the cases set in it instead of staying reading days.
+    it "quizzes a context's day on the cases set in that context" do
+      emergency = syllabus["urgencias"].first.specialty
+      set_there = create(:published_case, specialty: surgery.first.specialty, setting: emergency, questions_count: 1)
+      emergency_day = plan.days.kind_topics.find_by!(specialty: emergency)
+
+      get study_plan_day_path(emergency_day.date)
+      expect(response.body).to include(I18n.t("study_plans.day.setting_cases", count: 1, setting: "Urgencias"))
+      expect(response.body).not_to include(I18n.t("study_plans.day.reading"))
+
+      post quiz_study_plan_day_path(emergency_day.date)
+
+      expect(Exam.last.exam_questions.map(&:clinical_case)).to eq([set_there])
+    end
+
     it "sends a free student past today's allowance to the plans" do
       student.update_column(:trial_ends_at, 1.day.ago)
       allow(SubscriptionAccess).to receive(:free_daily_questions).and_return(0)

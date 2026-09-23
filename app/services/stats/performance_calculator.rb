@@ -8,6 +8,12 @@
 #
 # Discarded exams count for nothing here. Discarding is the student saying "that one did
 # not count", and a stats page that kept it would say otherwise.
+#
+# By specialty means by area, as everywhere else (`ClinicalCase.in_area`): a question
+# counts under what its case is about and under the setting it happens in, so a
+# pneumonia seen in urgencias is in Medicina Interna's row and in Urgencias'. The rows
+# then add up to more than the questions asked — the page says so — while the overall
+# figure and the difficulty rows still count each question once.
 module Stats
   class PerformanceCalculator < ApplicationService
     # The order CIFRHS breaks ties in: correct answers in Alta first, then Media.
@@ -21,6 +27,9 @@ module Stats
 
     Result = Data.define(:average, :completed_exams, :overall, :by_specialty, :by_difficulty) do
       def empty? = overall.asked.zero?
+
+      # True when some question sits in two rows, which the page has to explain.
+      def specialties_overlap? = by_specialty.sum { |_specialty, tally| tally.asked } > overall.asked
     end
 
     def initialize(user)
@@ -30,12 +39,12 @@ module Stats
 
     def call
       average, completed = kept_exams.status_completed.pick(Arel.sql("AVG(score)"), Arel.sql("COUNT(*)"))
-      rows = tallies
+      rows = tallies_by_difficulty
 
       success(
         Result.new(
           average: average, completed_exams: completed,
-          overall: sum(rows), by_specialty: by_specialty(rows), by_difficulty: by_difficulty(rows)
+          overall: rows.values.sum(Tally.none), by_specialty: by_specialty, by_difficulty: by_difficulty(rows)
         )
       )
     end
@@ -48,12 +57,15 @@ module Stats
       user.exams.kept
     end
 
-    # One query for every breakdown: [specialty_id, difficulty, Tally].
-    def tallies
-      counted_questions.group("clinical_cases.specialty_id", "clinical_cases.difficulty").pluck(
-        "clinical_cases.specialty_id", "clinical_cases.difficulty",
-        Arel.sql("COUNT(*)"), Arel.sql("COUNT(*) FILTER (WHERE answers.correct)")
-      ).map { |specialty_id, difficulty, asked, correct| [specialty_id, difficulty, Tally.new(correct:, asked:)] }
+    # Difficulty => Tally. Each question once, which is what the overall figure sums.
+    def tallies_by_difficulty
+      tally(counted_questions, "clinical_cases.difficulty").to_h
+    end
+
+    def tally(questions, key)
+      questions.group(key).pluck(
+        key, Arel.sql("COUNT(*)"), Arel.sql("COUNT(*) FILTER (WHERE answers.correct)")
+      ).map { |group, asked, correct| [group, Tally.new(correct:, asked:)] }
     end
 
     def counted_questions
@@ -62,20 +74,15 @@ module Stats
                   .where("answers.id IS NOT NULL OR exams.status = 'completed'")
     end
 
-    def sum(rows)
-      rows.sum(Tally.none) { |_specialty_id, _difficulty, tally| tally }
-    end
-
     # Reading order is the prelación order too: Medicina Interna, Pediatría,
     # Gineco-Obstetricia, Cirugía, then the transversal contexts.
-    def by_specialty(rows)
-      grouped = rows.group_by(&:first)
-      Specialty.in_reading_order.where(id: grouped.keys).map { |specialty| [specialty, sum(grouped[specialty.id])] }
+    def by_specialty
+      tallies = tally(counted_questions.joins(ClinicalCase::AREAS_JOIN), "areas.area_id").to_h
+      Specialty.in_reading_order.where(id: tallies.keys).map { |specialty| [specialty, tallies[specialty.id]] }
     end
 
-    def by_difficulty(rows)
-      grouped = rows.group_by(&:second)
-      DIFFICULTY_ORDER.map { |difficulty| [difficulty, sum(grouped.fetch(difficulty, []))] }
+    def by_difficulty(tallies)
+      DIFFICULTY_ORDER.map { |difficulty| [difficulty, tallies.fetch(difficulty, Tally.none)] }
     end
   end
 end

@@ -204,6 +204,7 @@ es:
       tally: "%{correct} aciertos de %{total} preguntas"
       time: "tiempo %{time}"
       by_specialty: "Por especialidad"
+      by_specialty_overlap: "Cada pregunta cuenta en la especialidad de su caso y también en el contexto donde ocurre (Urgencias, Medicina Familiar o Salud Pública), así que las filas suman más que el total."
       specialty_tally: "%{correct} de %{total}"
       questions: "Preguntas"
       blank: "En blanco"
@@ -435,6 +436,11 @@ es:
         flag: "Caso señalado. Estado: %{status}."
         retire: "Caso retirado. Estado: %{status}."
         restore: "Caso restaurado. Estado: %{status}."
+      setting:
+        title: "Contexto"
+        hint: "Dónde ocurre el caso. Cuenta en esa área además de en su especialidad."
+        unknown: "Sin identificar"
+        done: "Contexto del caso: %{setting}."
     question_reports:
       title: "Sugerencias"
       subtitle: "Lo que estudiantes enviaron desde «Sugerir cambios». Revisa el caso, actúa sobre él y cierra la sugerencia con una nota."
@@ -507,7 +513,11 @@ es:
         specialty: "Especialidad"
         cases: "Casos"
         published: "Publicados"
+        set_here: "Publicados que ocurren aquí"
       unfiled: "Sin especialidad"
+      no_setting:
+        one: "1 caso publicado sin contexto identificado: corre questions:classify_settings o corrígelo en la pantalla de revisión."
+        other: "%{count} casos publicados sin contexto identificado: corre questions:classify_settings o corrígelos en la pantalla de revisión."
     users:
       title: "Usuarios"
       subtitle: "Busca una cuenta por correo para atender una solicitud de soporte."
@@ -542,12 +552,17 @@ es:
       saved: "Cambios guardados."
       invalid_date: "La fecha no es válida."
   activerecord:
+    attributes:
+      clinical_case:
+        setting: "Contexto"
     errors:
       models:
         clinical_case:
           attributes:
             status:
               not_supported: "solo puede publicarse si la segunda opinión respaldó todas sus respuestas"
+            setting:
+              not_cross_cutting: "debe ser Salud Pública, Urgencias o Medicina Familiar"
         question:
           attributes:
             source_quote:
@@ -599,6 +614,7 @@ es:
       by_difficulty: "Por dificultad"
       by_difficulty_note: "En un empate, el ENARM cuenta primero los aciertos en Alta y luego en Media."
       by_specialty: "Por especialidad"
+      by_specialty_overlap: "Cada pregunta cuenta en la especialidad de su caso y también en el contexto donde ocurre (Urgencias, Medicina Familiar o Salud Pública), así que las filas suman más que el total."
       empty:
         title: "Aún no hay nada que medir"
         body: "Tu promedio, tus aciertos por especialidad y por dificultad aparecen en cuanto respondas tus primeras preguntas."
@@ -625,9 +641,9 @@ es:
       rules: "Con %{minimum} preguntas al día la mantienes. Cada %{days} días de estudio ganas un protector, hasta %{max}, que se usa solo si un día no puedes, como en una guardia. El día termina a la medianoche."
     coverage:
       title: "Lo que has visto"
-      intro: "Casos del banco que ya respondiste, por área. El ENARM enmarca sus casos en Salud Pública, Urgencias y Medicina Familiar, así que también cuentan."
+      intro: "Casos del banco que ya respondiste, por área. El ENARM sitúa cada caso en Urgencias, Medicina Familiar o Salud Pública, así que un caso cuenta en su especialidad y también en el contexto donde ocurre: puede aparecer en dos áreas."
       area: "%{seen} de %{published} casos"
-      none_published: "Aún no hay casos publicados"
+      none_published: "Aún no hay casos publicados en esta área, así que no cuenta como pendiente."
       neglected_title: "Estás dejando de lado"
       neglected_body: "Has visto mucho menos de estas áreas que del resto del banco."
       practice: "Practicar %{name}"
@@ -825,6 +841,9 @@ es:
         one: "1 caso en el banco"
         other: "%{count} casos en el banco"
       no_cases: "Sin casos todavía: tema de lectura"
+      setting_cases:
+        one: "El examen del día también toma el caso que ocurre en %{setting}."
+        other: "El examen del día también toma los %{count} casos que ocurren en %{setting}."
       reading: "Todavía no hay casos publicados de estos temas, así que hoy es de lectura. Márcalo cuando termines."
       about:
         case_workshop: "Casos de toda la especialidad que acabas de recorrer, mezclados, para cerrar el bloque."

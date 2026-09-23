@@ -202,6 +202,7 @@ en:
       tally: "%{correct} correct out of %{total} questions"
       time: "time %{time}"
       by_specialty: "By specialty"
+      by_specialty_overlap: "Each question counts under its case's specialty and also under the setting it happens in (Emergency, Family Medicine or Public Health), so the rows add up to more than the total."
       specialty_tally: "%{correct} of %{total}"
       questions: "Questions"
       blank: "Blank"
@@ -433,6 +434,11 @@ en:
         flag: "Case flagged. Status: %{status}."
         retire: "Case retired. Status: %{status}."
         restore: "Case restored. Status: %{status}."
+      setting:
+        title: "Setting"
+        hint: "Where the case happens. It counts in that area as well as in its specialty."
+        unknown: "Unknown"
+        done: "Case setting: %{setting}."
     question_reports:
       title: "Suggestions"
       subtitle: "What students sent through “Suggest changes”. Review the case, act on it, and close the suggestion with a note."
@@ -505,7 +511,11 @@ en:
         specialty: "Specialty"
         cases: "Cases"
         published: "Published"
+        set_here: "Published set here"
       unfiled: "No specialty"
+      no_setting:
+        one: "1 published case with no known setting: run questions:classify_settings or correct it on the review screen."
+        other: "%{count} published cases with no known setting: run questions:classify_settings or correct them on the review screen."
     users:
       title: "Users"
       subtitle: "Look up an account by email to handle a support request."
@@ -540,12 +550,17 @@ en:
       saved: "Changes saved."
       invalid_date: "That date is not valid."
   activerecord:
+    attributes:
+      clinical_case:
+        setting: "Setting"
     errors:
       models:
         clinical_case:
           attributes:
             status:
               not_supported: "can only be published once the second opinion has supported every answer"
+            setting:
+              not_cross_cutting: "must be Public Health, Emergency or Family Medicine"
         question:
           attributes:
             source_quote:
@@ -597,6 +612,7 @@ en:
       by_difficulty: "By difficulty"
       by_difficulty_note: "In a tie, the ENARM counts correct answers in High first, then in Medium."
       by_specialty: "By specialty"
+      by_specialty_overlap: "Each question counts under its case's specialty and also under the setting it happens in (Emergency, Family Medicine or Public Health), so the rows add up to more than the total."
       empty:
         title: "Nothing to measure yet"
         body: "Your average and your accuracy by specialty and by difficulty appear as soon as you answer your first questions."
@@ -623,9 +639,9 @@ en:
       rules: "%{minimum} questions a day keeps it. Every %{days} days of study earns a freeze, up to %{max}, spent only on a day you cannot study, like a night shift. The day ends at midnight."
     coverage:
       title: "What you have seen"
-      intro: "Cases from the bank you have already answered, by area. The ENARM frames its cases in Public Health, Emergency and Family Medicine, so those count too."
+      intro: "Cases from the bank you have already answered, by area. The ENARM sets every case in Emergency, Family Medicine or Public Health, so a case counts under its specialty and under the setting it happens in: it can appear in two areas."
       area: "%{seen} of %{published} cases"
-      none_published: "No published cases yet"
+      none_published: "No published cases in this area yet, so it does not count as pending."
       neglected_title: "You are leaving behind"
       neglected_body: "You have seen much less of these areas than of the rest of the bank."
       practice: "Practise %{name}"
@@ -823,6 +839,9 @@ en:
         one: "1 case in the bank"
         other: "%{count} cases in the bank"
       no_cases: "No cases yet: a reading topic"
+      setting_cases:
+        one: "The day's quiz also draws the case set in %{setting}."
+        other: "The day's quiz also draws the %{count} cases set in %{setting}."
       reading: "There are no published cases on these topics yet, so today is for reading. Mark it when you finish."
       about:
         case_workshop: "Cases from the whole specialty you just covered, mixed, to close the block."

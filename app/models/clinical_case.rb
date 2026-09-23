@@ -8,6 +8,9 @@ class ClinicalCase < ApplicationRecord
 
   belongs_to :topic, optional: true
   belongs_to :specialty, optional: true
+  # Where the case happens: one of the three cross-cutting contexts the convocatoria frames
+  # every case in. `specialty` is what the case is about. Nil is unknown, never "none".
+  belongs_to :setting, class_name: "Specialty", optional: true
   belongs_to :guideline, optional: true
   belongs_to :generation_run, optional: true
   belongs_to :clinical_image, optional: true
@@ -38,6 +41,7 @@ class ClinicalCase < ApplicationRecord
   validates :locale, presence: true
 
   validate :published_only_when_supported
+  validate :setting_is_cross_cutting
 
   # Withdrawn cases stay back whatever the verifier said, because both are a person's
   # decision and outrank a model's agreement: `flagged` is staff holding a case until it
@@ -46,6 +50,30 @@ class ClinicalCase < ApplicationRecord
   WITHDRAWN = %w[flagged retired].freeze
 
   scope :publishable, -> { verdict_supported.where.not(status: WITHDRAWN) }
+
+  # The cases an area holds: those about it, and those that happen in it. The owner's
+  # decision of 2026-09-23 — a case of pneumonia seen in urgencias counts for Medicina
+  # Interna and for Urgencias. An OR, so a case about Urgencias that is also set there is
+  # still one case, and picking several areas never returns a case twice.
+  scope :in_area, ->(specialties) { where(specialty: specialties).or(where(setting: specialties)) }
+
+  # One row per case and area it belongs to, `areas.area_id` naming the area. The UNION
+  # drops the second copy when subject and setting are the same specialty, which is what
+  # keeps that case from counting twice in its own area.
+  AREAS_JOIN = <<~SQL.squish.freeze
+    CROSS JOIN LATERAL (
+      SELECT area_id FROM (SELECT clinical_cases.specialty_id UNION SELECT clinical_cases.setting_id) AS pair(area_id)
+      WHERE area_id IS NOT NULL
+    ) AS areas
+  SQL
+
+  scope :by_area, -> { joins(AREAS_JOIN) }
+
+  # Specialty id => cases in that area. Areas overlap, so these do not add up to the
+  # number of cases; count the relation itself for that.
+  def self.count_by_area
+    by_area.group("areas.area_id").count
+  end
 
   scope :with_open_reports, -> { where(id: QuestionReport.status_open.joins(:question).select(:clinical_case_id)) }
 
@@ -69,5 +97,10 @@ class ClinicalCase < ApplicationRecord
 
   def published_only_when_supported
     errors.add(:status, :not_supported) if status_published? && !verdict_supported?
+  end
+
+  # A troncal is what a case is about, never where it happens.
+  def setting_is_cross_cutting
+    errors.add(:setting, :not_cross_cutting) if setting && !setting.kind_cross_cutting?
   end
 end

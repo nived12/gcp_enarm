@@ -125,6 +125,62 @@ RSpec.describe "question bank export and import" do
     expect(Question.sole.recommendation).to be_nil
   end
 
+  describe "the setting a case happens in" do
+    def rewrite_file
+      lines = Zlib::GzipReader.open(path) { |file| file.each_line.map { |line| JSON.parse(line) } }
+      Zlib::GzipWriter.open(path) { |file| lines.each { |line| file.puts(yield(line).to_json) } }
+    end
+
+    it "carries the setting across by slug" do
+      build_bank.update!(setting: create(:emergency_setting))
+      export
+      clear_generated
+      import
+
+      expect(ClinicalCase.sole.setting.slug).to eq("urgencias")
+    end
+
+    it "carries an unknown setting as unknown" do
+      build_bank
+      export
+      clear_generated
+      import
+
+      expect(ClinicalCase.sole.setting).to be_nil
+    end
+
+    it "lets a newer file correct a setting, back to unknown included" do
+      kase = build_bank
+      export
+      kase.update!(setting: create(:family_medicine_setting))
+      import
+
+      expect(kase.reload.setting).to be_nil
+    end
+
+    # A backup written before cases had a setting must not wipe out the settings
+    # questions:classify_settings has filled in since.
+    it "keeps the setting this database has when the file predates settings" do
+      kase = build_bank
+      export
+      rewrite_file { |line| line.except("setting_slug") }
+      family = create(:family_medicine_setting)
+      kase.update!(setting: family)
+      import
+
+      expect(kase.reload.setting).to eq(family)
+    end
+
+    it "refuses a case whose setting this database does not have" do
+      build_bank.update!(setting: create(:public_health_setting))
+      export
+      clear_generated
+      Specialty.find_by(slug: "salud-publica").destroy
+
+      expect(import.errors.full_messages.first).to include("el contexto salud-publica")
+    end
+  end
+
   describe "when a reference does not resolve on the far side" do
     it "refuses a case whose guideline this database does not have" do
       build_bank

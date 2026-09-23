@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -90,6 +90,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_140000) do
     t.bigint "generation_run_id"
     t.bigint "guideline_id"
     t.string "locale", default: "es", null: false
+    t.bigint "setting_id"
     t.string "source", default: "gpc_generated", null: false
     t.bigint "specialty_id"
     t.string "status", default: "draft", null: false
@@ -103,6 +104,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_140000) do
     t.index ["export_key"], name: "index_clinical_cases_on_export_key", unique: true
     t.index ["generation_run_id"], name: "index_clinical_cases_on_generation_run_id"
     t.index ["guideline_id"], name: "index_clinical_cases_on_guideline_id"
+    t.index ["setting_id"], name: "index_clinical_cases_on_setting_id"
     t.index ["specialty_id"], name: "index_clinical_cases_on_specialty_id"
     t.index ["status", "difficulty"], name: "index_clinical_cases_on_status_and_difficulty"
     t.index ["topic_id", "status"], name: "index_clinical_cases_on_topic_id_and_status"
@@ -605,6 +607,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_140000) do
   add_foreign_key "clinical_cases", "generation_runs"
   add_foreign_key "clinical_cases", "guidelines"
   add_foreign_key "clinical_cases", "specialties"
+  add_foreign_key "clinical_cases", "specialties", column: "setting_id"
   add_foreign_key "clinical_cases", "topics"
   add_foreign_key "clinical_images", "guideline_sections"
   add_foreign_key "entitlements", "users"

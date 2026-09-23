@@ -60,6 +60,41 @@ RSpec.describe Questions::CaseBuilder do
     expect(kase).to have_attributes(topic: topic, specialty: topic.branch.specialty)
   end
 
+  describe "the setting the model names" do
+    def with_setting(code, count: 1)
+      { "cases" => Array.new(count) do |i|
+        { "stem" => "Paciente #{i} con dolor torácico.", "setting" => code, "questions" => [question] }
+      end }
+    end
+
+    it "files the case under the context it names" do
+      emergency = create(:emergency_setting)
+
+      expect(build_from(with_setting("emergency"))[:cases].sole.setting).to eq(emergency)
+    end
+
+    it "reads the code once for every case that names it" do
+      family = create(:family_medicine_setting)
+
+      expect(build_from(with_setting("family_medicine", count: 2))[:cases].map(&:setting)).to eq([family, family])
+    end
+
+    it "keeps the case with an unknown setting when the code is made up" do
+      create(:emergency_setting)
+
+      built = build_from(with_setting("hospital_ward"))
+
+      expect(built[:cases].sole.setting).to be_nil
+      expect(built[:rejected]).to eq(0)
+    end
+
+    it "keeps the case with an unknown setting when the model names none" do
+      create(:emergency_setting)
+
+      expect(build_from(one_case(question))[:cases].sole.setting).to be_nil
+    end
+  end
+
   describe "what it refuses to keep" do
     it "drops a question whose quote is not in the recommendation" do
       built = build_from(one_case(question(quote: "angiografía coronaria inmediata")))

@@ -16,8 +16,10 @@ class ExamsController < ApplicationController
   def new
     @section = params[:section].presence_in(SECTIONS)
     @published = ClinicalCase.status_published
-    @specialties = Specialty.in_reading_order.where(id: @published.select(:specialty_id))
-    @specialty_counts = @published.group(:specialty_id).count
+    # By area, as Exams::Builder draws them: the count beside Urgencias is every case
+    # about it or set in it, which is exactly what ticking it adds to the pool.
+    @specialty_counts = @published.count_by_area
+    @specialties = Specialty.in_reading_order.where(id: @specialty_counts.keys)
     @topic_counts = @published.group(:topic_id).count
     @topics = Topic.where(id: @published.select(:topic_id)).includes(branch: :specialty)
                    .sort_by { |topic| [topic.branch.specialty.position, topic.name] }

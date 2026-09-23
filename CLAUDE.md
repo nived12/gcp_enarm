@@ -93,7 +93,12 @@ finding that contradicts the diagnosis.
 **A vignette is set where the exam sets it.** The convocatoria frames every case in Salud
 Pública, Urgencias or Medicina Familiar, drawing its content from the four troncales. A
 generated case opens in one of those settings — a consultorio familiar, urgencias, a
-public-health situation — not in a generic ward.
+public-health situation — not in a generic ward. **A case is filed twice**: `specialty` is
+what it is about, `setting` (one of the three cross-cutting specialties, nil when unknown)
+is where it happens, and the owner decided (2026-09-23) that it counts under both.
+Anything that counts or filters an area goes through `ClinicalCase.in_area` /
+`.count_by_area`, never `specialty_id` alone; whole-bank totals count cases, since areas
+overlap. Cases without a setting are read from the stem by `questions:classify_settings`.
 
 **The exam gives about one minute per item.** Anything that simulates exam conditions uses
 that pacing, not a comfortable one; running out of time is one of the things being tested.
