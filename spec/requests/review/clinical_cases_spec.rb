@@ -227,6 +227,25 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include("<mark>electrocardiograma de 12 derivaciones</mark>")
     end
 
+    it "shows what the second opinion made of each distractor's rationale, rejected ones included" do
+      kase = create(:published_case, questions_count: 1)
+      options = kase.questions.first.answer_options
+      options.find_by!(text: "Troponina I").update!(
+        rationale_verdict: "contradicted",
+        rationale_note: "La guía dice otra cosa."
+      )
+      options.find_by!(text: "Ecocardiograma").update!(rationale_verdict: "sound")
+      sign_in(reviewer)
+
+      get review_clinical_case_path(kase)
+
+      expect(response.body).to include(
+        "Troponina I no es el estudio inicial", "La guía dice otra cosa.",
+        I18n.t("review.show.rationale_verdicts.contradicted"), I18n.t("review.show.rationale_verdicts.sound"),
+        I18n.t("review.show.rationale_verdicts.unjudged")
+      )
+    end
+
     it "links out to the guideline, naming the section the site's own menu uses" do
       guideline = create(
         :guideline, source: "live_site",

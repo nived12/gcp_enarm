@@ -41,6 +41,52 @@ RSpec.describe Gpc::ArchiveRecommendationParser do
      "", line(marker: "E", text: "Un tercer estudio de cohorte describió lo mismo.", grading: "III")]
   end
 
+  # About forty IMSS guidelines of 2010–2013 set the header and the citations in a bold
+  # font that extracts with letters missing, and some of it runs through statements.
+  describe "a guideline whose bold glyphs lost letters" do
+    def damaged_header
+      "            Ev idcia / eRomend c óa i n                               Nivel/ G rado"
+    end
+
+    def parse_damaged(*lines) = described_class.call([damaged_header, "", *lines].join("\n")).payload
+
+    it "finds the table by its damaged header and keeps the rows that read cleanly" do
+      rows = parse_damaged(
+        line(marker: "E", text: "El edema es un signo común en todos los niños.", grading: "III"), *filler
+      )
+
+      expect(rows.map { |row| row[:text] }).to include("El edema es un signo común en todos los niños.")
+    end
+
+    it "drops a row whose words lost letters, there and only there" do
+      garbled = "El OS es la causa más frecuente dá c nr prima o de h u so en adolescentes."
+      rows = parse_damaged(line(marker: "E", text: garbled, grading: "III"), *filler)
+
+      expect(rows.map { |row| row[:text] }).not_to include(garbled)
+      expect(parse(line(marker: "E", text: garbled, grading: "III"), *filler).map { |row| row[:text] })
+        .to include(garbled)
+    end
+
+    it "never mistakes a statement line for the damaged header" do
+      expect(
+        Gpc::ArchiveTable::Region.table_header?(
+          line(
+            marker: "E", text: "Evitar el uso rutinario.",
+            grading: "Nivel D"
+          )
+        )
+      ).to be(false)
+    end
+  end
+
+  it "skips the template's sample row even when the scale's name is in quotes" do
+    sample = "            Evidencia / Recomendación                                   Nivel / Grado\n" \
+             "  E         La valoración del riesgo a través de la escala de “BRADEN”     2++"
+    rows = described_class.call([sample, "", header, "", *filler.drop(1)].join("\n")).payload
+
+    expect(rows.map { |row| row[:text] }.join).not_to include("BRADEN")
+  end
+
   describe "a guideline laid out in the usual template" do
     it "reads every row of the table and nothing before it" do
       expect(statements.size).to eq(15)

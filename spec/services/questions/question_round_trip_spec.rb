@@ -21,7 +21,8 @@ RSpec.describe "question bank export and import" do
     )
     kase = create(
       :clinical_case, guideline: guideline, topic: create(:topic), specialty: create(:specialty),
-      generation_run: create(:generation_run), stem: "Paciente de 54 años con dolor torácico."
+      generation_run: create(:generation_run, calls: 3, rejection_reasons: { "stem_asks_question" => 2 }),
+      stem: "Paciente de 54 años con dolor torácico."
     )
     question = create(
       :question, clinical_case: kase, position: 1, recommendation: recommendation,
@@ -30,7 +31,7 @@ RSpec.describe "question bank export and import" do
     create(:answer_option, question: question, position: 1, text: "Electrocardiograma", correct: true)
     create(
       :answer_option, question: question, position: 2, text: "Radiografía de tórax", correct: false,
-      rationale: "La radiografía no muestra la isquemia."
+      rationale: "La radiografía no muestra la isquemia.", rationale_verdict: "overstated", rationale_note: "Exagera."
     )
     kase
   end
@@ -66,7 +67,9 @@ RSpec.describe "question bank export and import" do
     expect(question.source_quote).to eq("electrocardiograma de 12 derivaciones")
     expect(question.recommendation.text).to include("12 derivaciones")
     expect(question.correct_option.text).to eq("Electrocardiograma")
-    expect(question.answer_options.second.rationale).to eq("La radiografía no muestra la isquemia.")
+    expect(question.answer_options.second).to have_attributes(
+      rationale: "La radiografía no muestra la isquemia.", rationale_verdict: "overstated", rationale_note: "Exagera."
+    )
     expect(question.clinical_case.guideline.catalog_key).to eq("IMSS-028-22")
   end
 
@@ -99,6 +102,9 @@ RSpec.describe "question bank export and import" do
     import
 
     expect(ClinicalCase.sole.generation_run.export_key).to eq(key)
+    expect(ClinicalCase.sole.generation_run).to have_attributes(
+      calls: 3, rejection_reasons: { "stem_asks_question" => 2 }
+    )
   end
 
   # An authored case has no run, no guideline and no citation; it still travels.

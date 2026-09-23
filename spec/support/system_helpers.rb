@@ -8,7 +8,10 @@ module SystemHelpers
     expect(page).to have_text(I18n.t("home.dashboard.greeting", name: user.name))
   end
 
+  # Waits for the answer form first: after "Siguiente" the page still holding an
+  # explanation has none, and its options can carry the same text as the next question's.
   def answer_with(text)
+    expect(page).to have_button(I18n.t("exams.question.submit"))
     find("label", text: text).click
     click_button I18n.t("exams.question.submit")
   end

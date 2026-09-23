@@ -1,8 +1,14 @@
 namespace :questions do
-  desc "Generate clinical cases: rake questions:generate[calls,budget_usd,source] (source: live_site|web_archive)"
-  task :generate, %i[calls budget source] => :environment do |_task, args|
+  desc "Generate clinical cases: rake questions:generate[calls,budget_usd,source,order,specialty] " \
+       "(source: live_site|web_archive; order: newest|by_specialty; specialty: a slug, to top one up)"
+  task :generate, %i[calls budget source order specialty] => :environment do |_task, args|
     calls = (args[:calls] || 10).to_i
     budget = args[:budget].presence&.to_f
+    order = args[:order].presence || "newest"
+    abort("Orden desconocido: #{order}. Usa #{Questions::WindowPlan::ORDERS.join(" o ")}") \
+      unless Questions::WindowPlan::ORDERS.include?(order)
+    specialty = Specialty.find_by(slug: args[:specialty]) if args[:specialty].present?
+    abort("No existe la especialidad #{args[:specialty]}") if args[:specialty].present? && specialty.nil?
     provider = Llm::Provider.for(:generator)
     abort("Falta la clave del generador. Revisa .env") unless provider.configured?
 
@@ -15,7 +21,8 @@ namespace :questions do
     )
 
     result = Questions::GenerationRunner.call(
-      run: run, calls: calls, budget_usd: budget, guidelines: guidelines, on_progress: ->(line) { puts line }
+      run: run, calls: calls, budget_usd: budget, guidelines: guidelines, order: order, specialty: specialty,
+      on_progress: ->(line) { puts line }
     )
     run.update!(status: result.success? ? "completed" : "failed", finished_at: Time.current)
     abort(result.errors.full_messages.to_sentence) if result.failure?
@@ -66,7 +73,8 @@ namespace :questions do
       result = Questions::Verifier.call(kase, run: run)
       state = result.success? ? result.payload[:verdict] : result.errors.full_messages.first
       tally[state] += 1
-      puts "caso #{kase.id}: #{state}"
+      rationales = result.payload[:rationales] if result.success?
+      puts "caso #{kase.id}: #{state}#{" razones #{rationales.to_json}" if rationales}"
     end
 
     run.update!(status: "completed", finished_at: Time.current)
@@ -104,5 +112,125 @@ namespace :questions do
       "%.4f",
       run.cost_usd
     )}"
+  end
+
+  desc "Judge the unjudged distractor rationales of verifier-supported cases: " \
+       "rake questions:verify_rationales[count]"
+  task :verify_rationales, [:count] => :environment do |_task, args|
+    count = (args[:count] || 10).to_i
+    provider = Llm::Provider.for(:verifier)
+    abort("Falta la clave del verificador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "verification", provider: provider.name, model: provider.model, started_at: Time.current,
+      notes: "rationales"
+    )
+
+    unjudged = AnswerOption.rationale_unjudged.joins(:question).select("questions.clinical_case_id")
+    cases = ClinicalCase.where(id: unjudged).verdict_supported.where.not(status: "retired")
+    tally = Hash.new(0)
+    cases.order(:id).limit(count).each do |kase|
+      result = Questions::RationaleVerifier.call(kase, run: run)
+      if result.success?
+        result.payload.each { |verdict, n| tally[verdict] += n }
+        puts "caso #{kase.id}: #{result.payload.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")}"
+      else
+        tally[:failed_cases] += 1
+        puts "caso #{kase.id}: #{result.errors.full_messages.first}"
+      end
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    puts "\n#{tally.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")} tokens=#{run.total_tokens} " \
+         "costo=$#{format("%.4f", run.cost_usd)}"
+  end
+
+  desc "Rewrite the rationales the verifier rejected, then run verify_rationales: " \
+       "rake questions:rewrite_rationales[count]"
+  task :rewrite_rationales, [:count] => :environment do |_task, args|
+    count = (args[:count] || 10).to_i
+    provider = Llm::Provider.for(:generator)
+    abort("Falta la clave del generador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "rationales", provider: provider.name, model: provider.model, started_at: Time.current,
+      notes: "rewrite"
+    )
+
+    rejected = AnswerOption.rationale_rejected.joins(:question).select("questions.clinical_case_id")
+    tally = Hash.new(0)
+    ClinicalCase.where(id: rejected).where.not(status: "retired").order(:id).limit(count).each do |kase|
+      result = Questions::RationaleWriter.call(kase, run: run, rewrite: true)
+      state = result.success? ? "#{result.payload[:written]} razones" : result.errors.full_messages.first
+      tally[result.success? ? :ok : :failed] += 1
+      puts "caso #{kase.id}: #{state}"
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    puts "\ncasos=#{tally[:ok]} fallidos=#{tally[:failed]} tokens=#{run.total_tokens} " \
+         "costo=$#{format("%.4f", run.cost_usd)}"
+    puts "Las razones reescritas quedan sin revisar: corre questions:verify_rationales."
+  end
+
+  desc "The whole bank, in chunks: generate, back up, verify, publish, to a dollar cap. Totals are per label, " \
+       "so re-running the same command continues: rake questions:full_run[calls,budget_usd,label,chunk]"
+  task :full_run, %i[calls budget label chunk] => :environment do |_task, args|
+    abort("Uso: rake questions:full_run[calls,budget_usd,label,chunk]") if args[:calls].blank? || args[:budget].blank?
+    missing = Llm::Provider.all.reject(&:configured?)
+    abort("Faltan claves: #{missing.map(&:role).join(", ")}. Revisa .env") if missing.any?
+
+    result = Questions::FullRunner.call(
+      calls: args[:calls].to_i, budget_usd: args[:budget].to_f, label: args[:label].presence || "full",
+      chunk: (args[:chunk].presence || Questions::FullRunner::CHUNK_CALLS).to_i,
+      on_progress: ->(line) { puts line }
+    )
+    abort(result.errors.full_messages.to_sentence) if result.failure?
+
+    summary = result.payload
+    puts "\nDetenida por: #{summary[:stopped]} · llamadas=#{summary[:calls]} casos=#{summary[:cases]} " \
+         "descartadas=#{summary[:rejected]} en_el_banco=#{summary[:live]} costo=$#{summary[:cost_usd]}"
+    puts "Respaldo final: #{summary[:backups].last}" if summary[:backups].any?
+  end
+
+  desc "Estimate calls, tokens, dollars and yield for a run, with no network: rake questions:estimate[calls,order]"
+  task :estimate, %i[calls order] => :environment do |_task, args|
+    result = Questions::CostEstimator.call(
+      calls: args[:calls].presence&.to_i,
+      order: args[:order].presence || "by_specialty"
+    )
+    abort(result.errors.full_messages.to_sentence) if result.failure?
+
+    estimate = result.payload
+    measured = estimate[:measured]
+    number = ->(value) { ActiveSupport::NumberHelper.number_to_delimited(value) }
+
+    puts "Corpus: #{estimate[:guidelines]} guías, #{number[estimate[:one_pass_calls]]} llamadas para una pasada " \
+         "por cada enunciado sin citar. Estimación para #{number[estimate[:calls]]} llamadas."
+    puts "Medido en la corrida #{measured[:reference_run]} (#{measured[:reference_calls]} llamadas): " \
+         "#{measured[:cases_per_call]} casos/llamada, #{measured[:questions_per_case]} preguntas/caso, " \
+         "#{(measured[:rejection_share] * 100).round(1)}% preguntas descartadas, " \
+         "#{(measured[:stem_asks_question_share] * 100).round(1)}% viñetas con pregunta, " \
+         "#{(measured[:published_share] * 100).round(1)}% de casos verificados publicables."
+    puts "Tokens por llamada de generación: #{number[estimate[:per_call][:input]]} entrada / " \
+         "#{number[estimate[:per_call][:output]]} salida (con razones de distractores)."
+    per_case = estimate[:per_case]
+    puts "Tokens por caso verificado: respuestas #{per_case[:answers_input]}/#{per_case[:answers_output]}, " \
+         "razones #{per_case[:rationales_input]}/#{per_case[:rationales_output]} " \
+         "(+#{estimate[:pending_rationale_cases]} casos ya publicados con razones sin revisar)."
+    puts "\nModelo                      Generar    Verificar  Rol configurado"
+    estimate[:costs].each do |row|
+      puts format(
+        "%-26s  $%8.2f  $%8.2f  %s", row[:model], row[:generation], row[:verification],
+        row[:roles].join(", ")
+      )
+    end
+    yielded = estimate[:yield]
+    puts "\nRendimiento: #{number[yielded[:cases]]} casos, #{number[yielded[:questions]]} preguntas; " \
+         "publicables #{number[yielded[:published_cases]]} casos, " \
+         "#{number[yielded[:published_questions]]} preguntas. ~#{estimate[:generation_hours]} h de generación."
+    estimate[:targets].each do |target, plan|
+      puts "#{number[target]} preguntas publicadas: #{number[plan[:calls]]} llamadas, ~$#{plan[:cost_usd]} " \
+           "con los modelos configurados"
+    end
   end
 end

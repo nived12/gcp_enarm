@@ -5,20 +5,21 @@
 # cites, and the rest of the guideline's statements: the most instructive distractors are
 # right somewhere else in the same guideline, and it can only say where if it can read
 # it. It writes nothing about the correct option, whose explanation already exists.
+#
+# With `rewrite: true` it writes again only the rationales Questions::RationaleVerifier
+# rejected, showing the model the rejected text and the reason, so the second attempt
+# knows what the first got wrong. A new rationale is unjudged until verified again.
 module Questions
   class RationaleWriter < ApplicationService
     MAX_TOKENS = 3_000
 
-    # Enough of the guideline to find where a distractor does apply, without sending a
-    # whole anexo for every case.
-    CONTEXT_STATEMENTS = 40
-
     LETTERS = Verifier::LETTERS
 
-    def initialize(clinical_case, run: nil)
+    def initialize(clinical_case, run: nil, rewrite: false)
       super()
       @clinical_case = clinical_case
       @run = run
+      @rewrite = rewrite
     end
 
     def call
@@ -27,10 +28,10 @@ module Questions
       completion = Llm::Completion.call(role: :generator, prompt: prompt, max_tokens: MAX_TOKENS)
       return failure(completion.errors) unless completion.success?
 
+      record(completion.payload)
       written = parse(completion.payload[:content])
       return failure("El modelo no devolvió JSON legible") if written.nil?
 
-      record(completion.payload)
       success(written: apply(written))
     end
 
@@ -40,10 +41,12 @@ module Questions
 
     private
 
-    attr_reader :clinical_case, :run
+    attr_reader :clinical_case, :run, :rewrite
 
     def questions
-      @questions ||= clinical_case.questions.includes(:answer_options, :recommendation).select(&:recommendation)
+      @questions ||= clinical_case.questions.includes(:answer_options, :recommendation).select do |question|
+        question.recommendation && (!rewrite || question.answer_options.any?(&:rationale_rejected?))
+      end
     end
 
     def prompt
@@ -52,22 +55,29 @@ module Questions
         correcta marcada con (correcta). Tu tarea es explicar los distractores.
 
         #{Prompt::RATIONALE_INSTRUCTIONS}
-        #{language}
+        #{rewrite_instructions}#{language}
         Caso clínico:
         #{clinical_case.stem}
 
         #{questions.map.with_index(1) { |question, index| block_for(question, index) }.join("\n")}
         Otras recomendaciones de la misma guía, por si algún distractor aplica en otro momento:
-        #{context}
+        #{GuidelineContext.new(questions)}
 
         Devuelve SOLO JSON, sin markdown, con una razón por cada distractor (nunca por la correcta):
         {"questions":[{"question":1,"rationales":{"B":"...","C":"...","D":"..."}}]}
       TEXT
     end
 
+    def rewrite_instructions
+      return "" unless rewrite
+
+      "\nSolo reescribe las razones marcadas como RECHAZADA; un revisor explicó por qué. " \
+        "Devuelve únicamente esas letras.\n"
+    end
+
     def block_for(question, index)
       options = question.answer_options.each_with_index.map do |option, position|
-        "  #{LETTERS[position]}) #{option.text}#{" (correcta)" if option.correct?}"
+        "  #{LETTERS[position]}) #{option.text}#{" (correcta)" if option.correct?}#{rejected(option)}"
       end
 
       <<~TEXT
@@ -78,18 +88,16 @@ module Questions
       TEXT
     end
 
+    def rejected(option)
+      return "" unless rewrite && option.rationale_rejected?
+
+      "\n     RECHAZADA: #{option.rationale}\n     Motivo del revisor: #{option.rationale_note}"
+    end
+
     def language
       return "" unless clinical_case.locale == "en"
 
       "\nEl caso está en inglés: escribe las razones EN INGLÉS.\n"
-    end
-
-    def context
-      cited = questions.map(&:recommendation_id)
-      guideline_id = questions.first.recommendation.guideline_section.guideline_id
-      Recommendation.actionable.where(guideline_sections: { guideline_id: guideline_id })
-                    .where.not(id: cited).order(:id).limit(CONTEXT_STATEMENTS)
-                    .map { |recommendation| "- #{recommendation.text.squish}" }.join("\n")
     end
 
     def parse(content)
@@ -98,8 +106,9 @@ module Questions
       nil
     end
 
-    # Only distractors, only letters that exist, only text that says something. A reply
-    # about the correct option or a letter the question does not have is dropped.
+    # Only distractors, only letters that exist, only text that says something — and in
+    # a rewrite, only the rationales that were rejected. A reply about the correct option
+    # or a letter the question does not have is dropped.
     def apply(written)
       Array(written["questions"]).sum do |entry|
         question = questions[entry["question"].to_i - 1]
@@ -107,12 +116,18 @@ module Questions
 
         entry["rationales"].sum do |letter, text|
           option = option_at(question, letter)
-          next 0 if option.nil? || option.correct? || text.to_s.squish.blank?
+          next 0 unless writable?(option, text)
 
-          option.update!(rationale: text.to_s.squish)
+          option.update!(rationale: text.to_s.squish, rationale_verdict: nil, rationale_note: nil)
           1
         end
       end
+    end
+
+    def writable?(option, text)
+      return false if option.nil? || option.correct? || text.to_s.squish.blank?
+
+      !rewrite || option.rationale_rejected?
     end
 
     def option_at(question, letter)
@@ -123,9 +138,7 @@ module Questions
     def record(usage)
       return if run.nil?
 
-      run.increment!(:input_tokens, usage[:input_tokens])
-      run.increment!(:output_tokens, usage[:output_tokens])
-      run.increment!(:cost_usd, usage[:cost_usd])
+      run.charge!(usage)
       run.increment!(:attempts, 1)
     end
   end

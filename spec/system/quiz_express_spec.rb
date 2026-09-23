@@ -23,7 +23,8 @@ RSpec.describe "Quiz Express", type: :system, viewport: :phone do
     click_link I18n.t("exams.question.skip")
     expect(page).to have_text(I18n.t("exams.bar.position", position: 2, total: 3))
     click_link I18n.t("exams.question.previous")
-    expect(page).to have_text(I18n.t("exams.bar.position", position: 1, total: 3))
+    # Every question here offers the same options, so wait for the first one itself.
+    expect(page).to have_no_link(I18n.t("exams.question.previous"))
 
     answer_with("Troponina I")
     expect(page).to have_text(I18n.t("exams.question.wrong"))

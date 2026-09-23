@@ -32,15 +32,19 @@ module Questions
       completion = Llm::Completion.call(role: :generator, prompt: prompt, max_tokens: MAX_TOKENS)
       return failure(completion.errors) unless completion.success?
 
+      run&.charge!(completion.payload)
       payload = parse(completion.payload[:content])
       return failure("El modelo no devolvió JSON legible") if payload.nil?
 
       built = CaseBuilder.call(
         payload, guideline: guideline, recommendations: recommendations, run: run, locale: locale
       ).payload
-      record(completion.payload, built)
+      record(built)
 
-      success(cases: built[:cases], rejected: built[:rejected], tokens: completion.payload[:output_tokens])
+      success(
+        cases: built[:cases], rejected: built[:rejected], reasons: built[:reasons],
+        tokens: completion.payload[:output_tokens]
+      )
     end
 
     def context_for_logging
@@ -69,15 +73,13 @@ module Questions
       nil
     end
 
-    def record(usage, built)
+    def record(built)
       return if run.nil?
 
-      run.increment!(:input_tokens, usage[:input_tokens])
-      run.increment!(:output_tokens, usage[:output_tokens])
-      run.increment!(:cost_usd, usage[:cost_usd])
       run.increment!(:cases_created, built[:cases].size)
       run.increment!(:attempts, built[:cases].size + built[:rejected])
       run.increment!(:rejections, built[:rejected])
+      run.tally_rejections!(built[:reasons])
     end
   end
 end

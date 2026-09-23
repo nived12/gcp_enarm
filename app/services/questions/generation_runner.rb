@@ -1,9 +1,6 @@
 # Walks the generatable corpus a window of statements at a time, handing each window to
-# Questions::CaseGenerator, and stops at a number of calls or at a spending cap.
-#
-# Breadth first: every guideline's first window before any guideline's second, so a run
-# stopped early — by the cap, a crash, or on purpose — has touched the whole syllabus
-# thinly rather than a few topics deeply.
+# Questions::CaseGenerator, and stops at a number of calls or at a spending cap. The order
+# of the windows is Questions::WindowPlan's.
 #
 # A window is made of statements no question cites yet, so running it again continues
 # where the last run stopped instead of paying for the same cases twice. A statement the
@@ -16,12 +13,13 @@ module Questions
   class GenerationRunner < ApplicationService
     FAILURES_IN_A_ROW = 5
 
-    def initialize(run:, calls:, budget_usd: nil, guidelines: Guideline.generatable, on_progress: nil)
+    def initialize(run:, calls:, budget_usd: nil, guidelines: Guideline.generatable, order: "newest",
+                   specialty: nil, on_progress: nil)
       super()
       @run = run
       @calls = calls
       @budget_usd = budget_usd
-      @guidelines = guidelines
+      @plan = WindowPlan.new(guidelines, order: order, specialty: specialty)
       @on_progress = on_progress
     end
 
@@ -32,7 +30,7 @@ module Questions
       end
 
       counts = { calls: 0, cases: 0, rejected: 0, failed: 0 }
-      planned = windows.first(calls)
+      planned = plan.windows.first(calls)
       @planned = planned.size
       @failures_in_a_row = 0
       stopped = planned.each_with_index do |(guideline, recommendations), index|
@@ -52,7 +50,7 @@ module Questions
 
     private
 
-    attr_reader :run, :calls, :budget_usd, :guidelines, :on_progress
+    attr_reader :run, :calls, :budget_usd, :plan, :on_progress
 
     def spent?
       budget_usd && run.reload.cost_usd >= budget_usd
@@ -80,26 +78,6 @@ module Questions
       tags = options.values_at(:detail, :locale).join("/")
       state = result.success? ? "#{result.payload[:cases].size} casos" : result.errors.full_messages.first
       on_progress.call("#{guideline.catalog_key} [#{tags}] #{state}")
-    end
-
-    # Current guidelines first, since the plan prefers them; within a pass, newest first.
-    def windows
-      by_guideline = uncited.group_by(&:source_guideline_id)
-      ordered = guidelines.where(id: by_guideline.keys).order(Arel.sql("year DESC NULLS LAST"), :catalog_key)
-      slices = ordered.map { |g| [g, by_guideline[g.id].each_slice(CaseGenerator::RECOMMENDATIONS_PER_CALL).to_a] }
-
-      deepest = slices.map { |_, windows| windows.size }.max.to_i
-      (0...deepest).flat_map do |pass|
-        slices.filter_map { |guideline, windows| [guideline, windows[pass]] if windows[pass] }
-      end
-    end
-
-    def uncited
-      Recommendation.actionable
-                    .where(guideline_sections: { guideline_id: guidelines.select(:id) })
-                    .where.not(id: Question.where.not(recommendation_id: nil).select(:recommendation_id))
-                    .select("recommendations.*, guideline_sections.guideline_id AS source_guideline_id")
-                    .order(:id)
     end
 
     # A fixed rotation rather than a random draw, so a run is reproducible. Long vignettes

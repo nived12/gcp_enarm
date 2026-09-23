@@ -21,6 +21,12 @@ RSpec.describe Questions::Prompt do
     expect(prompt).to include('"Diagnóstico del síndrome coronario agudo"')
   end
 
+  # Case 250 of the pilot ended its vignette with its own question.
+  it "keeps the question out of the vignette" do
+    expect(prompt).to include(described_class::STEM_INSTRUCTIONS)
+    expect(described_class::STEM_INSTRUCTIONS).to include("nunca con\nuna pregunta", "What is")
+  end
+
   # §9.1 of the convocatoria: the three cross-cutting contexts are where a case happens.
   it "sets the case where the exam sets it" do
     expect(prompt).to include("medicina\nfamiliar en el primer nivel, un servicio de urgencias")

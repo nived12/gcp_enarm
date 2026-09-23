@@ -328,6 +328,11 @@ es:
       undated: "sin año"
       expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
       retired_notice: "Caso retirado: no llegará a los alumnos."
+      rationale_verdicts:
+        unjudged: "Razón sin revisar por la segunda opinión."
+        sound: "Razón respaldada por la segunda opinión."
+        overstated: "Razón exagerada, oculta a los alumnos"
+        contradicted: "Razón contradicha por el caso o la guía, oculta a los alumnos"
       second_opinion: "Segunda opinión"
       verdict_meaning:
         supported: "Otro modelo respondió cada pregunta usando solo la recomendación citada y eligió la misma opción."

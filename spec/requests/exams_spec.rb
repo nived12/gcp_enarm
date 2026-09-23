@@ -110,6 +110,23 @@ RSpec.describe "Exams", type: :request do
       )
     end
 
+    # The cheap generator overstates; a rationale the second opinion rejected would
+    # teach a rule no guideline wrote.
+    it "never shows a rationale the second opinion rejected, and shows the ones it has not judged" do
+      options = kase.questions.first.answer_options
+      options.find_by!(text: "Troponina I").update!(rationale_verdict: "overstated", rationale_note: "Exagera.")
+      options.find_by!(text: "Ecocardiograma").update!(rationale_verdict: "sound")
+      answer(exam, 1, "Troponina I")
+
+      get exam_question_path(exam, 1)
+
+      expect(response.body).not_to include("Troponina I no es el estudio inicial", "Exagera.")
+      expect(response.body).to include(
+        "Ecocardiograma no es el estudio inicial",
+        "Radiografía de tórax no es el estudio"
+      )
+    end
+
     it "warns when the cited guideline is past its validity" do
       kase.guideline.update!(year: 2008)
       answer(exam, 1, "Troponina I")
@@ -122,6 +139,7 @@ RSpec.describe "Exams", type: :request do
     it "lets a question be left for later and brings it round again after the rest" do
       get exam_question_path(exam, 1)
       expect(response.body).to include(I18n.t("exams.question.skip"), exam_question_path(exam, 2))
+      expect(response.body).to include('<meta name="turbo-cache-control" content="no-preview">')
 
       get exam_question_path(exam, 2)
       expect(response).to have_http_status(:ok)

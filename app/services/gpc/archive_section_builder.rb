@@ -76,13 +76,19 @@ module Gpc
       counts[:sections] += 1
       counts[:recommendations] += statements.size
 
-      if section.content_hash == digest
+      if section.content_hash == digest && !parked?(section)
         section.update!(position: position)
       else
         rebuild(section, statements, position, digest)
         counts[:rebuilt] += 1
       end
       section.id
+    end
+
+    # Rows an earlier reconcile left below zero; see reconcile. Rebuilding the section
+    # puts them back, and a question citing one keeps its row.
+    def parked?(section)
+      section.persisted? && section.recommendations.where(position: ..0).exists?
     end
 
     def rebuild(section, statements, position, digest)
@@ -98,10 +104,14 @@ module Gpc
     # A statement whose text survived the reparse keeps its row, so the questions that
     # cite it keep their citation; only rows whose text is gone are deleted, and one a
     # question cites stops the rebuild. Positions are parked below zero first because
-    # (section, position) is unique and the survivors may swap places.
+    # (section, position) is unique and the survivors may swap places. Parked at -id,
+    # which no two rows share, and read back after parking: rows loaded before it kept
+    # their old position in memory, so a survivor whose place did not change looked
+    # unchanged, was never saved, and stayed parked — and the next rebuild flipped it
+    # back on top of another row.
     def reconcile(section, statements)
-      pool = section.recommendations.group_by(&:text)
-      section.recommendations.update_all("position = -position")
+      section.recommendations.update_all("position = -id")
+      pool = section.recommendations.reload.group_by(&:text)
 
       kept = statements.each.with_index(1).map do |statement, index|
         attributes = statement.slice(*RECOMMENDATION_ATTRIBUTES).merge(position: index)

@@ -1,3 +1,6 @@
+<%# A cached copy of a question can be out of date (the form of one since answered), and
+    Turbo would show it while fetching the real page. %>
+<% turbo_exempts_page_from_preview %>
 <% content_for :title, t("exams.bar.position", position: @exam_question.position, total: @exam.question_count) %>
 <% question = @exam_question.question %>
 <% answer = @exam_question.answer %>

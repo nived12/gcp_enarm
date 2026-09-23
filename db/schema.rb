@@ -48,6 +48,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_040000) do
     t.integer "position", null: false
     t.bigint "question_id", null: false
     t.text "rationale"
+    t.text "rationale_note"
+    t.string "rationale_verdict"
     t.text "text", null: false
     t.datetime "updated_at", null: false
     t.index ["question_id", "position"], name: "index_answer_options_on_question_id_and_position", unique: true
@@ -175,6 +177,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_040000) do
 
   create_table "generation_runs", force: :cascade do |t|
     t.integer "attempts", default: 0, null: false
+    t.integer "calls", default: 0, null: false
     t.integer "cases_created", default: 0, null: false
     t.decimal "cost_usd", precision: 12, scale: 8, default: "0.0", null: false
     t.datetime "created_at", null: false
@@ -186,6 +189,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_040000) do
     t.integer "output_tokens", default: 0, null: false
     t.string "provider", null: false
     t.string "purpose", null: false
+    t.jsonb "rejection_reasons", default: {}, null: false
     t.integer "rejections", default: 0, null: false
     t.datetime "started_at"
     t.string "status", default: "running", null: false

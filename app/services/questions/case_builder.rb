@@ -12,6 +12,15 @@ module Questions
     STRONG_GRADES = /\A(A|1\+{1,2}|I{1,2}[ab]?|alta|fuerte)\b/i
     WEAK_GRADES = /\A(D|4|IV|muy baja|baja|d[ée]bil)\b/i
 
+    # The vignette is the patient; the question lives only on Question. A stem that ends
+    # by asking something shows the student a question nobody answers, above the one
+    # they are asked (the pilot's case 250 did, and four more with it).
+    ENDS_IN_A_QUESTION = /[?？]["'”»)\]]*\z/
+
+    # A question's own text found inside the stem is the same defect without the mark.
+    # Below this length a "question" is a word or two, which any vignette may contain.
+    QUESTION_ECHO_MIN_LENGTH = 20
+
     # `recommendations` must be in the order the prompt numbered them, since that number
     # is how the model says which one it used.
     def initialize(payload, guideline:, recommendations:, run: nil, locale: "es")
@@ -22,21 +31,37 @@ module Questions
       @run = run
       @locale = locale
       @rejected = 0
+      @reasons = Hash.new(0)
     end
 
     def call
       cases = Array(payload["cases"]).filter_map { |attributes| build_case(attributes) }
 
-      success(cases: cases, rejected: rejected)
+      success(cases: cases, rejected: rejected, reasons: reasons)
+    end
+
+    def self.asks_question?(stem, question_texts)
+      return true if stem.to_s.strip.match?(ENDS_IN_A_QUESTION)
+
+      vignette = echo_form(stem)
+      question_texts.any? do |text|
+        echo = echo_form(text)
+        echo.length >= QUESTION_ECHO_MIN_LENGTH && vignette.include?(echo)
+      end
+    end
+
+    def self.echo_form(text)
+      text.to_s.downcase.delete("¿?¡!").squish
     end
 
     private
 
-    attr_reader :payload, :guideline, :recommendations, :run, :locale, :rejected
+    attr_reader :payload, :guideline, :recommendations, :run, :locale, :rejected, :reasons
 
     def build_case(attributes)
       questions = Array(attributes["questions"])
       return if attributes["stem"].blank? || questions.empty?
+      return reject(questions.size, :stem_asks_question) if stem_asks_question?(attributes["stem"], questions)
 
       kase = ClinicalCase.new(
         stem: attributes["stem"], guideline: guideline, generation_run: run,
@@ -68,15 +93,25 @@ module Questions
         )
       end
 
-      return question if usable?(question, options)
+      reason = rejection_for(question, options)
+      return question if reason.nil?
 
-      @rejected += 1
       kase.questions.delete(question)
+      reject(1, reason)
+    end
+
+    def reject(count, reason)
+      @rejected += count
+      @reasons[reason.to_s] += count
       nil
     end
 
+    def stem_asks_question?(stem, questions)
+      self.class.asks_question?(stem, questions.map { |question| question["text"] })
+    end
+
     # The model numbers the statements itself, so a number outside the list means it
-    # invented the reference. Nil, and usable? drops the question.
+    # invented the reference. Nil, and rejection_for drops the question.
     def cited(number)
       index = number.to_i - 1
       recommendations[index] unless index.negative?
@@ -84,16 +119,18 @@ module Questions
 
     # Four options, exactly one of them correct, and a quote that really is in the cited
     # recommendation. The quote check lives on Question so that nothing can write a
-    # question that skips it; this only decides whether to keep the row at all.
-    def usable?(question, options)
-      return false if question.recommendation.nil?
-      return false unless options.size == Question::OPTION_COUNT
-      return false unless options.count { |option| option["correct"] } == 1
+    # question that skips it; this only decides whether to keep the row at all, and names
+    # why not, so a run can say which defect cost it money.
+    def rejection_for(question, options)
+      return :unknown_recommendation if question.recommendation.nil?
+      return :wrong_option_count unless options.size == Question::OPTION_COUNT
+      return :not_one_correct unless options.count { |option| option["correct"] } == 1
+      return if question.valid?
 
-      question.valid?
+      question.errors.of_kind?(:source_quote, :not_in_recommendation) ? :quote_not_in_recommendation : :incomplete
     end
 
-    # Only called with questions that passed usable?, so every one has a recommendation;
+    # Only called with questions that passed rejection_for, so every one has a recommendation;
     # a missing grade is the only gap, and filter_map drops it.
     def difficulty_for(questions)
       grades = questions.filter_map { |question| question.recommendation.grade }

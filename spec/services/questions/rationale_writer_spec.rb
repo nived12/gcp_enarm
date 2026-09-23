@@ -82,7 +82,46 @@ RSpec.describe Questions::RationaleWriter do
 
     described_class.call(clinical_case, run: run)
 
-    expect(run.reload).to have_attributes(input_tokens: 900, output_tokens: 300, attempts: 1)
+    expect(run.reload).to have_attributes(input_tokens: 900, output_tokens: 300, attempts: 1, calls: 1)
+  end
+
+  it "leaves a new rationale unjudged, whatever the old one's verdict was" do
+    question.answer_options.second.update!(rationale: "Vieja.", rationale_verdict: "sound")
+    stub_model("questions" => [{ "question" => 1, "rationales" => { "B" => "Nueva." } }])
+
+    described_class.call(clinical_case)
+
+    expect(question.answer_options.second.reload).to have_attributes(rationale: "Nueva.", rationale_verdict: nil)
+  end
+
+  describe "rewriting what the verifier rejected" do
+    before do
+      question.answer_options.second.update!(
+        rationale: "Es inaceptable.", rationale_verdict: "overstated", rationale_note: "Exagera."
+      )
+      question.answer_options.third.update!(rationale: "Mide presión.", rationale_verdict: "sound")
+    end
+
+    it "shows the rejected text and the reviewer's reason, and rewrites only that one" do
+      stub_model("questions" => [{ "question" => 1, "rationales" => { "B" => "Mide oxigenación.", "C" => "Otra." } }])
+
+      result = described_class.call(clinical_case, rewrite: true)
+
+      expect(Llm::Completion).to have_received(:call)
+        .with(hash_including(prompt: a_string_including("RECHAZADA: Es inaceptable.", "Motivo del revisor: Exagera.")))
+      expect(result.payload).to eq(written: 1)
+      expect(question.answer_options.reload.map(&:rationale).drop(1).first(2)).to eq(
+        ["Mide oxigenación.",
+        "Mide presión."]
+      )
+      expect(question.answer_options.second).to have_attributes(rationale_verdict: nil, rationale_note: nil)
+    end
+
+    it "has nothing to do when nothing was rejected" do
+      question.answer_options.second.update!(rationale_verdict: "sound")
+
+      expect(described_class.call(clinical_case, rewrite: true)).to be_failure
+    end
   end
 
   it "fails on a reply it cannot read, or when the provider fails" do

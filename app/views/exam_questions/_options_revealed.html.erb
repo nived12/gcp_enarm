@@ -19,8 +19,9 @@
           </span>
         <% end %>
         <%# Why a distractor is not the answer — under every one, not only the one chosen:
-            the others are the next exam's wrong answers. %>
-        <% if option.rationale.present? && !option.correct? %>
+            the others are the next exam's wrong answers. One the second opinion rejected
+            as overstated or contradicted is never shown. %>
+        <% if option.rationale_visible? %>
           <span class="mt-2 block text-xs leading-relaxed text-ink-muted"><%= option.rationale %></span>
         <% end %>
       </span>

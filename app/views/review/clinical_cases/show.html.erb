@@ -82,9 +82,15 @@
           </span>
           <span class="min-w-0">
             <span class="text-ink"><%= option.text %></span>
-            <%# What a student who chose it will read. %>
+            <%# What a student who chose it will read, and what the second opinion made of
+                it. A rejected rationale is shown here, struck through with the reason, so
+                the doctor can judge the judge; students never see it. %>
             <% if option.rationale.present? && !option.correct? %>
-              <span class="mt-2 block text-xs leading-relaxed text-ink-muted"><%= option.rationale %></span>
+              <span class="mt-2 block text-xs leading-relaxed <%= option.rationale_rejected? ? "text-ink-faint line-through" : "text-ink-muted" %>"><%= option.rationale %></span>
+              <% rationale_verdict = option.rationale_verdict || "unjudged" %>
+              <span class="mt-1 block text-xs <%= option.rationale_rejected? ? "text-incorrect" : "text-ink-faint" %>">
+                <%= t("review.show.rationale_verdicts.#{rationale_verdict}") %><% if option.rationale_note.present? %>: <%= option.rationale_note %><% end %>
+              </span>
             <% end %>
           </span>
         </li>
