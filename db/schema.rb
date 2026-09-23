@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -159,6 +159,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
 
   create_table "generation_runs", force: :cascade do |t|
     t.integer "attempts", default: 0, null: false
+    t.integer "calls", default: 0, null: false
     t.integer "cases_created", default: 0, null: false
     t.decimal "cost_usd", precision: 12, scale: 8, default: "0.0", null: false
     t.datetime "created_at", null: false
@@ -170,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_030000) do
     t.integer "output_tokens", default: 0, null: false
     t.string "provider", null: false
     t.string "purpose", null: false
+    t.jsonb "rejection_reasons", default: {}, null: false
     t.integer "rejections", default: 0, null: false
     t.datetime "started_at"
     t.string "status", default: "running", null: false

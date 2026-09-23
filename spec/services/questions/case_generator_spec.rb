@@ -84,8 +84,29 @@ RSpec.describe Questions::CaseGenerator do
 
       expect(run.reload).to have_attributes(
         input_tokens: 600, output_tokens: 1_200, cost_usd: 0.00195,
-        cases_created: 1, rejections: 1, attempts: 2
+        cases_created: 1, rejections: 1, attempts: 2, calls: 1,
+        rejection_reasons: { "quote_not_in_recommendation" => 1 }
       )
+    end
+
+    it "adds each call's rejection reasons to what the run already counted" do
+      run = create(:generation_run, rejection_reasons: { "quote_not_in_recommendation" => 2 })
+      stub_model(one_case(question(quote: "inventado"), question(index: 9)))
+
+      described_class.call(guideline, run: run)
+
+      expect(run.reload.rejection_reasons).to eq("quote_not_in_recommendation" => 3, "unknown_recommendation" => 1)
+    end
+
+    # The tokens were spent whether or not the reply parses, and a spending cap that
+    # does not see them lets a run of bad replies overshoot it.
+    it "charges a reply it could not read" do
+      run = create(:generation_run)
+      stub_model("lo siento, no puedo")
+
+      described_class.call(guideline, run: run)
+
+      expect(run.reload).to have_attributes(input_tokens: 600, cost_usd: 0.00195, calls: 1, cases_created: 0)
     end
 
     it "works without a run at all" do

@@ -64,21 +64,61 @@ RSpec.describe Questions::CaseBuilder do
     it "drops a question whose quote is not in the recommendation" do
       built = build_from(one_case(question(quote: "angiografía coronaria inmediata")))
 
-      expect(built).to eq(cases: [], rejected: 1)
+      expect(built).to eq(cases: [], rejected: 1, reasons: { "quote_not_in_recommendation" => 1 })
     end
 
     it "drops a question that does not offer exactly four options" do
-      expect(build_from(one_case(question(options: options(total: 3))))[:cases]).to be_empty
+      built = build_from(one_case(question(options: options(total: 3))))
+
+      expect(built).to eq(cases: [], rejected: 1, reasons: { "wrong_option_count" => 1 })
     end
 
     it "drops a question with more than one correct answer" do
-      expect(build_from(one_case(question(options: options(correct_count: 2))))[:cases]).to be_empty
+      built = build_from(one_case(question(options: options(correct_count: 2))))
+
+      expect(built).to eq(cases: [], rejected: 1, reasons: { "not_one_correct" => 1 })
+    end
+
+    it "drops a question that is missing its text, and says it was incomplete" do
+      expect(build_from(one_case(question(text: "")))[:reasons]).to eq("incomplete" => 1)
     end
 
     # The model numbers the statements itself. Number 0 once read as "the last one".
     it "drops a question citing a statement number that was never sent" do
-      expect(build_from(one_case(question(number: 99)))[:cases]).to be_empty
+      expect(build_from(one_case(question(number: 99)))[:reasons]).to eq("unknown_recommendation" => 1)
       expect(build_from(one_case(question(number: 0)))[:cases]).to be_empty
+    end
+
+    describe "a vignette that asks its own question" do
+      def case_with_stem(stem, *questions)
+        { "cases" => [{ "stem" => stem, "questions" => questions.presence || [question, question] }] }
+      end
+
+      # Case 250 of the pilot: the student read a question nobody answered above the one
+      # they were asked. The whole case goes, and every question in it counts as rejected.
+      it "rejects the whole case when the stem ends in a question" do
+        built = build_from(case_with_stem("Paciente de 54 años con dolor torácico. ¿Cuál es la conducta inicial?"))
+
+        expect(built).to eq(cases: [], rejected: 2, reasons: { "stem_asks_question" => 2 })
+      end
+
+      it "sees the question mark through a closing quote or bracket, and in English" do
+        expect(build_from(case_with_stem("A 54-year-old man. What is the next step?\""))[:cases]).to be_empty
+        expect(build_from(case_with_stem("Paciente de 54 años (¿dolor típico?) "))[:cases]).to be_empty
+      end
+
+      it "rejects a stem that repeats a question's text without the marks" do
+        stem = "Paciente de 54 años con dolor torácico. Cuál es el estudio inicial"
+
+        expect(build_from(case_with_stem(stem))[:reasons]).to eq("stem_asks_question" => 2)
+      end
+
+      it "keeps a stem that only quotes a short question or asks mid-sentence" do
+        stem = "La madre pregunta: ¿es contagioso? Refiere fiebre de 38.5 °C."
+        short = question(text: "¿Diagnóstico?")
+
+        expect(build_from(case_with_stem(stem, short))[:cases].size).to eq(1)
+      end
     end
 
     it "keeps the good questions in a case that also had a bad one" do

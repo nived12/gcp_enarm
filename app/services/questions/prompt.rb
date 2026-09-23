@@ -50,6 +50,15 @@ module Questions
         recomendaciones.
     TEXT
 
+    # Five of the pilot's 197 vignettes, case 250 among them, ended with a question of
+    # their own; the student then read a question nobody answers above the one they are
+    # asked. Questions::CaseBuilder rejects any that still do.
+    STEM_INSTRUCTIONS = <<~TEXT.strip
+      La viñeta ("stem") solo describe al paciente y termina con un dato clínico, nunca con
+      una pregunta: no escribas en ella "¿Cuál es…?", "What is…?" ni ninguna otra pregunta
+      o instrucción al alumno. Cada pregunta va únicamente en su propio campo "text".
+    TEXT
+
     # An unknown detail level falls back to focused rather than failing the call.
     def initialize(guideline, recommendations, detail: :focused, locale: "es")
       @guideline = guideline
@@ -68,6 +77,8 @@ module Questions
         #{questions_per_case} preguntas de opción múltiple.
 
         #{vignette_instructions}
+
+        #{STEM_INSTRUCTIONS}
 
         #{SETTING_INSTRUCTIONS}
 

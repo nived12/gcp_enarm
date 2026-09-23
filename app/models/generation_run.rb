@@ -22,6 +22,22 @@ class GenerationRun < ApplicationRecord
 
   scope :recent, -> { order(started_at: :desc) }
 
+  # One completion's usage, charged the moment it is returned — before its reply is
+  # parsed, since a reply that turns out to be unreadable was still paid for.
+  def charge!(usage)
+    increment!(:input_tokens, usage[:input_tokens].to_i)
+    increment!(:output_tokens, usage[:output_tokens].to_i)
+    increment!(:cost_usd, usage[:cost_usd].to_f)
+    increment!(:calls, 1)
+  end
+
+  def tally_rejections!(reasons)
+    return if reasons.blank?
+
+    merged = rejection_reasons.merge(reasons.transform_keys(&:to_s)) { |_reason, before, added| before + added }
+    update!(rejection_reasons: merged)
+  end
+
   def total_tokens
     input_tokens + output_tokens
   end
