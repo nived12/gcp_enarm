@@ -204,6 +204,7 @@ es:
       tally: "%{correct} aciertos de %{total} preguntas"
       time: "tiempo %{time}"
       by_specialty: "Por especialidad"
+      by_specialty_overlap: "Cada pregunta cuenta en la especialidad de su caso y también en el contexto donde ocurre (Urgencias, Medicina Familiar o Salud Pública), así que las filas suman más que el total."
       specialty_tally: "%{correct} de %{total}"
       questions: "Preguntas"
       blank: "En blanco"
@@ -604,6 +605,7 @@ es:
       by_difficulty: "Por dificultad"
       by_difficulty_note: "En un empate, el ENARM cuenta primero los aciertos en Alta y luego en Media."
       by_specialty: "Por especialidad"
+      by_specialty_overlap: "Cada pregunta cuenta en la especialidad de su caso y también en el contexto donde ocurre (Urgencias, Medicina Familiar o Salud Pública), así que las filas suman más que el total."
       empty:
         title: "Aún no hay nada que medir"
         body: "Tu promedio, tus aciertos por especialidad y por dificultad aparecen en cuanto respondas tus primeras preguntas."
@@ -630,9 +632,9 @@ es:
       rules: "Con %{minimum} preguntas al día la mantienes. Cada %{days} días de estudio ganas un protector, hasta %{max}, que se usa solo si un día no puedes, como en una guardia. El día termina a las 4 a. m."
     coverage:
       title: "Lo que has visto"
-      intro: "Casos del banco que ya respondiste, por área. El ENARM enmarca sus casos en Salud Pública, Urgencias y Medicina Familiar, así que también cuentan."
+      intro: "Casos del banco que ya respondiste, por área. El ENARM sitúa cada caso en Urgencias, Medicina Familiar o Salud Pública, así que un caso cuenta en su especialidad y también en el contexto donde ocurre: puede aparecer en dos áreas."
       area: "%{seen} de %{published} casos"
-      none_published: "Aún no hay casos publicados"
+      none_published: "Aún no hay casos publicados en esta área, así que no cuenta como pendiente."
       neglected_title: "Estás dejando de lado"
       neglected_body: "Has visto mucho menos de estas áreas que del resto del banco."
       practice: "Practicar %{name}"

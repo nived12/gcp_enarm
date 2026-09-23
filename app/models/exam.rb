@@ -128,15 +128,18 @@ class Exam < ApplicationRecord
   end
 
   # Correct answers against questions asked, per specialty, in the order CIFRHS breaks
-  # ties by. Blanks count as asked and missed.
+  # ties by. Blanks count as asked and missed. A specialty is an area
+  # (ClinicalCase.in_area): a question counts under its case's subject and its setting,
+  # so the rows can add up to more than the exam — the results page says so.
   def tally_by_specialty
-    counts = exam_questions.reorder(nil).joins(:clinical_case).left_joins(:answer).group("clinical_cases.specialty_id")
-                           .pluck("clinical_cases.specialty_id", Arel.sql("COUNT(*)"),
+    counts = exam_questions.reorder(nil).joins(:clinical_case).joins(ClinicalCase::AREAS_JOIN).left_joins(:answer)
+                           .group("areas.area_id")
+                           .pluck("areas.area_id", Arel.sql("COUNT(*)"),
                              Arel.sql("COUNT(*) FILTER (WHERE answers.correct)")
                            )
     specialties = Specialty.where(id: counts.map(&:first)).index_by(&:id)
 
-    counts.filter_map { |id, asked, correct| [specialties[id], correct, asked] if specialties[id] }
+    counts.map { |id, asked, correct| [specialties[id], correct, asked] }
           .sort_by { |specialty, _correct, _asked| specialty.position }
   end
 

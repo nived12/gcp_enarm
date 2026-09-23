@@ -120,6 +120,52 @@ RSpec.describe Exams::Builder do
     )
   end
 
+  describe "a specialty filter that is an area" do
+    let(:emergency) { create(:emergency_setting, position: 6) }
+    let!(:internal_in_emergency) do
+      create(:published_case, specialty: internal, setting: emergency, questions_count: 1)
+    end
+    let!(:emergency_in_emergency) do
+      create(:published_case, specialty: emergency, setting: emergency, questions_count: 1)
+    end
+    let!(:emergency_unknown) { create(:published_case, specialty: emergency, setting: nil, questions_count: 1) }
+    let!(:internal_unknown) { create(:published_case, specialty: internal, setting: nil, questions_count: 1) }
+
+    it "draws the cases about Urgencias and the cases set in urgencias" do
+      exam = build(filters: { specialty_ids: [emergency.id] }).payload[:exam]
+
+      expect(cases_in(exam)).to contain_exactly(internal_in_emergency, emergency_in_emergency, emergency_unknown)
+    end
+
+    it "never draws a case twice when a troncal and a context are picked together" do
+      exam = build(filters: { specialty_ids: [internal.id, emergency.id] }).payload[:exam]
+
+      expect(exam.exam_questions.map(&:clinical_case_id).tally.values).to all(eq(1))
+      expect(cases_in(exam))
+        .to contain_exactly(internal_in_emergency, emergency_in_emergency, emergency_unknown, internal_unknown)
+    end
+
+    it "leaves a troncal's filter to what the case is about" do
+      exam = build(filters: { specialty_ids: [internal.id] }).payload[:exam]
+
+      expect(cases_in(exam)).to contain_exactly(internal_in_emergency, internal_unknown)
+    end
+
+    it "keeps withdrawn cases out whatever their setting" do
+      internal_in_emergency.update!(status: "retired")
+
+      expect(cases_in(build(filters: { specialty_ids: [emergency.id] }).payload[:exam]))
+        .to contain_exactly(emergency_in_emergency, emergency_unknown)
+    end
+
+    it "draws exactly the cases the form counts beside the box" do
+      count = ClinicalCase.status_published.count_by_area.fetch(emergency.id)
+      exam = build(filters: { specialty_ids: [emergency.id], question_count: 100 }).payload[:exam]
+
+      expect(cases_in(exam).size).to eq(count)
+    end
+  end
+
   describe "the student's own history" do
     let!(:seen) { create(:published_case, questions_count: 1) }
     let!(:unseen) { create(:published_case, questions_count: 1) }

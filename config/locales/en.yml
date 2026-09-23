@@ -202,6 +202,7 @@ en:
       tally: "%{correct} correct out of %{total} questions"
       time: "time %{time}"
       by_specialty: "By specialty"
+      by_specialty_overlap: "Each question counts under its case's specialty and also under the setting it happens in (Emergency, Family Medicine or Public Health), so the rows add up to more than the total."
       specialty_tally: "%{correct} of %{total}"
       questions: "Questions"
       blank: "Blank"
@@ -602,6 +603,7 @@ en:
       by_difficulty: "By difficulty"
       by_difficulty_note: "In a tie, the ENARM counts correct answers in High first, then in Medium."
       by_specialty: "By specialty"
+      by_specialty_overlap: "Each question counts under its case's specialty and also under the setting it happens in (Emergency, Family Medicine or Public Health), so the rows add up to more than the total."
       empty:
         title: "Nothing to measure yet"
         body: "Your average and your accuracy by specialty and by difficulty appear as soon as you answer your first questions."
@@ -628,9 +630,9 @@ en:
       rules: "%{minimum} questions a day keeps it. Every %{days} days of study earns a freeze, up to %{max}, spent only on a day you cannot study, like a night shift. The day ends at 4 a.m."
     coverage:
       title: "What you have seen"
-      intro: "Cases from the bank you have already answered, by area. The ENARM frames its cases in Public Health, Emergency and Family Medicine, so those count too."
+      intro: "Cases from the bank you have already answered, by area. The ENARM sets every case in Emergency, Family Medicine or Public Health, so a case counts under its specialty and under the setting it happens in: it can appear in two areas."
       area: "%{seen} of %{published} cases"
-      none_published: "No published cases yet"
+      none_published: "No published cases in this area yet, so it does not count as pending."
       neglected_title: "You are leaving behind"
       neglected_body: "You have seen much less of these areas than of the rest of the bank."
       practice: "Practise %{name}"

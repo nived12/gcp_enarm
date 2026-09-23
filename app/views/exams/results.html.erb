@@ -17,6 +17,9 @@
 <% if tally.size > 1 %>
   <section class="mt-10">
     <h2 class="eyebrow"><%= t("exams.results.by_specialty") %></h2>
+    <% if tally.sum { |_specialty, _right, asked| asked } > @exam.question_count %>
+      <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("exams.results.by_specialty_overlap") %></p>
+    <% end %>
     <ul class="mt-3 divide-y divide-line border-y border-line">
       <% tally.each do |specialty, right, asked| %>
         <li class="flex items-baseline justify-between gap-4 py-3 text-sm">

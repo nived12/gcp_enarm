@@ -97,9 +97,11 @@ module Exams
       end.then { |rows| filters["interleave"] ? rows : blocked(rows) }
     end
 
+    # A specialty picked is an area: the cases about it and the cases set in it, each
+    # once however many areas are picked. The deal below still interleaves by subject.
     def candidates
       cases = ClinicalCase.status_published
-      cases = cases.where(specialty_id: filters["specialty_ids"]) if filters["specialty_ids"]
+      cases = cases.in_area(filters["specialty_ids"]) if filters["specialty_ids"]
       cases = cases.where(topic_id: filters["topic_ids"]) if filters["topic_ids"]
       cases = cases.where(difficulty: filters["difficulties"]) if filters["difficulties"]
       cases = cases.where.not(id: seen_cases) if filters["unseen_only"]

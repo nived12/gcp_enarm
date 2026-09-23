@@ -48,7 +48,21 @@ RSpec.describe "Stats", type: :request do
       I18n.t("difficulties.high"), I18n.t("stats.show.no_questions"), "Medicina Interna",
       I18n.t("stats.coverage.area", seen: 1, published: 1), I18n.t("stats.coverage.none_published")
     )
-    expect(response.body).not_to include(I18n.t("stats.coverage.neglected_title"))
+    expect(response.body).not_to include(
+      I18n.t("stats.coverage.neglected_title"),
+      I18n.t("stats.show.by_specialty_overlap")
+    )
+  end
+
+  it "counts a case set in a context under that context too, and says why the rows overlap" do
+    internal = create(:specialty, name: "Medicina Interna", position: 1)
+    family = create(:family_medicine_setting, position: 7)
+    answer(create(:published_case, specialty: internal, setting: family, questions_count: 1), correct: true)
+
+    get stats_path
+
+    expect(response.body).to include(I18n.t("stats.show.by_specialty_overlap"), "Medicina Familiar")
+    expect(response.body.scan(I18n.t("stats.coverage.area", seen: 1, published: 1)).size).to eq(2)
   end
 
   it "has accuracy before it has an average, while the first exam is unfinished" do
@@ -76,6 +90,23 @@ RSpec.describe "Stats", type: :request do
     form = Nokogiri::HTML(response.body).at_css("[data-testid=neglected] form")
     post form["action"], params: form.css("input[type=hidden]").to_h { |input| [input["name"], input["value"]] }
     expect(Exam.last.exam_questions.map { |exam_question| exam_question.clinical_case.specialty }).to eq([family])
+  end
+
+  # Medicina Familiar owns almost no case by subject; the practice button has to draw
+  # the ones set in a family-medicine consult, or it would open an empty exam.
+  it "practises a context from the cases set in it" do
+    internal = create(:specialty, name: "Medicina Interna", position: 1)
+    family = create(:family_medicine_setting, position: 7)
+    create_list(:published_case, 10, specialty: internal, questions_count: 1).each do |kase|
+      answer(kase, correct: true)
+    end
+    set_in_family = create(:published_case, specialty: internal, setting: family, questions_count: 1)
+
+    get stats_path
+    form = Nokogiri::HTML(response.body).at_css("[data-testid=neglected] form")
+    post form["action"], params: form.css("input[type=hidden]").to_h { |input| [input["name"], input["value"]] }
+
+    expect(Exam.last.exam_questions.map(&:clinical_case)).to eq([set_in_family])
   end
 
   describe "the streak" do

@@ -76,6 +76,33 @@ RSpec.describe Stats::PerformanceCalculator do
     counter = ->(*, payload) { queries += 1 unless payload[:name] == "SCHEMA" }
     ActiveSupport::Notifications.subscribed(counter, "sql.active_record") { performance }
 
-    expect(queries).to be <= 3
+    expect(queries).to be <= 4
+  end
+
+  describe "a question counted by subject and by setting" do
+    let(:emergency) { create(:emergency_setting, position: 6) }
+
+    it "puts the question in both rows and says the rows overlap, while the overall figure counts it once" do
+      hard_internal.update!(setting: emergency)
+      sit([hard_internal, easy_pediatrics], [true, false, true, false])
+
+      expect(performance.by_specialty).to eq(
+        [
+          [internal, described_class::Tally.new(correct: 1, asked: 2)],
+          [pediatrics, described_class::Tally.new(correct: 1, asked: 2)],
+          [emergency, described_class::Tally.new(correct: 1, asked: 2)]
+        ]
+      )
+      expect(performance.overall).to eq(described_class::Tally.new(correct: 2, asked: 4))
+      expect(performance).to be_specialties_overlap
+    end
+
+    it "counts a case about Urgencias set in urgencias once, and then nothing overlaps" do
+      kase = create(:published_case, specialty: emergency, setting: emergency, questions_count: 1)
+      sit([kase], [true])
+
+      expect(performance.by_specialty).to eq([[emergency, described_class::Tally.new(correct: 1, asked: 1)]])
+      expect(performance).not_to be_specialties_overlap
+    end
   end
 end
