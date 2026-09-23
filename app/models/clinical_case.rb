@@ -39,8 +39,10 @@ class ClinicalCase < ApplicationRecord
 
   validate :published_only_when_supported
 
-  # Withdrawn cases stay back whatever the verifier said: `retired` is a person's decision
-  # that outranks a model's agreement, and `flagged` is a student's report still unread.
+  # Withdrawn cases stay back whatever the verifier said, because both are a person's
+  # decision and outrank a model's agreement: `flagged` is staff holding a case until it
+  # is decided, `retired` is that decision. A student's report never flags a case — one
+  # student could otherwise pull an item from everyone's bank — it only queues it.
   WITHDRAWN = %w[flagged retired].freeze
 
   scope :publishable, -> { verdict_supported.where.not(status: WITHDRAWN) }
