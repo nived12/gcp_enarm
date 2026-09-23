@@ -3,10 +3,8 @@
 <%= link_to t("admin.users.back"), admin_users_path, class: "mt-4 inline-flex min-h-11 items-center text-sm text-ink-muted hover:text-accent" %>
 
 <section class="mt-4 card px-6 py-5">
-  <p class="break-all text-lg font-medium text-ink"><%= @user.email %></p>
-  <% if @user.name.present? %>
-    <p class="mt-1 text-sm text-ink-muted"><%= @user.name %></p>
-  <% end %>
+  <p class="text-lg font-medium text-ink"><%= @user.full_name %></p>
+  <p class="mt-1 break-all text-sm text-ink-muted"><%= @user.email %></p>
 
   <dl class="mt-5 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
     <div>

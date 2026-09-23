@@ -1,4 +1,5 @@
-<%# form, name, type, label, plus any of: autocomplete, autofocus, required, value %>
+<%# form, name, type, label, plus any of: autocomplete, autofocus, required, value.
+    `value` is passed on only when given: an explicit nil would blank a model-backed field. %>
 <div class="mb-4">
   <%= form.label name, label, class: "mb-1.5 block text-sm font-medium text-ink" %>
   <%= form.public_send(
@@ -7,7 +8,7 @@
         required: local_assigns.fetch(:required, true),
         autofocus: local_assigns.fetch(:autofocus, false),
         autocomplete: local_assigns[:autocomplete],
-        value: local_assigns[:value],
-        class: "input"
+        class: "input",
+        **local_assigns.slice(:value)
       ) %>
 </div>

@@ -7,7 +7,8 @@ RSpec.describe "Returning to pricing after signing up", type: :request do
 
   def sign_up
     post registration_path, params: {
-      user: { email: "nueva@example.com", password: "contrasena-segura", password_confirmation: "contrasena-segura" }
+      user: { first_name: "Dana", last_name: "Ríos", email: "nueva@example.com", password: "contrasena-segura",
+              password_confirmation: "contrasena-segura" }
     }
   end
 

@@ -25,7 +25,14 @@ class User < ApplicationRecord
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 
   normalizes :email, with: ->(e) { e.strip.downcase }
+  normalizes :first_name, :last_name, with: ->(value) { value.squish }
 
+  # Given names and surnames are separate so the greeting can use the first alone.
+  # Surnames are asked for at sign-up but not required afterwards: accounts created
+  # before the split, and some Google profiles, carry only a given name.
+  validates :first_name, presence: true, length: { maximum: 100 }
+  validates :last_name, length: { maximum: 100 }
+  validates :last_name, presence: true, on: :sign_up
   validates :email, presence: true, uniqueness: true
   validates :locale, inclusion: { in: %w[es en] }
   validates :time_zone, inclusion: { in: TIME_ZONES }
@@ -35,6 +42,10 @@ class User < ApplicationRecord
   # the account is recovered.
   generates_token_for :password_reset, expires_in: 15.minutes do
     password_salt&.last(10)
+  end
+
+  def full_name
+    [ first_name, last_name ].compact_blank.join(" ")
   end
 
   # The day the student is on, in their own time zone.

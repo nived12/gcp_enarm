@@ -12,7 +12,7 @@ RSpec.describe "Sessions", type: :request do
       sign_in
       get root_path
 
-      expect(response.body).to include(I18n.t("home.dashboard.greeting", name: user.name))
+      expect(response.body).to include(I18n.t("home.dashboard.greeting", name: user.first_name))
     end
   end
 

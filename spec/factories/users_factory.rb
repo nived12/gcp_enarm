@@ -2,7 +2,8 @@ FactoryBot.define do
   factory :user do
     sequence(:email) { |n| "medico#{n}@example.com" }
     password { "contrasena-segura" }
-    name { "Gabriela" }
+    first_name { "Gabriela" }
+    last_name { "Guadarrama López" }
     locale { "es" }
     role { "student" }
 

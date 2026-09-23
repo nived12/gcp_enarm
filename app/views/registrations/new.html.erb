@@ -9,8 +9,12 @@
       </div>
     <% end %>
 
-    <%= render "shared/field", form: form, name: :name, type: :text,
-          label: t("attributes.name"), autocomplete: "name", autofocus: true, required: false %>
+    <div class="sm:grid sm:grid-cols-2 sm:gap-x-3">
+      <%= render "shared/field", form: form, name: :first_name, type: :text,
+            label: t("attributes.first_name"), autocomplete: "given-name", autofocus: true %>
+      <%= render "shared/field", form: form, name: :last_name, type: :text,
+            label: t("attributes.last_name"), autocomplete: "family-name" %>
+    </div>
     <%= render "shared/field", form: form, name: :email, type: :email,
           label: t("attributes.email"), autocomplete: "username" %>
     <%= render "shared/field", form: form, name: :password, type: :password,

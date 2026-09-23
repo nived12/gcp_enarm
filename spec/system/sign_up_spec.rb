@@ -15,7 +15,8 @@ RSpec.describe "Signing up", type: :system do
 
   it "takes the time zone from the browser, and lets the student change it" do
     visit new_registration_path
-    fill_in I18n.t("attributes.name"), with: "Dana"
+    fill_in I18n.t("attributes.first_name"), with: "Dana"
+    fill_in I18n.t("attributes.last_name"), with: "Ríos Vega"
     fill_in I18n.t("attributes.email"), with: "dana@example.com"
     fill_in I18n.t("attributes.password"), with: "contrasena-segura"
     fill_in I18n.t("attributes.password_confirmation"), with: "contrasena-segura"

@@ -1,0 +1,15 @@
+<section class="card mt-6 px-5 py-5">
+  <%= form_with model: user, url: account_name_path, method: :patch do |form| %>
+    <fieldset>
+      <legend class="eyebrow"><%= t("account_names.title") %></legend>
+      <p class="mt-2 mb-4 text-sm leading-relaxed text-ink-muted"><%= t("account_names.hint") %></p>
+      <div class="sm:grid sm:grid-cols-2 sm:gap-x-3">
+        <%= render "shared/field", form: form, name: :first_name, type: :text,
+              label: t("attributes.first_name"), autocomplete: "given-name" %>
+        <%= render "shared/field", form: form, name: :last_name, type: :text,
+              label: t("attributes.last_name"), autocomplete: "family-name", required: false %>
+      </div>
+    </fieldset>
+    <%= form.submit t("account_names.submit"), class: "btn btn--ghost w-full sm:w-auto" %>
+  <% end %>
+</section>

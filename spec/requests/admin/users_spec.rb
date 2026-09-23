@@ -16,6 +16,15 @@ RSpec.describe "Admin user lookup", type: :request do
       expect(response.body).not_to include("otra@example.com")
     end
 
+    it "finds an account by given names and surnames together" do
+      named = create(:user, first_name: "María José", last_name: "Pérez López", email: "mj@example.com")
+
+      get admin_users_path(q: "josé pérez")
+
+      expect(response.body).to include(named.email, "María José Pérez López")
+      expect(response.body).not_to include(student.email)
+    end
+
     it "treats the search as text, not a pattern" do
       get admin_users_path(q: "%")
 

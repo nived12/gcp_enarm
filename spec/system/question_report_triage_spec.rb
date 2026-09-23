@@ -4,8 +4,8 @@ require "rails_helper"
 # student reports a question in place, and an admin finds it, reads the case on the
 # review screen, withdraws it and closes the report with a note.
 RSpec.describe "Suggesting a change and triaging it", type: :system do
-  let(:student) { create(:user, name: "Ana") }
-  let(:admin) { create(:user, :admin, name: "Gabriela") }
+  let(:student) { create(:user, first_name: "Ana") }
+  let(:admin) { create(:user, :admin, first_name: "Gabriela") }
   let!(:kase) { create(:published_case, questions_count: 1, stem: "Paciente de 58 años con dolor torácico.") }
 
   it "files the report without leaving the question, and the admin resolves it" do

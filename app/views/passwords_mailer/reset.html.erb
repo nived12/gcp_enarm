@@ -1,3 +1,5 @@
+<p><%= t("passwords_mailer.reset.greeting", name: @user.first_name) %></p>
+
 <p>
   <%= t("passwords_mailer.reset.intro") %>
   <%= link_to t("passwords_mailer.reset.link"), edit_password_url(@user.password_reset_token) %>.

@@ -20,6 +20,21 @@ RSpec.describe User do
     it "rejects a locale the UI has no translations for" do
       expect(build(:user, locale: "fr")).not_to be_valid
     end
+
+    it "requires a given name, and surnames only when signing up" do
+      expect(build(:user, first_name: " ")).not_to be_valid
+      expect(build(:user, last_name: nil)).to be_valid
+      expect(build(:user, last_name: nil).valid?(:sign_up)).to be(false)
+      expect(build(:user, first_name: "a" * 101)).not_to be_valid
+      expect(build(:user, last_name: "a" * 101)).not_to be_valid
+    end
+  end
+
+  describe "#full_name" do
+    it "joins given names and surnames, and stands alone without surnames" do
+      expect(build(:user, first_name: "María José", last_name: "Pérez López").full_name).to eq("María José Pérez López")
+      expect(build(:user, first_name: "Gabriela", last_name: nil).full_name).to eq("Gabriela")
+    end
   end
 
   describe "normalization" do
@@ -27,6 +42,12 @@ RSpec.describe User do
       user = create(:user, email: "  Gabriela@Example.COM ")
 
       expect(user.email).to eq("gabriela@example.com")
+    end
+
+    it "collapses stray whitespace in names" do
+      user = create(:user, first_name: "  María   José ", last_name: " Pérez  López ")
+
+      expect([ user.first_name, user.last_name ]).to eq([ "María José", "Pérez López" ])
     end
   end
 

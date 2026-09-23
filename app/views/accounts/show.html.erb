@@ -2,7 +2,7 @@
 
 <section>
   <p class="eyebrow"><%= t("billing.account.eyebrow") %></p>
-  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= @user.name.presence || t("billing.account.title") %></h1>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= @user.full_name %></h1>
   <p class="mt-1 text-sm text-ink-muted"><%= @user.email %></p>
 </section>
 
@@ -21,6 +21,8 @@
   <%= link_to (@user.unlimited? ? t("billing.account.extend") : t("billing.account.see_plans")), pricing_path,
         class: "btn btn--ghost mt-4 w-full sm:w-auto" %>
 </section>
+
+<%= render "accounts/name", user: @user %>
 
 <%= render "accounts/time_zone", user: @user %>
 

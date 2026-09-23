@@ -4,7 +4,7 @@ require "rails_helper"
 # plan, see today's topics named on the home screen, and start the quiz on exactly those.
 # SCREENSHOTS=1 keeps a picture of each screen under tmp/screenshots.
 RSpec.describe "Study plan", type: :system, viewport: :phone do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
   let!(:syllabus) { create_syllabus }
   let(:first_topic) { syllabus["cirugia-general"].first }
 

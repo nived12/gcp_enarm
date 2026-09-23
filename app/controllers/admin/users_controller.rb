@@ -10,7 +10,13 @@ module Admin
     def index
       @query = params[:q].to_s.strip
       users = User.order(created_at: :desc).limit(LIMIT)
-      users = users.where("email ILIKE ?", "%#{User.sanitize_sql_like(@query)}%") if @query.present?
+      if @query.present?
+        pattern = "%#{User.sanitize_sql_like(@query)}%"
+        users = users.where(
+          "email ILIKE :pattern OR concat_ws(' ', first_name, last_name) ILIKE :pattern",
+          pattern: pattern
+        )
+      end
       @users = users
     end
 

@@ -3,7 +3,7 @@ require "rails_helper"
 # An exam started by mistake, or finished and not wanted, can be taken out of the
 # student's history and average — after they confirm it.
 RSpec.describe "Discarding an exam", type: :system, viewport: :phone do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
 
   before { create(:published_case, questions_count: 1) }
 

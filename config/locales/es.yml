@@ -248,7 +248,6 @@ es:
     dashboard:
       today: "HOY"
       greeting: "Hola, %{name}"
-      fallback_name: "colega"
       average: "Tu promedio"
       completed:
         one: "en 1 examen terminado"
@@ -289,6 +288,7 @@ es:
   passwords_mailer:
     reset:
       subject: "Restablece tu contraseña"
+      greeting: "Hola, %{name}:"
       intro: "Puedes elegir una contraseña nueva desde aquí:"
       link: "restablecer mi contraseña"
       expiry: "El enlace expira en %{duration}."
@@ -522,7 +522,7 @@ es:
       title: "Usuarios"
       subtitle: "Busca una cuenta por correo para atender una solicitud de soporte."
       search: "Buscar"
-      search_placeholder: "correo@ejemplo.com"
+      search_placeholder: "Nombre o correo"
       empty:
         title: "Ninguna cuenta coincide"
         body: "Revisa el correo o busca solo una parte de él."
@@ -553,6 +553,12 @@ es:
       invalid_date: "La fecha no es válida."
   activerecord:
     attributes:
+      user:
+        first_name: "Nombre(s)"
+        last_name: "Apellidos"
+        email: "Correo electrónico"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
       clinical_case:
         setting: "Contexto"
     errors:
@@ -573,7 +579,8 @@ es:
               taken: "ya tiene una cuenta"
 
   attributes:
-    name: "Nombre"
+    first_name: "Nombre(s)"
+    last_name: "Apellidos"
     email: "Correo electrónico"
     password: "Contraseña"
     password_confirmation: "Confirmar contraseña"
@@ -585,6 +592,11 @@ es:
       have_account: "¿Ya tienes cuenta?"
     create:
       welcome: "Tu cuenta está lista. Te damos la bienvenida."
+  account_names:
+    title: "Tu nombre"
+    hint: "Así te saludamos. Si tu nombre o tus apellidos quedaron en el campo equivocado, corrígelos aquí."
+    submit: "Guardar nombre"
+    updated: "Nombre actualizado."
   time_zones:
     title: "Tu zona horaria"
     hint: "Tu día termina a la medianoche de esta hora: ahí cierran tu racha y tus preguntas gratuitas del día. Chihuahua usa la hora del centro."

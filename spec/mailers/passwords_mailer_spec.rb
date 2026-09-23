@@ -6,9 +6,11 @@ RSpec.describe PasswordsMailer do
   let(:user) { create(:user, email: "gabriela@example.com") }
   let(:mail) { described_class.reset(user) }
 
-  it "addresses the user with a Spanish subject" do
+  it "addresses the user by name with a Spanish subject" do
     expect(mail.to).to eq(["gabriela@example.com"])
+    expect(mail[:to].display_names).to eq(["Gabriela Guadarrama López"])
     expect(mail.subject).to eq(I18n.t("passwords_mailer.reset.subject"))
+    expect(mail.text_part.body.to_s).to include(I18n.t("passwords_mailer.reset.greeting", name: "Gabriela"))
   end
 
   it "carries a working reset link in both parts" do

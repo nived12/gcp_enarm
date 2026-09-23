@@ -246,7 +246,6 @@ en:
     dashboard:
       today: "TODAY"
       greeting: "Hello, %{name}"
-      fallback_name: "colleague"
       average: "Your average"
       completed:
         one: "across 1 finished exam"
@@ -287,6 +286,7 @@ en:
   passwords_mailer:
     reset:
       subject: "Reset your password"
+      greeting: "Hello, %{name}:"
       intro: "You can choose a new password here:"
       link: "reset my password"
       expiry: "This link expires in %{duration}."
@@ -520,7 +520,7 @@ en:
       title: "Users"
       subtitle: "Look up an account by email to handle a support request."
       search: "Search"
-      search_placeholder: "email@example.com"
+      search_placeholder: "Name or email"
       empty:
         title: "No account matches"
         body: "Check the email or search for part of it."
@@ -551,6 +551,12 @@ en:
       invalid_date: "That date is not valid."
   activerecord:
     attributes:
+      user:
+        first_name: "First name(s)"
+        last_name: "Last name(s)"
+        email: "Email address"
+        password: "Password"
+        password_confirmation: "Password confirmation"
       clinical_case:
         setting: "Setting"
     errors:
@@ -571,7 +577,8 @@ en:
               taken: "already has an account"
 
   attributes:
-    name: "Name"
+    first_name: "First name(s)"
+    last_name: "Last name(s)"
     email: "Email address"
     password: "Password"
     password_confirmation: "Confirm password"
@@ -583,6 +590,11 @@ en:
       have_account: "Already have an account?"
     create:
       welcome: "Your account is ready. Welcome."
+  account_names:
+    title: "Your name"
+    hint: "This is how we greet you. If your first name or surnames ended up in the wrong field, fix them here."
+    submit: "Save name"
+    updated: "Name updated."
   time_zones:
     title: "Your time zone"
     hint: "Your day ends at midnight in this zone: that is when your streak and your free questions for the day close. Chihuahua keeps central time."

@@ -39,7 +39,7 @@ RSpec.describe "Authentication", type: :request do
     it "creates the account and signs the user in" do
       expect {
         post registration_path, params: {
-          user: { name: "Gabriela", email: "nueva@example.com",
+          user: { first_name: "Gabriela", last_name: "Guadarrama", email: "nueva@example.com",
                   password: "contrasena-segura", password_confirmation: "contrasena-segura" }
         }
       }.to change(User, :count).by(1)
@@ -50,7 +50,8 @@ RSpec.describe "Authentication", type: :request do
     it "keeps the time zone the browser reported, and the default for one tzinfo does not know" do
       sign_up = lambda do |email, zone|
         post registration_path, params: {
-          user: { email: email, password: "contrasena-segura", password_confirmation: "contrasena-segura",
+          user: { first_name: "Dana", last_name: "Ríos", email: email, password: "contrasena-segura",
+                  password_confirmation: "contrasena-segura",
                   time_zone: zone }.compact
         }
         User.find_by!(email: email).time_zone
@@ -60,6 +61,16 @@ RSpec.describe "Authentication", type: :request do
       expect(sign_up.call("marte@example.com", "Mars/Olympus_Mons")).to eq("America/Mexico_City")
       expect(sign_up.call("vacio@example.com", "")).to eq("America/Mexico_City")
       expect(sign_up.call("sin-dato@example.com", nil)).to eq("America/Mexico_City")
+    end
+
+    it "asks for surnames as well as given names" do
+      post registration_path, params: {
+        user: { first_name: "Dana", last_name: "", email: "nueva@example.com",
+                password: "contrasena-segura", password_confirmation: "contrasena-segura" }
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("Apellidos no puede estar en blanco", "value=\"Dana\"")
     end
 
     it "re-renders the form when the passwords do not match" do

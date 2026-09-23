@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Account", type: :request do
-  let(:student) { create(:user, :trial_expired, name: "Dana") }
+  let(:student) { create(:user, :trial_expired, first_name: "Dana") }
 
   before { post session_path, params: { email: student.email, password: "contrasena-segura" } }
 
@@ -98,6 +98,33 @@ RSpec.describe "Account", type: :request do
 
       expect(flash[:alert]).to eq(I18n.t("time_zones.invalid"))
       expect(student.reload.time_zone).to eq("America/Mexico_City")
+    end
+  end
+
+  describe "names" do
+    it "offers both names for correction" do
+      get account_path
+
+      page = Nokogiri::HTML(response.body)
+      expect(page.at_css("input[name='user[first_name]']")["value"]).to eq("Dana")
+      expect(page.at_css("input[name='user[last_name]']")["value"]).to eq("Guadarrama López")
+    end
+
+    it "moves a word the name split put in the wrong field" do
+      student.update_columns(first_name: "María", last_name: "José Pérez López")
+
+      patch account_name_path, params: { user: { first_name: "María José", last_name: "Pérez López" } }
+
+      expect(response).to redirect_to(account_path)
+      expect(flash[:notice]).to eq(I18n.t("account_names.updated"))
+      expect(student.reload.full_name).to eq("María José Pérez López")
+    end
+
+    it "refuses an empty given name and keeps the old one" do
+      patch account_name_path, params: { user: { first_name: "", last_name: "Ríos" } }
+
+      expect(flash[:alert]).to include("Nombre(s)")
+      expect(student.reload.first_name).to eq("Dana")
     end
   end
 end

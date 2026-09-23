@@ -4,7 +4,7 @@ require "rails_helper"
 # case missed today comes back tomorrow in Repaso, and a pearls session keeps the streak.
 # SCREENSHOTS=1 saves each screen under tmp/screenshots.
 RSpec.describe "Review loop", type: :system, viewport: :phone do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
   let!(:kase) { create(:published_case, questions_count: 2, stem: "Paciente de 58 años con dolor torácico.") }
 
   before do

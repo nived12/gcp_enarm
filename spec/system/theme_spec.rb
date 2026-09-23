@@ -3,7 +3,7 @@ require "rails_helper"
 # Light and dark are equals in the design, so dark gets walked like light: every screen
 # a student sees, at phone width, painted from the dark tokens and nothing off-screen.
 RSpec.describe "Dark mode", type: :system, viewport: :phone do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
 
   # --ground in application.tailwind.css, as the browser reports it.
   LIGHT_GROUND = "rgb(255, 252, 245)".freeze

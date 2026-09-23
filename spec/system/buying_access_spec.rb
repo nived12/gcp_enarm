@@ -7,7 +7,7 @@ require "rails_helper"
 # target, so intercepting checkout.stripe.com itself would let the browser load it — and
 # the webhook is delivered by hand, signed with the test secret.
 RSpec.describe "Buying an access window", type: :system, viewport: :phone, stripe: true do
-  let(:student) { create(:user, :trial_expired, name: "Ana") }
+  let(:student) { create(:user, :trial_expired, first_name: "Ana") }
   let(:hosted_page) { "https://checkout.stripe.com/c/pay/cs_test_system" }
   let(:redirects) { Queue.new }
 

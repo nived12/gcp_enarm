@@ -5,7 +5,7 @@ module SystemHelpers
     fill_in I18n.t("attributes.email"), with: user.email
     fill_in I18n.t("attributes.password"), with: "contrasena-segura"
     click_button I18n.t("sessions.new.submit")
-    expect(page).to have_text(I18n.t("home.dashboard.greeting", name: user.name))
+    expect(page).to have_text(I18n.t("home.dashboard.greeting", name: user.first_name))
   end
 
   # Waits for the answer form first: after "Siguiente" the page still holding an

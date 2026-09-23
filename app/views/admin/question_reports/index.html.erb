@@ -48,6 +48,7 @@
           <span aria-hidden="true">·</span>
           <span><%= l(report.created_at.to_date, format: :long) %></span>
           <span aria-hidden="true">·</span>
+          <span><%= report.user.full_name %></span>
           <span class="break-all"><%= report.user.email %></span>
         </p>
 
@@ -79,7 +80,7 @@
         <% else %>
           <div class="mt-3 border-t border-line pt-4 text-sm text-ink-muted">
             <p>
-              <%= t("admin.question_reports.closed_by", who: report.resolved_by&.email || t("admin.question_reports.someone"),
+              <%= t("admin.question_reports.closed_by", who: report.resolved_by&.full_name || t("admin.question_reports.someone"),
                     date: l(report.resolved_at.to_date, format: :long)) %>
             </p>
             <% if report.resolution_note.present? %>

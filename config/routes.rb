@@ -30,7 +30,9 @@ Rails.application.routes.draw do
   # provider's webhook; returning from checkout grants nothing by itself.
   resource :pricing, only: :show, controller: "pricing"
   resources :checkouts, only: :create
-  resource :account, only: %i[show update]
+  resource :account, only: %i[show update] do
+    resource :name, only: :update, controller: "account_names"
+  end
   post "webhooks/stripe" => "stripe_webhooks#create", as: :stripe_webhook
   get "legal/:page" => "legal#show", as: :legal, constraints: { page: /terms|privacy|refunds/ }
 

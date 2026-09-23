@@ -4,7 +4,7 @@ require "rails_helper"
 # Quiz Express keeps today's streak, and the page then shows where they stand — including
 # the part of the bank they have not touched.
 RSpec.describe "Stats", type: :system, viewport: :phone do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
   let(:internal) { create(:specialty, name: "Medicina Interna", position: 1) }
   let(:family) { create(:specialty, name: "Medicina Familiar", kind: "cross_cutting", position: 2) }
 

@@ -3,7 +3,7 @@ require "rails_helper"
 # The builder's own controls — pills and the topic search — and a sitting interrupted
 # and taken up again.
 RSpec.describe "Arma tu Examen", type: :system do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
   let!(:chosen) do
     create(
       :published_case, questions_count: 2, stem: "Paciente de 58 años con dolor torácico.",

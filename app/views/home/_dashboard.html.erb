@@ -5,7 +5,7 @@
 <section>
   <p class="eyebrow"><%= t("home.dashboard.today") %></p>
   <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink">
-    <%= t("home.dashboard.greeting", name: Current.user.name.presence || t("home.dashboard.fallback_name")) %>
+    <%= t("home.dashboard.greeting", name: Current.user.first_name) %>
   </h1>
 </section>
 

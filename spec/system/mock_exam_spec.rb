@@ -3,7 +3,7 @@ require "rails_helper"
 # The exam as the real one is sat: every case on one page, answers saved as they are
 # chosen and changeable until the end, and a clock that ends the sitting by itself.
 RSpec.describe "Simulacro ENARM", type: :system do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
 
   before do
     create(:published_case, questions_count: 2)

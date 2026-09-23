@@ -34,7 +34,7 @@ RSpec.describe "Admin suggestion triage", type: :request do
       expect(response.body).not_to include("Ya corregida.")
 
       get admin_question_reports_path(filter_status: "resolved")
-      expect(response.body).to include("Ya corregida.", "Se cambió la opción.", reviewer.email)
+      expect(response.body).to include("Ya corregida.", "Se cambió la opción.", reviewer.full_name)
       expect(response.body).not_to include("La B no es la inicial.")
 
       get admin_question_reports_path(filter_status: "all")

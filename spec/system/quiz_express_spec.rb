@@ -3,7 +3,7 @@ require "rails_helper"
 # The practice loop, at phone width because that is where it is used: nothing that helps
 # answer before the answer; after it, the explanation, the cited statement and its figure.
 RSpec.describe "Quiz Express", type: :system, viewport: :phone do
-  let(:student) { create(:user, name: "Ana") }
+  let(:student) { create(:user, first_name: "Ana") }
   let!(:figure_case) do
     create(:published_case, questions_count: 2, figure: true, stem: "Paciente de 58 años con dolor torácico.")
   end
