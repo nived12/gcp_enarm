@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_050000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_060000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -298,6 +298,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_050000) do
     t.index ["guideline_section_id", "position"], name: "index_recommendations_on_guideline_section_id_and_position", unique: true
     t.index ["guideline_section_id"], name: "index_recommendations_on_guideline_section_id"
     t.index ["scale"], name: "index_recommendations_on_scale"
+  end
+
+  create_table "review_cards", force: :cascade do |t|
+    t.bigint "clinical_case_id"
+    t.datetime "created_at", null: false
+    t.date "due_on", null: false
+    t.decimal "ease_factor", precision: 4, scale: 2, default: "2.5", null: false
+    t.integer "interval_days", default: 0, null: false
+    t.integer "lapses", default: 0, null: false
+    t.date "last_reviewed_on"
+    t.bigint "recommendation_id"
+    t.integer "repetitions", default: 0, null: false
+    t.integer "reviews_count", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["clinical_case_id"], name: "index_review_cards_on_clinical_case_id"
+    t.index ["recommendation_id"], name: "index_review_cards_on_recommendation_id"
+    t.index ["user_id", "clinical_case_id"], name: "index_review_cards_on_user_id_and_clinical_case_id", unique: true, where: "(clinical_case_id IS NOT NULL)"
+    t.index ["user_id", "due_on"], name: "index_review_cards_on_user_id_and_due_on"
+    t.index ["user_id", "recommendation_id"], name: "index_review_cards_on_user_id_and_recommendation_id", unique: true, where: "(recommendation_id IS NOT NULL)"
+    t.check_constraint "num_nonnulls(clinical_case_id, recommendation_id) = 1", name: "review_cards_one_subject"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -599,6 +620,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_050000) do
   add_foreign_key "questions", "clinical_cases"
   add_foreign_key "questions", "recommendations"
   add_foreign_key "recommendations", "guideline_sections"
+  add_foreign_key "review_cards", "clinical_cases", on_delete: :cascade
+  add_foreign_key "review_cards", "recommendations", on_delete: :cascade
+  add_foreign_key "review_cards", "users", on_delete: :cascade
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
   add_foreign_key "solid_queue_batch_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

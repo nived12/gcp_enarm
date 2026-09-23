@@ -20,21 +20,36 @@ class StudyDay < ApplicationRecord
     (time.in_time_zone(time_zone) - DAY_STARTS_AT_HOUR.hours).to_date
   end
 
-  # A pearls session (Phase 5b) counts as showing up as well as ten questions do.
+  # One pearls session: ten statements, about two minutes.
+  PEARLS_PER_SESSION = 10
+
+  # A whole pearls session counts as showing up as well as ten questions do. One card
+  # does not: a single tap would otherwise keep the streak.
   def self.qualifies?(questions_answered, pearls_reviewed)
-    questions_answered >= MINIMUM_QUESTIONS || pearls_reviewed.positive?
+    questions_answered >= MINIMUM_QUESTIONS || pearls_reviewed >= PEARLS_PER_SESSION
   end
 
   # One statement, so two answers arriving together cannot lose a count between a read
   # and a write.
   def self.count_answer!(user, at: Time.current)
+    count!(user, :questions_answered, at)
+  end
+
+  def self.count_pearl!(user, at: Time.current)
+    count!(user, :pearls_reviewed, at)
+  end
+
+  INCREMENTS = {
+    questions_answered: "questions_answered = study_days.questions_answered + 1, updated_at = excluded.updated_at",
+    pearls_reviewed: "pearls_reviewed = study_days.pearls_reviewed + 1, updated_at = excluded.updated_at"
+  }.freeze
+
+  def self.count!(user, column, at)
     now = Time.current
     upsert(
-      { user_id: user.id, date: date_for(at, user.time_zone), questions_answered: 1, created_at: now, updated_at: now },
-      unique_by: %i[user_id date],
-      on_duplicate: Arel.sql(
-        "questions_answered = study_days.questions_answered + 1, updated_at = excluded.updated_at"
-      )
+      { user_id: user.id, date: date_for(at, user.time_zone), column => 1, created_at: now, updated_at: now },
+      unique_by: %i[user_id date], on_duplicate: Arel.sql(INCREMENTS.fetch(column))
     )
   end
+  private_class_method :count!
 end

@@ -1,0 +1,9 @@
+<%# One line, under the streak: what the review deck holds today. Never more than a line
+    above the fold. %>
+<% cases = ReviewCard.where(user: Current.user).published_cases.due(Current.user.study_date).count %>
+<%= link_to reviews_path, class: "mt-3 flex min-h-11 items-center gap-3 border-t border-line pt-3 text-sm" do %>
+  <span class="min-w-0 flex-1 truncate <%= cases.positive? ? "text-ink" : "text-ink-faint" %>">
+    <%= cases.positive? ? t("home.dashboard.due", count: cases) : t("home.dashboard.due_none") %>
+  </span>
+  <span class="shrink-0 font-medium text-accent"><%= cases.positive? ? t("home.dashboard.due_link") : t("home.dashboard.due_pearls") %></span>
+<% end %>

@@ -10,7 +10,10 @@ class Exam < ApplicationRecord
   has_many :answers, through: :exam_questions
 
   enum :mode,
-    { quick_quiz: "quick_quiz", custom: "custom", full_exam: "full_exam", extended_exam: "extended_exam" },
+    {
+      quick_quiz: "quick_quiz", custom: "custom", full_exam: "full_exam", extended_exam: "extended_exam",
+      review: "review", weak_spots: "weak_spots"
+    },
     prefix: :mode
 
   enum :status,
@@ -24,7 +27,11 @@ class Exam < ApplicationRecord
 
   # How many questions each preset asks for. The real exam is ~280 items; 450 is the
   # length it had before 2021, and some students still train on it.
-  QUESTION_COUNTS = { "quick_quiz" => 10, "full_exam" => 280, "extended_exam" => 450 }.freeze
+  # A review session and a weak-spot quiz are twenty: long enough to matter, short
+  # enough to do between consults.
+  QUESTION_COUNTS = {
+    "quick_quiz" => 10, "full_exam" => 280, "extended_exam" => 450, "review" => 20, "weak_spots" => 20
+  }.freeze
 
   # The exam-length modes are rehearsals, so they default to the real exam's conditions:
   # explanations at the end and a clock. 75 seconds a question is the real sitting — six
@@ -44,6 +51,10 @@ class Exam < ApplicationRecord
   # rows stay: its answers still count against the free daily allowance, or answering
   # and discarding would get round it, and the cases in it were still seen.
   scope :kept, -> { where.not(status: "discarded") }
+
+  # Finishing an exam turns its blanks into misses and makes the single page's answers
+  # final, so every case in it goes back into the review schedule.
+  after_commit :reschedule_reviews, on: :update, if: -> { saved_change_to_status?(to: "completed") }
 
   def self.default_feedback_timing(mode)
     EXAM_LENGTH_MODES.include?(mode.to_s) ? "at_end" : "after_each"
@@ -127,5 +138,11 @@ class Exam < ApplicationRecord
 
     counts.filter_map { |id, asked, correct| [specialties[id], correct, asked] if specialties[id] }
           .sort_by { |specialty, _correct, _asked| specialty.position }
+  end
+
+  private
+
+  def reschedule_reviews
+    Reviews::CaseScheduler.call(user, exam_questions.reorder(nil).distinct.pluck(:clinical_case_id))
   end
 end

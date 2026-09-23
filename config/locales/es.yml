@@ -64,6 +64,8 @@ es:
       custom: "Arma tu Examen"
       full_exam: "ENARM Actual"
       extended_exam: "ENARM Clásico"
+      review: "Repaso"
+      weak_spots: "Puntos débiles"
     builder:
       unknown_mode: "Ese tipo de examen no existe."
       nothing_matches: "No hay casos publicados con esos filtros. Prueba con menos."
@@ -276,6 +278,12 @@ es:
         create: "Arma tu plan de estudio"
         create_body: "Un calendario día por día hasta el examen, con los temas de cada día."
         create_action: "Crear"
+      due:
+        one: "1 caso para repasar hoy"
+        other: "%{count} casos para repasar hoy"
+      due_none: "Nada pendiente de repaso"
+      due_link: "Repasar"
+      due_pearls: "Perlas"
 
   passwords_mailer:
     reset:
@@ -589,6 +597,7 @@ es:
         other: "días seguidos"
       today: "Hoy: %{answered} de %{minimum} preguntas"
       today_done: "Hoy ya cuenta: %{answered} preguntas"
+      today_done_pearls: "Hoy ya cuenta: hiciste tu sesión de perlas"
       start: "Responde %{minimum} preguntas hoy para empezar una racha."
       keep: "Te faltan %{remaining} para que hoy cuente."
       best:
@@ -816,3 +825,81 @@ es:
       see_results: "Ver resultados"
       mark_done: "Marcar como hecho"
       completed: "Marcado como hecho."
+  reviews:
+    nothing_due: "No tienes casos pendientes de repaso hoy."
+    index:
+      eyebrow: "Repaso"
+      title: "Lo que vuelve hoy"
+      intro: "Los casos que fallaste regresan en intervalos crecientes: al día siguiente, luego a los pocos días, luego más espaciados mientras los sigas acertando."
+      cases: "Casos para repasar"
+      cases_due:
+        one: "1 caso te espera hoy."
+        other: "%{count} casos te esperan hoy."
+      cases_none: "Nada pendiente hoy. Los casos que falles aparecerán aquí al día siguiente."
+      cases_week:
+        one: "1 caso más vuelve en los próximos siete días."
+        other: "%{count} casos más vuelven en los próximos siete días."
+      start: "Empezar repaso"
+      pearls: "Perlas"
+      pearls_intro:
+        one: "Recomendaciones de las GPC en tarjetas: lees la recomendación con una frase oculta, la revelas y calificas qué tan bien la recordabas. Una sesión de 1 tarjeta cuenta para tu racha."
+        other: "Recomendaciones de las GPC en tarjetas: lees la recomendación con una frase oculta, la revelas y calificas qué tan bien la recordabas. Una sesión de %{count} tarjetas cuenta para tu racha."
+      pearls_due:
+        one: "1 perla vuelve hoy."
+        other: "%{count} perlas vuelven hoy."
+      pearls_start: "Empezar sesión de perlas"
+      how: "Si marcas que un error fue por leer mal el caso o por falta de tiempo, el caso vuelve igual, pero sin empezar de cero: no era algo que te faltara saber."
+    summary:
+      title: "Repaso"
+      due: "Hoy: %{cases} casos y %{pearls} perlas"
+      none: "Nada pendiente hoy"
+      open: "Abrir"
+
+  pearls:
+    unknown_grade: "Esa calificación no existe."
+    show:
+      eyebrow: "Repaso"
+      title: "Perlas"
+      progress: "%{position} de %{total}"
+      empty:
+        title: "No hay perlas por ahora"
+        body: "Las perlas salen de las guías que ya tienen casos publicados. Vuelve cuando el banco crezca."
+        back: "Volver al inicio"
+    card:
+      blank_label: "frase oculta"
+      reveal: "Mostrar respuesta"
+      answer: "La recomendación completa"
+      grade_prompt: "¿Qué tan bien la recordabas?"
+      grades:
+        again: "No la recordaba"
+        hard: "Con dificultad"
+        good: "Bien"
+        easy: "Fácil"
+    done:
+      title: "Sesión completa"
+      streak_kept:
+        one: "Hoy ya cuenta. Llevas 1 día de racha."
+        other: "Hoy ya cuenta. Llevas %{count} días de racha."
+      streak_pending: "Sesión guardada. Termina una sesión completa para que hoy cuente."
+      again: "Otra sesión"
+      home: "Volver al inicio"
+
+  weak_spots:
+    none: "Todavía no hay temas por debajo de tu promedio."
+    preset:
+      title: "Tus puntos débiles"
+      body: "Temas donde vas por debajo de tu propio promedio, con más peso a lo reciente y a los errores por no saber:"
+      start:
+        one: "Practicar 1 pregunta"
+        other: "Practicar %{count} preguntas"
+      none: "Ningún tema está por debajo de tu promedio. Sigue así."
+      not_enough: "Responde al menos %{minimum} preguntas para encontrar tus puntos débiles."
+
+  remediation:
+    title: "Qué leer ahora"
+    intro: "Los temas en los que te fue peor que en el resto del examen, con las secciones de la guía donde está lo que fallaste. La ruta es la del menú de la guía."
+    tally: "%{correct} de %{total}"
+    no_reading: "Los errores aquí fueron por leer mal el caso o por tiempo: no hay lectura pendiente."
+    misses:
+      one: "1 error"
+      other: "%{count} errores"

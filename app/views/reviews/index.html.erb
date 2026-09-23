@@ -1,0 +1,32 @@
+<% content_for :title, t("reviews.index.title") %>
+
+<section>
+  <p class="eyebrow"><%= t("reviews.index.eyebrow") %></p>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("reviews.index.title") %></h1>
+  <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("reviews.index.intro") %></p>
+</section>
+
+<section class="card mt-8 px-6 py-5" aria-labelledby="cases-title">
+  <h2 id="cases-title" class="eyebrow"><%= t("reviews.index.cases") %></h2>
+  <p class="numeric mt-2 text-4xl font-medium tracking-tight <%= @summary.cases_due.positive? ? "text-ink" : "text-ink-faint" %>"><%= @summary.cases_due %></p>
+  <p class="mt-1 text-sm text-ink-muted">
+    <%= @summary.cases_due.positive? ? t("reviews.index.cases_due", count: @summary.cases_due) : t("reviews.index.cases_none") %>
+  </p>
+  <% if @summary.cases_this_week.positive? %>
+    <p class="mt-1 text-xs text-ink-faint"><%= t("reviews.index.cases_week", count: @summary.cases_this_week) %></p>
+  <% end %>
+  <% if @summary.cases_due.positive? %>
+    <%= button_to t("reviews.index.start"), exams_path(mode: "review"), class: "btn btn--primary mt-4 w-full sm:w-auto", form: { class: "contents" } %>
+  <% end %>
+</section>
+
+<section class="card mt-3 px-6 py-5" aria-labelledby="pearls-title">
+  <h2 id="pearls-title" class="eyebrow"><%= t("reviews.index.pearls") %></h2>
+  <p class="mt-2 text-sm leading-relaxed text-ink-muted"><%= t("reviews.index.pearls_intro", count: StudyDay::PEARLS_PER_SESSION) %></p>
+  <% if @summary.pearls_due.positive? %>
+    <p class="mt-1 text-xs text-ink-faint"><%= t("reviews.index.pearls_due", count: @summary.pearls_due) %></p>
+  <% end %>
+  <%= link_to t("reviews.index.pearls_start"), pearls_path, class: "btn btn--ghost mt-4 w-full sm:w-auto" %>
+</section>
+
+<p class="mt-6 max-w-prose text-xs leading-relaxed text-ink-faint"><%= t("reviews.index.how") %></p>

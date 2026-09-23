@@ -62,6 +62,8 @@ en:
       custom: "Build your Exam"
       full_exam: "Current ENARM"
       extended_exam: "Classic ENARM"
+      review: "Review"
+      weak_spots: "Weak spots"
     builder:
       unknown_mode: "That kind of exam does not exist."
       nothing_matches: "No published cases match those filters. Try fewer."
@@ -274,6 +276,12 @@ en:
         create: "Build your study plan"
         create_body: "A day-by-day calendar up to the exam, naming each day's topics."
         create_action: "Create"
+      due:
+        one: "1 case to review today"
+        other: "%{count} cases to review today"
+      due_none: "Nothing due for review"
+      due_link: "Review"
+      due_pearls: "Pearls"
 
   passwords_mailer:
     reset:
@@ -587,6 +595,7 @@ en:
         other: "days in a row"
       today: "Today: %{answered} of %{minimum} questions"
       today_done: "Today counts: %{answered} questions"
+      today_done_pearls: "Today counts: you did your pearls session"
       start: "Answer %{minimum} questions today to start a streak."
       keep: "%{remaining} more and today counts."
       best:
@@ -814,3 +823,81 @@ en:
       see_results: "See results"
       mark_done: "Mark as done"
       completed: "Marked as done."
+  reviews:
+    nothing_due: "You have no cases due for review today."
+    index:
+      eyebrow: "Review"
+      title: "What comes back today"
+      intro: "Cases you missed come back at growing intervals: the next day, a few days later, then further apart as long as you keep getting them right."
+      cases: "Cases to review"
+      cases_due:
+        one: "1 case is waiting today."
+        other: "%{count} cases are waiting today."
+      cases_none: "Nothing due today. Cases you miss show up here the next day."
+      cases_week:
+        one: "1 more case comes back in the next seven days."
+        other: "%{count} more cases come back in the next seven days."
+      start: "Start review"
+      pearls: "Pearls"
+      pearls_intro:
+        one: "Guideline recommendations as cards: read the recommendation with one phrase hidden, reveal it and rate how well you remembered it. A session of 1 card counts towards your streak."
+        other: "Guideline recommendations as cards: read the recommendation with one phrase hidden, reveal it and rate how well you remembered it. A session of %{count} cards counts towards your streak."
+      pearls_due:
+        one: "1 pearl comes back today."
+        other: "%{count} pearls come back today."
+      pearls_start: "Start a pearls session"
+      how: "If you mark a miss as misreading the case or running out of time, the case still comes back, but without starting over: it was not something you did not know."
+    summary:
+      title: "Review"
+      due: "Today: %{cases} cases and %{pearls} pearls"
+      none: "Nothing due today"
+      open: "Open"
+
+  pearls:
+    unknown_grade: "That rating does not exist."
+    show:
+      eyebrow: "Review"
+      title: "Pearls"
+      progress: "%{position} of %{total}"
+      empty:
+        title: "No pearls for now"
+        body: "Pearls come from guidelines that already have published cases. Come back when the bank grows."
+        back: "Back home"
+    card:
+      blank_label: "hidden phrase"
+      reveal: "Show answer"
+      answer: "The full recommendation"
+      grade_prompt: "How well did you remember it?"
+      grades:
+        again: "Did not remember"
+        hard: "With difficulty"
+        good: "Good"
+        easy: "Easy"
+    done:
+      title: "Session complete"
+      streak_kept:
+        one: "Today counts. Your streak is 1 day."
+        other: "Today counts. Your streak is %{count} days."
+      streak_pending: "Session saved. Finish a full session for today to count."
+      again: "Another session"
+      home: "Back home"
+
+  weak_spots:
+    none: "No topic is below your average yet."
+    preset:
+      title: "Your weak spots"
+      body: "Topics where you are below your own average, weighing recent answers and knowledge gaps more:"
+      start:
+        one: "Practise 1 question"
+        other: "Practise %{count} questions"
+      none: "No topic is below your average. Keep it up."
+      not_enough: "Answer at least %{minimum} questions to find your weak spots."
+
+  remediation:
+    title: "What to read now"
+    intro: "The topics that went worse than the rest of the exam, with the guideline sections that hold what you missed. The path is the guideline's own menu."
+    tally: "%{correct} of %{total}"
+    no_reading: "The misses here were misreading or time: nothing to read."
+    misses:
+      one: "1 miss"
+      other: "%{count} misses"

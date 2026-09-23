@@ -110,6 +110,14 @@ RSpec.describe "Stats", type: :request do
       expect(response.body).not_to include(I18n.t("stats.streak.best", count: 1))
     end
 
+    it "says a pearls session made today count, without claiming questions" do
+      student.study_days.create!(date: today, pearls_reviewed: StudyDay::PEARLS_PER_SESSION)
+
+      get stats_path
+
+      expect(response.body).to include(I18n.t("stats.streak.today_done_pearls"))
+    end
+
     it "sits under the average on the home screen and leads to the stats" do
       create(:published_case)
 

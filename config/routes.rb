@@ -64,5 +64,12 @@ Rails.application.routes.draw do
     end
   end
 
+  # Spaced repetition: the missed cases due again today, and pearls — guideline
+  # statements as flashcards — on the same schedule.
+  resources :reviews, only: :index
+  resource :pearls, only: :show do
+    post :review
+  end
+
   root "home#show"
 end

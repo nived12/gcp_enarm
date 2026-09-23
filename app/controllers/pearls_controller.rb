@@ -1,0 +1,30 @@
+# Pearls: guideline statements as flashcards, ten to a session. The session is carried in
+# the address (`step`) rather than stored — it only numbers the cards on screen; what is
+# counted towards the streak is each graded card, on the student's study day.
+class PearlsController < ApplicationController
+  SESSION_SIZE = StudyDay::PEARLS_PER_SESSION
+
+  def show
+    @step = params[:step].to_i.clamp(0, SESSION_SIZE)
+    if @step == SESSION_SIZE
+      @streak = Stats::StreakCalculator.call(Current.user).payload
+      return render(:done)
+    end
+
+    @pearl = Pearls::CardPicker.call(Current.user).payload
+  end
+
+  # Only a statement in the pool, or one the student already holds a card for, can be
+  # graded; anything else is not a pearl.
+  def review
+    recommendation = Recommendation.find(params.expect(:recommendation_id))
+    held = ReviewCard.where(user: Current.user, recommendation: recommendation).exists?
+    return head(:not_found) unless held || Pearl.pool.exists?(recommendation.id)
+
+    result = Pearls::ReviewRecorder.call(Current.user, recommendation, grade: params[:grade])
+    return head(:unprocessable_content) if result.failure?
+
+    step = params[:step].to_i.clamp(0, SESSION_SIZE - 1) + 1
+    redirect_to pearls_path(step: step), status: :see_other
+  end
+end

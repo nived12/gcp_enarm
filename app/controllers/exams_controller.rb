@@ -23,8 +23,12 @@ class ExamsController < ApplicationController
                    .sort_by { |topic| [topic.branch.specialty.position, topic.name] }
   end
 
+  # The review session and the weak-spot quiz choose their own cases; every other mode
+  # is drawn by the general builder.
+  BUILDERS = { "review" => Exams::ReviewBuilder, "weak_spots" => Exams::WeakSpotBuilder }.freeze
+
   def create
-    result = Exams::Builder.call(
+    result = BUILDERS.fetch(params[:mode].to_s, Exams::Builder).call(
       user: Current.user, mode: params[:mode], filters: filter_params,
       settings: setting_params
     )
@@ -84,7 +88,7 @@ class ExamsController < ApplicationController
   end
 
   def section_for(mode)
-    return "custom" if mode == "custom"
+    return "custom" if %w[custom weak_spots].include?(mode)
 
     "mock" if Exam::EXAM_LENGTH_MODES.include?(mode)
   end

@@ -23,7 +23,15 @@ class Answer < ApplicationRecord
 
   scope :answered_on, ->(day) { where(answered_at: day.all_day) }
 
+  # A new answer, a changed one and a reason given later all move the case's review
+  # schedule, which is replayed from the answers rather than kept alongside them.
+  after_commit :reschedule_review, on: %i[create update]
+
   private
+
+  def reschedule_review
+    Reviews::CaseScheduler.call(exam_question.exam.user, [exam_question.clinical_case_id])
+  end
 
   def option_belongs_to_the_question
     return if answer_option.nil? || answer_option.question_id == exam_question&.question_id

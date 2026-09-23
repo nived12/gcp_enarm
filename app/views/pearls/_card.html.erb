@@ -1,0 +1,41 @@
+<% guideline = pearl.guideline %>
+<% recommendation = pearl.recommendation %>
+<%# The statement with one phrase hidden, then all of it. The reveal is a <details>, so
+    it works without JavaScript and a screen reader announces it as a disclosure. The
+    hidden phrase is marked with the accent, never with <mark>: --highlight belongs only
+    to the span a question was generated from. No figure is ever shown here. %>
+<article class="card mt-6 px-5 py-6 sm:px-6">
+  <div class="flex flex-wrap items-center gap-3">
+    <span class="grade-marker"><%= recommendation.grade %></span>
+    <p class="numeric text-xs text-ink-faint">
+      <%= guideline.catalog_key %> · <%= guideline.year %>
+      <% if guideline.expired? %>· <span class="font-medium text-incorrect"><%= t("exams.feedback.expired") %></span><% end %>
+    </p>
+  </div>
+  <p class="mt-2 text-sm text-ink-muted"><%= guideline.title %></p>
+
+  <p class="vignette mt-5 whitespace-pre-line text-ink" lang="es"><%= pearl.before %><span class="rounded-control bg-surface-sunk px-2 text-ink-faint"><span aria-hidden="true">＿＿＿＿</span><span class="sr-only"><%= t("pearls.card.blank_label") %></span></span><%= pearl.after %></p>
+
+  <details class="group mt-6">
+    <summary class="btn btn--primary w-full cursor-pointer list-none group-open:hidden sm:w-auto"><%= t("pearls.card.reveal") %></summary>
+
+    <div class="mt-6 border-t border-line pt-5">
+      <p class="eyebrow"><%= t("pearls.card.answer") %></p>
+      <p class="vignette mt-3 whitespace-pre-line text-ink" lang="es"><%= pearl.before %><strong class="font-semibold text-accent underline decoration-2 underline-offset-4"><%= pearl.answer %></strong><%= pearl.after %></p>
+      <div class="numeric mt-4 space-y-1 text-xs leading-relaxed text-ink-faint">
+        <p><%= recommendation.cited_as %></p>
+        <p class="font-sans"><%= recommendation.guideline_section.menu_path %></p>
+      </div>
+
+      <p id="pearl-grade-label" class="mt-6 text-sm font-medium text-ink"><%= t("pearls.card.grade_prompt") %></p>
+      <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-labelledby="pearl-grade-label">
+        <% Pearls::ReviewRecorder::QUALITIES.each_key do |grade| %>
+          <%= button_to t("pearls.card.grades.#{grade}"), review_pearls_path,
+                params: { recommendation_id: recommendation.id, grade: grade, step: step },
+                class: "min-h-11 w-full rounded-full border border-line-strong px-4 text-sm text-ink hover:border-accent hover:text-accent",
+                form: { class: "contents" } %>
+        <% end %>
+      </div>
+    </div>
+  </details>
+</article>

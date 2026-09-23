@@ -1,0 +1,10 @@
+<%# The review deck on the stats page: what is due today, and the way into it. %>
+<%= link_to reviews_path, class: "card mt-3 flex min-h-11 items-center gap-4 px-6 py-4 transition-shadow hover:ring-2 hover:ring-accent" do %>
+  <span class="min-w-0 flex-1">
+    <span class="eyebrow block"><%= t("reviews.summary.title") %></span>
+    <span class="mt-1 block text-sm text-ink">
+      <%= summary.anything_due? ? t("reviews.summary.due", cases: summary.cases_due, pearls: summary.pearls_due) : t("reviews.summary.none") %>
+    </span>
+  </span>
+  <span class="shrink-0 text-sm font-medium text-accent"><%= t("reviews.summary.open") %></span>
+<% end %>

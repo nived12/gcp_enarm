@@ -1,0 +1,42 @@
+<%# What to read next: the topics this exam went worse on than the exam as a whole, each
+    with the guideline sections behind its misses, named as the site's own menu names
+    them. Nothing when the exam is too short for a topic's result to mean anything. %>
+<% weaknesses = Exams::RemediationReporter.call(exam).payload %>
+<% if weaknesses.any? %>
+  <section class="mt-10" aria-labelledby="remediation-title">
+    <h2 id="remediation-title" class="eyebrow"><%= t("remediation.title") %></h2>
+    <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("remediation.intro") %></p>
+    <ul class="mt-4 space-y-3">
+      <% weaknesses.each do |weakness| %>
+        <li class="card px-5 py-5 sm:px-6">
+          <div class="flex items-baseline justify-between gap-4">
+            <h3 class="text-sm font-medium text-ink"><%= weakness.topic.name %></h3>
+            <span class="numeric shrink-0 text-sm text-ink-muted"><%= t("remediation.tally", correct: weakness.correct, total: weakness.asked) %></span>
+          </div>
+          <% if weakness.readings.empty? %>
+            <p class="mt-2 text-xs leading-relaxed text-ink-faint"><%= t("remediation.no_reading") %></p>
+          <% else %>
+            <ul class="mt-3 divide-y divide-line border-t border-line">
+              <% weakness.readings.each do |reading| %>
+                <% guideline = reading.guideline %>
+                <li class="py-3 text-sm">
+                  <p class="text-ink"><%= reading.section.menu_path %></p>
+                  <p class="mt-1 text-xs text-ink-muted"><%= guideline.title %></p>
+                  <p class="numeric mt-1 text-xs text-ink-faint">
+                    <%= guideline.catalog_key %> · <%= guideline.year || t("exams.feedback.undated") %>
+                    <% if guideline.expired? %>· <span class="font-medium text-incorrect"><%= t("exams.feedback.expired") %></span><% end %>
+                    · <%= t("remediation.misses", count: reading.misses) %>
+                  </p>
+                  <% if guideline.source_url.present? %>
+                    <%= link_to t("exams.feedback.open_guideline"), guideline.source_url, target: "_blank", rel: "noopener",
+                          class: "inline-flex min-h-11 items-center text-sm text-accent underline underline-offset-2 hover:text-accent-hover" %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
