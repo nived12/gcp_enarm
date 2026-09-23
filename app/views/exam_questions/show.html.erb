@@ -5,7 +5,7 @@
 
 <%= render "exams/bar", exam: @exam,
       progress_label: t("exams.bar.position", position: @exam_question.position, total: @exam.question_count),
-      progress: @exam_question.position.fdiv(@exam.question_count) %>
+      progress: @exam.answers.count.fdiv(@exam.question_count) %>
 
 <div class="mt-8">
   <%= render "case", clinical_case: @exam_question.clinical_case, question: question %>
@@ -34,27 +34,8 @@
   </article>
 </div>
 
-<% if revealed %>
-  <% following = @exam_question.next_in_exam %>
-  <nav class="mt-12 flex items-center justify-between gap-4 border-t border-line pt-8">
-    <% if @exam.status_completed? %>
-      <% if (previous = @exam.exam_questions.find_by(position: @exam_question.position - 1)) %>
-        <%= link_to t("exams.question.previous"), exam_question_path(@exam, previous.position), class: "btn btn--ghost" %>
-      <% else %>
-        <span></span>
-      <% end %>
-      <%= link_to following ? t("exams.question.next") : t("exams.question.back_to_results"),
-            following ? exam_question_path(@exam, following.position) : exam_path(@exam), class: "btn btn--primary" %>
-    <% else %>
-      <span></span>
-      <% if following %>
-        <%= link_to t("exams.question.next"), exam_question_path(@exam, following.position), class: "btn btn--primary" %>
-      <% else %>
-        <%= button_to t("exams.question.see_results"), complete_exam_path(@exam), method: :patch, class: "btn btn--primary" %>
-      <% end %>
-    <% end %>
-  </nav>
-<% end %>
+<%= render "navigation", exam: @exam, exam_question: @exam_question, revealed: revealed %>
+<%= render "question_map", exam: @exam, current: @exam_question %>
 
 <% if @exam.unfinished? %>
   <div class="mt-12 flex justify-center"><%= render "exams/discard", exam: @exam %></div>

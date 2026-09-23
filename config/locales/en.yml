@@ -66,7 +66,7 @@ en:
       nothing_matches: "No published cases match those filters. Try fewer."
     answers:
       not_running: "This exam is not in progress."
-      not_current: "That question is no longer the current one."
+      already_answered: That question already has an answer.
       choose_option: "Choose an option to answer."
       time_up: "Time is up. The exam ended with what you managed to answer."
     bar:
@@ -90,6 +90,16 @@ en:
       next: "Next question →"
       back_to_results: "Back to results"
       see_results: "See results"
+      navigation: Question navigation
+      skip: "Skip →"
+      map:
+        title: All questions
+        unanswered: unanswered
+        right: correct
+        wrong: incorrect
+        confirm_finish:
+          one: "1 question is unanswered and will count as wrong. Finish the exam?"
+          other: "%{count} questions are unanswered and will count as wrong. Finish the exam?"
     feedback:
       explanation: "Explanation"
       source: "Cited recommendation"

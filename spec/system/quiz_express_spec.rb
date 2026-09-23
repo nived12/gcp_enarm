@@ -19,6 +19,12 @@ RSpec.describe "Quiz Express", type: :system, viewport: :phone do
     expect(page).to have_no_css("figure")
     expect_no_sideways_scroll
 
+    # A question can be left for later and come back to.
+    click_link I18n.t("exams.question.skip")
+    expect(page).to have_text(I18n.t("exams.bar.position", position: 2, total: 3))
+    click_link I18n.t("exams.question.previous")
+    expect(page).to have_text(I18n.t("exams.bar.position", position: 1, total: 3))
+
     answer_with("Troponina I")
     expect(page).to have_text(I18n.t("exams.question.wrong"))
     expect(page).to have_text(label("exams.feedback.source"))
@@ -35,6 +41,13 @@ RSpec.describe "Quiz Express", type: :system, viewport: :phone do
       answer_with("Electrocardiograma de 12 derivaciones")
       expect(page).to have_text(I18n.t("exams.question.right"))
     end
+
+    # Any question is one tap away, to reread a miss before finishing.
+    find("summary", text: I18n.t("exams.question.map.title")).click
+    click_link "1"
+    expect(page).to have_text(I18n.t("exams.question.wrong"))
+    expect(page).to have_text("Troponina I no es el estudio inicial")
+    expect_no_sideways_scroll
     click_button I18n.t("exams.question.see_results")
 
     expect(page).to have_text("66.7%")

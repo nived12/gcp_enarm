@@ -1,0 +1,22 @@
+<%# Back is always one question back, to reread an answer or return to one left open.
+    Forward leads to the next question still without an answer, so a skipped one comes
+    round again; after the review of a finished exam it is simply the next one. %>
+<% previous = exam.exam_questions.find_by(position: exam_question.position - 1) %>
+<nav class="mt-12 flex items-center justify-between gap-4 border-t border-line pt-8" aria-label="<%= t("exams.question.navigation") %>">
+  <% if previous %>
+    <%= link_to t("exams.question.previous"), exam_question_path(exam, previous.position), class: "btn btn--ghost whitespace-nowrap" %>
+  <% else %>
+    <span></span>
+  <% end %>
+
+  <% if exam.status_completed? %>
+    <% following = exam_question.next_in_exam %>
+    <%= link_to following ? t("exams.question.next") : t("exams.question.back_to_results"),
+          following ? exam_question_path(exam, following.position) : exam_path(exam), class: "btn btn--primary" %>
+  <% elsif (following = exam.unanswered_after(exam_question.position)) %>
+    <%= link_to revealed ? t("exams.question.next") : t("exams.question.skip"),
+          exam_question_path(exam, following.position), class: [revealed ? "btn btn--primary" : "btn btn--ghost", "whitespace-nowrap"] %>
+  <% elsif revealed %>
+    <%= button_to t("exams.question.see_results"), complete_exam_path(exam), method: :patch, class: "btn btn--primary" %>
+  <% end %>
+</nav>

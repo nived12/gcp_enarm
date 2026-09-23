@@ -1,0 +1,45 @@
+<%# Every question of the exam at a glance, to jump to any of them: which have an answer,
+    which were right once explained, and where the student is. Folded away, because the
+    question in front of them is what the page is for. The marks say it in words for
+    screen readers and in symbols for everyone, never in colour alone. %>
+<% questions = exam.exam_questions.includes(:answer) %>
+<% answered = questions.count { |exam_question| exam_question.answer } %>
+<% left = exam.question_count - answered %>
+<details class="mt-8 rounded-card border border-line bg-surface">
+  <summary class="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-5 py-3 text-sm font-medium text-ink">
+    <span><%= t("exams.question.map.title") %></span>
+    <span class="numeric text-ink-muted"><%= t("exams.sheet.answered", answered: answered, total: exam.question_count) %></span>
+  </summary>
+
+  <div class="border-t border-line px-5 py-5">
+    <ol class="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] gap-2">
+      <% questions.each do |exam_question| %>
+        <% answer = exam_question.answer %>
+        <% state = if answer.nil? then "unanswered" elsif answer.correct? then "right" else "wrong" end %>
+        <li>
+          <%= link_to exam_question_path(exam, exam_question.position),
+                aria: { current: (exam_question == current ? "step" : nil) },
+                class: class_names(
+                  "numeric flex min-h-11 flex-col items-center justify-center rounded-control border text-sm leading-none",
+                  "border-line text-ink-muted hover:border-accent" => state == "unanswered",
+                  "border-correct bg-correct-soft text-correct" => state == "right",
+                  "border-incorrect bg-incorrect-soft text-incorrect" => state == "wrong",
+                  "ring-2 ring-accent ring-offset-2 ring-offset-surface" => exam_question == current
+                ) do %>
+            <span><%= exam_question.position %></span>
+            <span class="mt-0.5 text-[0.65rem]" aria-hidden="true"><%= { "right" => "✓", "wrong" => "✗" }[state] %></span>
+            <span class="sr-only"><%= t("exams.question.map.#{state}") %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+
+    <% if exam.status_in_progress? && left.positive? %>
+      <div class="mt-5 flex justify-end">
+        <%= button_to t("exams.sheet.finish"), complete_exam_path(exam), method: :patch,
+              form: { data: { turbo_confirm: t("exams.question.map.confirm_finish", count: left) } },
+              class: "btn btn--ghost" %>
+      </div>
+    <% end %>
+  </div>
+</details>

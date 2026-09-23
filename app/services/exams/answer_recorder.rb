@@ -1,12 +1,14 @@
 # Records the student's choice on one question of a running exam.
 #
-# One question at a time (explanations after each answer), only the question the student
-# is on can be answered, and only once: the explanation has been shown. On the single
-# page (explanations at the end) any question can be answered in any order and changed
-# until the exam is finished, as on the real exam's answer sheet.
+# Any question can be answered in any order, since a student may skip one and come back.
+# One question at a time (explanations after each answer) an answer is final: its
+# explanation has been shown. On the single page (explanations at the end) it can be
+# changed until the exam is finished, as on the real exam's answer sheet.
 #
 # Time spent is measured on the exam's own clock — the seconds it ran since the previous
 # answer — so a pause is never billed to the question that was on screen when it began.
+# A skipped question's seconds go to the next one answered; the clock cannot tell reading
+# from skipping.
 module Exams
   class AnswerRecorder < ApplicationService
     def initialize(exam_question, answer_option_id:)
@@ -18,7 +20,7 @@ module Exams
     def call
       return failure(I18n.t("exams.answers.not_running")) unless exam.status_in_progress?
       return time_up if exam.time_up?
-      return failure(I18n.t("exams.answers.not_current")) unless answerable?
+      return failure(I18n.t("exams.answers.already_answered")) if exam.feedback_after_each? && exam_question.answer
       return failure(I18n.t("exams.answers.choose_option")) if option.nil?
       return success(answer: change) if exam_question.answer
 
@@ -42,10 +44,6 @@ module Exams
 
     def exam
       exam_question.exam
-    end
-
-    def answerable?
-      exam.feedback_at_end? || exam.current_question == exam_question
     end
 
     # A changed mind costs no extra daily allowance and keeps the time first spent.

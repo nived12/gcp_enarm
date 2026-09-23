@@ -119,10 +119,38 @@ RSpec.describe "Exams", type: :request do
       expect(response.body).to include(I18n.t("exams.feedback.expired"))
     end
 
-    it "does not let the student jump ahead of the question they are on" do
+    it "lets a question be left for later and brings it round again after the rest" do
+      get exam_question_path(exam, 1)
+      expect(response.body).to include(I18n.t("exams.question.skip"), exam_question_path(exam, 2))
+
+      get exam_question_path(exam, 2)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t("exams.question.previous"), exam_question_path(exam, 1))
+
+      answer(exam, 2, "Electrocardiograma de 12 derivaciones")
       get exam_question_path(exam, 2)
 
-      expect(response).to redirect_to(exam_question_path(exam, 1))
+      expect(response.body).to include(I18n.t("exams.question.next"))
+      expect(response.body).to include("href=\"#{exam_question_path(exam, 1)}\"")
+      expect(exam.current_question.position).to eq(1)
+    end
+
+    it "keeps an explained answer as it was" do
+      answer(exam, 1, "Troponina I")
+      answer(exam, 1, "Electrocardiograma de 12 derivaciones")
+
+      expect(flash[:alert]).to eq(I18n.t("exams.answers.already_answered"))
+      expect(Answer.last).not_to be_correct
+    end
+
+    it "maps every question, and warns before finishing with some unanswered" do
+      answer(exam, 1, "Troponina I")
+
+      get exam_question_path(exam, 1)
+
+      expect(response.body).to include(I18n.t("exams.question.map.title"), I18n.t("exams.question.map.wrong"))
+      expect(response.body).to include(I18n.t("exams.question.map.unanswered"), "aria-current=\"step\"")
+      expect(response.body).to include(CGI.escapeHTML(I18n.t("exams.question.map.confirm_finish", count: 1)))
     end
 
     it "offers the results after the last explanation" do

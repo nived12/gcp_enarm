@@ -109,6 +109,13 @@ class Exam < ApplicationRecord
     exam_questions.where.missing(:answer).first
   end
 
+  # Where "next" leads from a question: the first one after it still without an answer,
+  # coming round to the start for the ones skipped earlier. Nil once none is left.
+  def unanswered_after(position)
+    unanswered = exam_questions.where.missing(:answer).where.not(position: position)
+    unanswered.find_by("exam_questions.position > ?", position) || unanswered.first
+  end
+
   # Correct answers against questions asked, per specialty, in the order CIFRHS breaks
   # ties by. Blanks count as asked and missed.
   def tally_by_specialty

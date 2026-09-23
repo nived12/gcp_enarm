@@ -34,10 +34,17 @@ RSpec.describe Exams::AnswerRecorder do
     expect(exam.answers.order(:id).pluck(:seconds_spent)).to eq([40, 25])
   end
 
-  it "only takes the question the student is on" do
-    result = record(second, "Troponina I")
+  it "takes a question left for later, ahead of one skipped" do
+    expect(record(second, "Troponina I")).to be_success
+    expect(exam.current_question).to eq(first)
+  end
 
-    expect(result.errors.full_messages).to eq([I18n.t("exams.answers.not_current")])
+  it "keeps an explained answer as it was" do
+    record(first, "Troponina I")
+    result = record(first, "Electrocardiograma de 12 derivaciones")
+
+    expect(result.errors.full_messages).to eq([I18n.t("exams.answers.already_answered")])
+    expect(first.reload.answer).not_to be_correct
   end
 
   it "needs an option of this question" do

@@ -68,7 +68,7 @@ es:
       nothing_matches: "No hay casos publicados con esos filtros. Prueba con menos."
     answers:
       not_running: "Este examen no está en curso."
-      not_current: "Esa pregunta ya no es la actual."
+      already_answered: "Esa pregunta ya tiene respuesta."
       choose_option: "Elige una opción para responder."
       time_up: "Se acabó el tiempo. El examen terminó con lo que alcanzaste a responder."
     bar:
@@ -92,6 +92,16 @@ es:
       next: "Siguiente pregunta →"
       back_to_results: "Volver a resultados"
       see_results: "Ver resultados"
+      navigation: Navegación entre preguntas
+      skip: "Saltar →"
+      map:
+        title: Todas las preguntas
+        unanswered: sin responder
+        right: correcta
+        wrong: incorrecta
+        confirm_finish:
+          one: "Queda 1 pregunta sin responder y contará como error. ¿Terminar el examen?"
+          other: "Quedan %{count} preguntas sin responder y contarán como error. ¿Terminar el examen?"
     feedback:
       explanation: "Explicación"
       source: "Recomendación citada"

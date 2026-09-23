@@ -136,6 +136,21 @@ RSpec.describe Exam do
     expect(second.next_in_exam).to be_nil
   end
 
+  it "leads on to the next question without an answer, coming round to the ones skipped" do
+    exam = build_exam(question_count: 3)
+    open = [1, 3].to_h do |position|
+      [position, exam.exam_questions.create!(
+        question: create(:question), clinical_case: create(:clinical_case),
+        position: position
+      )]
+    end
+    answer(exam, position: 2, correct: true)
+
+    expect(exam.unanswered_after(1)).to eq(open[3])
+    expect(exam.unanswered_after(3)).to eq(open[1])
+    expect(exam.unanswered_after(2)).to eq(open[3])
+  end
+
   def answer(exam, position:, correct:, specialty: nil)
     kase = create(:clinical_case, specialty: specialty)
     exam_question = exam.exam_questions.create!(
