@@ -45,6 +45,11 @@ namespace :questions do
     puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
   end
 
+  desc "File every case under its guideline's current main topic, after taxonomy:seed and gpc:link"
+  task refile: :environment do
+    puts "casos reubicados: #{Questions::Refiler.call.payload[:moved]}"
+  end
+
   desc "Have a second model family judge unverified cases: rake questions:verify[count]"
   task :verify, [:count] => :environment do |_task, args|
     count = (args[:count] || 10).to_i

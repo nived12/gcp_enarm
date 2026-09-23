@@ -93,11 +93,21 @@ class Guideline < ApplicationRecord
     Date.new(year + VALIDITY_YEARS, 12, 31) if year
   end
 
-  # The topic a case is filed under when the title names several: the one that accounts
-  # for most of it. "Síndrome nefrítico agudo en edad pediátrica" is pediatric nephrology
-  # before it is adult nephrology.
+  # The topic a case is filed under when the title names several.
+  #
+  # A troncal's topic comes first. The convocatoria's cross-cutting contexts — Medicina
+  # Familiar, Urgencias, Salud Pública — are where a case happens, not what it is about, and
+  # their topics match titles by setting ("…en el primer nivel de atención") rather than by
+  # subject. They win only when the guideline names no subject of its own.
+  #
+  # Then the topic that accounts for most of the title: "Síndrome nefrítico agudo en edad
+  # pediátrica" is pediatric nephrology before it is adult nephrology.
   def main_topic
-    topics.reorder("guideline_topics.relevance DESC", "topics.id").first
+    topics.joins(branch: :specialty)
+          .reorder(Arel.sql("CASE specialties.kind WHEN 'core' THEN 0 ELSE 1 END"),
+            "guideline_topics.relevance DESC", "topics.id"
+          )
+          .first
   end
 
   def expired?

@@ -63,6 +63,24 @@ RSpec.describe Guideline do
       expect(guideline.topics).to include(adult)
     end
 
+    # "…en el primer nivel de atención" once filed conjunctivitis under primary care.
+    it "prefers a troncal's topic to a setting's, however much of the title the setting matches" do
+      guideline = create(:guideline)
+      setting = create(:topic, branch: create(:branch, specialty: create(:specialty, kind: "cross_cutting")))
+      create(:guideline_topic, guideline: guideline, topic: setting, relevance: 0.6)
+      subject = create(:guideline_topic, guideline: guideline, relevance: 0.2).topic
+
+      expect(guideline.main_topic).to eq(subject)
+    end
+
+    it "falls back to a setting's topic when the guideline names no subject" do
+      guideline = create(:guideline)
+      triage = create(:topic, branch: create(:branch, specialty: create(:specialty, kind: "cross_cutting")))
+      create(:guideline_topic, guideline: guideline, topic: triage)
+
+      expect(guideline.main_topic).to eq(triage)
+    end
+
     it "is nil for a guideline no topic names" do
       expect(create(:guideline).main_topic).to be_nil
     end

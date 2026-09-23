@@ -25,8 +25,11 @@
           aliases: [fibrilación auricular, taquiarritmia, bradiarritmia, síndrome del seno enfermo]
         - name: Hipertensión arterial sistémica
           aliases: [HAS, hipertensión arterial]
+        - name: Riesgo cardiovascular
+          aliases: [factores de riesgo cardiovascular, estratificación de riesgo cardiovascular]
+        # "laestenosis" is SS-154-08's own title, missing its space.
         - name: Valvulopatías
-          aliases: [estenosis aórtica, insuficiencia mitral, válvula mitral, válvula tricúspide]
+          aliases: [estenosis aórtica, insuficiencia mitral, válvula mitral, válvula tricúspide, laestenosis aórtica]
         - name: Endocarditis y pericarditis
           aliases: [endocarditis infecciosa, derrame pericárdico, pericarditis, miocarditis aguda]
         - name: Rehabilitación cardiovascular
@@ -172,7 +175,7 @@
         - name: Enfermedad de Parkinson
           aliases: [parkinsonismo]
         - name: Neuropatías periféricas
-          aliases: [polineuropatía, síndrome de Guillain-Barré]
+          aliases: [polineuropatía, síndrome de Guillain-Barré, túnel del carpo, parálisis de Bell]
         - name: Miastenia gravis
     - name: Dermatología
       topics:
@@ -203,8 +206,9 @@
         - name: Cáncer de cabeza y cuello
           aliases: [cavidad oral, carcinoma epidermoide de laringe, cáncer de laringe]
         - name: Cáncer de vejiga
+        # "medulobastoma" is IMSS-264-10's own misspelling.
         - name: Tumores del sistema nervioso central
-          aliases: [tumor cerebral]
+          aliases: [tumor cerebral, astrocitoma, meduloblastoma, medulobastoma]
         - name: Seguridad en quimioterapia
           aliases: [agentes antineoplásicos]
         - name: Cuidados paliativos
@@ -254,7 +258,7 @@
         - name: Ictericia neonatal
           aliases: [hiperbilirrubinemia neonatal, ictericia del recién nacido]
         - name: Sepsis neonatal
-          aliases: [infección neonatal]
+          aliases: [infección neonatal, tétanos neonatal]
         - name: Prematurez
           aliases: [recién nacido prematuro, pretérmino, displasia broncopulmonar]
         - name: Trastornos hematológicos del recién nacido
@@ -262,9 +266,10 @@
     - name: Crecimiento y desarrollo
       topics:
         - name: Vigilancia del crecimiento
-          aliases: [somatometría, percentiles, curvas de crecimiento]
+          aliases: [somatometría, percentiles, curvas de crecimiento, control y seguimiento de la salud en la niña y el niño]
+        # "desarrrollo" is IMSS-734-14's own misspelling.
         - name: Desarrollo psicomotor
-          aliases: [hitos del desarrollo, retraso del desarrollo]
+          aliases: [hitos del desarrollo, retraso del desarrollo, desarrrollo psicomotor]
         - name: Alimentación y lactancia
           aliases: [lactancia materna, ablactación, alimentación complementaria]
         - name: Esquema de vacunación
@@ -416,6 +421,8 @@
           aliases: [quiste de ovario, tumor anexial benigno]
         - name: Infertilidad
           aliases: [esterilidad, reproducción asistida]
+        - name: Dismenorrea
+          aliases: [dolor menstrual]
     - name: Oncología ginecológica
       topics:
         - name: Cáncer cervicouterino
@@ -522,17 +529,19 @@
         - name: Epistaxis
           aliases: [sangrado nasal]
         - name: Patología bucal
-          aliases: [estomatitis aftosa, problemas bucales, pulpitis, infecciones odontogénicas]
+          aliases: [estomatitis aftosa, problemas bucales, pulpitis, infecciones odontogénicas, candidiasis orofaríngea]
     - name: Oftalmología
       topics:
         - name: Ojo rojo
-          aliases: [conjuntivitis, queratitis, uveítis, tracoma, iridociclitis]
+          aliases: [conjuntivitis, queratitis, uveítis, tracoma, iridociclitis, hiposfagma]
         - name: Glaucoma
           aliases: [presión intraocular]
         - name: Catarata
           aliases: [cirugía de catarata]
         - name: Retinopatía diabética e hipertensiva
           aliases: [retinopatía diabética, fondo de ojo]
+        - name: Alteraciones visuales en la infancia
+          aliases: [alteraciones visuales, ambliopía, estrabismo]
         # "queratocono" alone stems to "querato", which is also queratosis actínica; the
         # title's own wording reaches only the keratoconus guideline.
         - name: Párpados y superficie ocular
@@ -581,6 +590,10 @@
           aliases: [malformación ano rectal]
         - name: Hipospadias
 
+# The three cross-cutting specialties are settings, not subjects (convocatoria §9.1).
+# Their aliases must name a subject too: "primer nivel de atención", "detección oportuna"
+# or "referencia oportuna" appear in dozens of titles about something else, and each one
+# once filed conjunctivitis under primary care.
 - name: Salud Pública
   kind: cross_cutting
   color_token: teal
@@ -594,7 +607,7 @@
         - name: Diseños de estudio
           aliases: [cohorte, casos y controles, ensayo clínico]
         - name: Tamizaje y pruebas diagnósticas
-          aliases: [sensibilidad, especificidad, valor predictivo, detección oportuna]
+          aliases: [sensibilidad, especificidad diagnóstica, valor predictivo]
     - name: Bioestadística
       topics:
         - name: Pruebas de hipótesis
@@ -645,7 +658,7 @@
         - name: Crisis hipertensiva
           aliases: [urgencia hipertensiva, emergencia hipertensiva]
         - name: Arritmias inestables
-          aliases: [cardioversión, desfibrilación]
+          aliases: [cardioversión eléctrica, desfibrilación]
     - name: Urgencias metabólicas
       topics:
         - name: Cetoacidosis y estado hiperosmolar
@@ -686,15 +699,15 @@
     - name: Atención en el primer nivel
       topics:
         - name: Consulta de primer contacto
-          aliases: [primer nivel de atención, medicina general]
+          aliases: [médico de primer contacto]
         - name: Referencia y contrarreferencia
-          aliases: [referencia oportuna, sistema de referencia]
+          aliases: [sistema de referencia y contrarreferencia]
     - name: Medicina preventiva
       topics:
         - name: Detección oportuna en el adulto
-          aliases: [chequeo, detección temprana, prevención primaria]
+          aliases: [chequeo médico]
         - name: Salud del adolescente
-          aliases: [atención al adolescente]
+          aliases: [salud integral del adolescente]
         - name: Atención integral al adulto mayor
           aliases: [salud del adulto mayor]
     - name: Salud mental en el primer nivel

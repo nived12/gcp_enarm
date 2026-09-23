@@ -160,6 +160,7 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
 | `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. |
 | `taxonomy:seed` | Rebuild the topic tree after editing `db/seeds/taxonomy.yml`. Runs automatically on deploy. |
+| `questions:refile` | Re-file every case under its guideline's current main topic. Run after `taxonomy:seed` and `gpc:link` whenever the taxonomy changed; free, no model calls. |
 | `questions:generate[calls,budget,source]` | Generate cases. Breadth-first over every generatable guideline, and it resumes where the last run stopped, so it is safe to run in instalments. `budget` is a cap in USD, priced from the provider's published rate (peak rate for DeepSeek, so it stops early rather than late); `source` is `live_site` or `web_archive`. Example: `bin/rails "questions:generate[200,1.00]"`. |
 | `questions:verify` | Run the second-opinion pass over unverified cases. A case only becomes publishable once another model family has agreed with its answer. |
 | `llm:status` | Show which model each role resolved to and whether its key is set. Run it before any paid generation. |
