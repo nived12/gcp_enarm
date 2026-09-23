@@ -32,6 +32,7 @@
     <% end %>
     <%= render "home/streak", streak: Stats::StreakCalculator.call(Current.user).payload %>
   </section>
+  <%= render "home/today_plan" %>
 
   <% if unfinished %>
     <%= link_to exam_path(unfinished), class: "card mt-3 flex items-center gap-4 px-6 py-4 transition-shadow hover:ring-2 hover:ring-accent" do %>

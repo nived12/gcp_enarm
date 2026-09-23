@@ -1,0 +1,29 @@
+<%# Today's plan, in one row: what today names and the button that starts it. The whole
+    calendar is one tap further, never above the fold. %>
+<% plan = Current.user.study_plan %>
+<% if plan.nil? %>
+  <%= link_to new_study_plan_path, class: "card mt-3 flex min-h-11 items-center gap-4 px-6 py-4 transition-shadow hover:ring-2 hover:ring-accent" do %>
+    <span class="min-w-0 flex-1">
+      <span class="block text-sm font-medium text-ink"><%= t("home.dashboard.today_plan.create") %></span>
+      <span class="mt-0.5 block text-xs text-ink-faint"><%= t("home.dashboard.today_plan.create_body") %></span>
+    </span>
+    <span class="shrink-0 text-sm font-medium text-accent"><%= t("home.dashboard.today_plan.create_action") %></span>
+  <% end %>
+<% else %>
+  <% day = plan.day_on(Current.user.study_date) %>
+  <section class="card mt-3 flex items-center gap-4 px-6 py-4 <%= day ? plan_day_color_class(day) : "specialty-none" %>" data-testid="today-plan">
+    <%= link_to (day ? study_plan_day_path(day.date) : study_plan_path), class: "min-w-0 flex-1" do %>
+      <span class="flex items-center gap-2 text-xs text-ink-faint">
+        <span class="plan-swatch size-2 rounded-full" aria-hidden="true"></span><%= t("home.dashboard.today_plan.label") %>
+      </span>
+      <span class="mt-0.5 block text-sm font-medium leading-snug text-ink"><%= day ? plan_day_title(day) : t("home.dashboard.today_plan.rest") %></span>
+    <% end %>
+    <% if day&.done? %>
+      <span class="shrink-0 text-sm font-medium text-correct"><%= t("study_plans.done") %></span>
+    <% elsif day&.quiz? %>
+      <%= button_to t("home.dashboard.today_plan.start"), quiz_study_plan_day_path(day.date), class: "btn btn--primary shrink-0 px-4", form: { class: "contents" } %>
+    <% else %>
+      <%= link_to t("home.dashboard.today_plan.open"), (day ? study_plan_day_path(day.date) : study_plan_path), class: "shrink-0 text-sm font-medium text-accent" %>
+    <% end %>
+  </section>
+<% end %>
