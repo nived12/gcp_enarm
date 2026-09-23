@@ -1,5 +1,5 @@
 # The next pearl for a student: one due for review first, most overdue first; then one
-# they have never seen.
+# they have never seen, while today's allowance of new ones lasts (`Pearl::NEW_PER_DAY`).
 #
 # New pearls come from the guidelines behind the cases the student missed, then from the
 # ones behind cases they have met, then from the rest — the statements nearest to what
@@ -30,6 +30,8 @@ module Pearls
     end
 
     def fresh
+      return if Pearl.new_allowance_spent?(user)
+
       (0..).step(BATCH).each do |offset|
         batch = unseen.offset(offset).limit(BATCH).to_a
         return nil if batch.empty?
@@ -46,7 +48,7 @@ module Pearls
 
     def priority
       missed_cases = ReviewCard.where(user: user).cases.select(:clinical_case_id)
-      seen_cases = ExamQuestion.joins(:exam).where(exams: { user_id: user.id }).select(:clinical_case_id)
+      seen_cases = ExamQuestion.answered_by(user).select(:clinical_case_id)
       missed = ClinicalCase.where(id: missed_cases).select(:guideline_id)
       seen = ClinicalCase.where(id: seen_cases).select(:guideline_id)
       Arel.sql(ActiveRecord::Base.sanitize_sql_array([<<~SQL.squish, Guideline.oldest_valid_year, user.id]))

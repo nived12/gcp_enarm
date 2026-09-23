@@ -110,13 +110,13 @@ module Exams
     end
 
     def seen_cases
-      ExamQuestion.joins(:exam).where(exams: { user_id: user.id }).select(:clinical_case_id)
+      ExamQuestion.answered_by(user).select(:clinical_case_id)
     end
 
-    # A blank counts as a miss, as it does on the exam.
+    # A case answered wrong at least once. A question left blank is not counted: the
+    # case may never have been read, and one never seen cannot be "previously wrong".
     def missed_cases
-      ExamQuestion.joins(:exam, :answer).where(exams: { user_id: user.id }, answers: { correct: false })
-                  .select(:clinical_case_id)
+      ExamQuestion.answered_by(user).where(answers: { correct: false }).select(:clinical_case_id)
     end
 
     # Shuffled, then dealt one specialty at a time, so the draw is interleaved and a

@@ -27,13 +27,4 @@ RSpec.describe Answer do
 
     expect(answer).not_to be_valid
   end
-
-  it "counts the answers given on a day" do
-    exam_question.create_answer!(answered_at: Time.current)
-
-    expect(
-      [described_class.answered_on(Date.current).count,
-      described_class.answered_on(Date.yesterday).count]
-    ).to eq([1, 0])
-  end
 end

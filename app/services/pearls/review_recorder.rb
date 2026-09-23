@@ -21,6 +21,7 @@ module Pearls
       today = user.study_date
       card = ReviewCard.find_or_initialize_by(user: user, recommendation: recommendation)
       return success(card: card) if card.last_reviewed_on == today
+      return new_allowance_spent if card.new_record? && Pearl.new_allowance_spent?(user)
 
       ReviewCard.transaction do
         card.schedule(QUALITIES.fetch(grade), on: today).save!
@@ -32,5 +33,12 @@ module Pearls
     private
 
     attr_reader :user, :recommendation, :grade
+
+    # The picker stops offering new pearls at the day's allowance; this holds the line
+    # for a card that was already on screen in another tab.
+    def new_allowance_spent
+      errors.add(:base, :new_allowance_spent, message: I18n.t("pearls.new_allowance_spent", limit: Pearl::NEW_PER_DAY))
+      failure
+    end
   end
 end

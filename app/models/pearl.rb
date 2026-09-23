@@ -39,6 +39,17 @@ class Pearl
 
   attr_reader :recommendation, :range
 
+  # New statements a student may add to their deck in one study day; cards due for review
+  # are never capped. Every new card comes back after 1 and 6 days and then at growing
+  # intervals, so each day's new cards become the reviews of the weeks after, and an
+  # unlimited intake buries what is due under statements met once. Twenty is Anki's
+  # default for new cards a day, and two sessions of ten.
+  NEW_PER_DAY = 20
+
+  def self.new_allowance_spent?(user)
+    ReviewCard.where(user: user).pearls.where(created_at: user.study_day_times).count >= NEW_PER_DAY
+  end
+
   # The statements a pearls session draws from: actionable, graded, from a dated
   # guideline that has published cases, short enough to read in one breath, and not
   # leaning on a figure.

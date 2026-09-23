@@ -17,6 +17,7 @@
           label: t("attributes.password"), autocomplete: "new-password" %>
     <%= render "shared/field", form: form, name: :password_confirmation, type: :password,
           label: t("attributes.password_confirmation"), autocomplete: "new-password" %>
+    <%= form.hidden_field :time_zone, value: "", data: { controller: "time-zone" } %>
     <%= render "shared/submit", form: form, label: t("registrations.new.submit") %>
   <% end %>
 

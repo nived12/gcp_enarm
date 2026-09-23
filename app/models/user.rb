@@ -11,13 +11,24 @@ class User < ApplicationRecord
     inverse_of: :resolved_by, dependent: :nullify
   has_one :study_plan, dependent: :destroy
 
+  TIME_ZONES = TZInfo::Timezone.all_identifiers.to_set.freeze
+
+  # What /account offers, west to east: one per distinct clock a student in Mexico can be
+  # on. Since the country dropped daylight saving in 2022 Chihuahua keeps central time and
+  # Hermosillo and Mazatlán share an hour; both stay because students look for their city.
+  # Sign-up fills the zone from the browser, which may name one not listed here.
+  TIME_ZONE_CHOICES = {
+    "tijuana" => "America/Tijuana", "hermosillo" => "America/Hermosillo", "mazatlan" => "America/Mazatlan",
+    "mexico_city" => "America/Mexico_City", "cancun" => "America/Cancun"
+  }.freeze
+
   enum :role, { student: "student", reviewer: "reviewer", admin: "admin" }, prefix: :role
 
   normalizes :email, with: ->(e) { e.strip.downcase }
 
   validates :email, presence: true, uniqueness: true
   validates :locale, inclusion: { in: %w[es en] }
-  validates :time_zone, inclusion: { in: TZInfo::Timezone.all_identifiers }
+  validates :time_zone, inclusion: { in: TIME_ZONES }
 
   # Salting the token with the current digest invalidates outstanding reset links
   # the moment the password changes — a link that leaked stops working as soon as
@@ -29,5 +40,9 @@ class User < ApplicationRecord
   # The day the student is on, by the study calendar's 4 a.m. boundary.
   def study_date(time = Time.current)
     StudyDay.date_for(time, time_zone)
+  end
+
+  def study_day_times(date = study_date)
+    StudyDay.time_range(date, time_zone)
   end
 end

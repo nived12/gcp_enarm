@@ -9,6 +9,12 @@ class ExamQuestion < ApplicationRecord
 
   validates :position, presence: true, uniqueness: { scope: :exam_id }
 
+  # What the student has seen: a case counts once any of its questions has been answered,
+  # in any exam, a discarded one included, because they still read it. A case only drawn
+  # into an exam they never reached has not been seen. Every "seen" and "unseen" in the
+  # product — the builder's filter, coverage, pearls, weak spots — reads this.
+  scope :answered_by, ->(user) { joins(:exam, :answer).where(exams: { user_id: user.id }) }
+
   # Whether its answer, explanation and citation are on screen: after each answer one at a
   # time, and only once the exam is over on the single page.
   def revealed?

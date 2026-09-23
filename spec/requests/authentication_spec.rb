@@ -47,6 +47,21 @@ RSpec.describe "Authentication", type: :request do
       expect(response).to redirect_to(root_path)
     end
 
+    it "keeps the time zone the browser reported, and the default for one tzinfo does not know" do
+      sign_up = lambda do |email, zone|
+        post registration_path, params: {
+          user: { email: email, password: "contrasena-segura", password_confirmation: "contrasena-segura",
+                  time_zone: zone }.compact
+        }
+        User.find_by!(email: email).time_zone
+      end
+
+      expect(sign_up.call("tijuana@example.com", "America/Tijuana")).to eq("America/Tijuana")
+      expect(sign_up.call("marte@example.com", "Mars/Olympus_Mons")).to eq("America/Mexico_City")
+      expect(sign_up.call("vacio@example.com", "")).to eq("America/Mexico_City")
+      expect(sign_up.call("sin-dato@example.com", nil)).to eq("America/Mexico_City")
+    end
+
     it "re-renders the form when the passwords do not match" do
       post registration_path, params: {
         user: { email: "nueva@example.com",

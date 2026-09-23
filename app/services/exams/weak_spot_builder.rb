@@ -54,7 +54,7 @@ module Exams
 
     # Case id => whether every answer the student gave on it was right.
     def answered
-      @answered ||= ExamQuestion.joins(:exam, :answer).where(exams: { user_id: user.id }).group(:clinical_case_id)
+      @answered ||= ExamQuestion.answered_by(user).group(:clinical_case_id)
                                 .pluck(:clinical_case_id, Arel.sql("BOOL_AND(answers.correct)")).to_h
     end
   end

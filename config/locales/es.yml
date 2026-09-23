@@ -570,6 +570,19 @@ es:
       have_account: "¿Ya tienes cuenta?"
     create:
       welcome: "Tu cuenta está lista. Te damos la bienvenida."
+  time_zones:
+    title: "Tu zona horaria"
+    hint: "Tu día de estudio termina a las 4 a. m. de esta hora: ahí cierran tu racha y tus preguntas gratuitas del día. Chihuahua usa la hora del centro."
+    option: "%{name} · %{time}"
+    submit: "Guardar zona horaria"
+    updated: "Zona horaria actualizada."
+    invalid: "No reconocemos esa zona horaria."
+    names:
+      tijuana: "Tijuana"
+      hermosillo: "Hermosillo"
+      mazatlan: "Mazatlán"
+      mexico_city: "Ciudad de México"
+      cancun: "Cancún"
   stats:
     show:
       title: "Tu avance"
@@ -860,6 +873,7 @@ es:
 
   pearls:
     unknown_grade: "Esa calificación no existe."
+    new_allowance_spent: "Hoy ya agregaste tus %{limit} perlas nuevas."
     show:
       eyebrow: "Repaso"
       title: "Perlas"
@@ -868,6 +882,9 @@ es:
         title: "No hay perlas por ahora"
         body: "Las perlas salen de las guías que ya tienen casos publicados. Vuelve cuando el banco crezca."
         back: "Volver al inicio"
+      new_allowance_spent:
+        title: "Hoy ya viste tus %{limit} perlas nuevas"
+        body: "Así lo que te toca repasar no queda enterrado bajo lo nuevo. Las perlas pendientes de repaso siempre aparecen; mañana hay más nuevas."
     card:
       blank_label: "frase oculta"
       reveal: "Mostrar respuesta"

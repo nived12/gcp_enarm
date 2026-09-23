@@ -23,6 +23,18 @@ RSpec.describe Pearls::ReviewRecorder do
     expect(user.study_days.sole.pearls_reviewed).to eq(1)
   end
 
+  it "adds no new pearl past the day's allowance, and still grades one already held" do
+    stub_const("Pearl::NEW_PER_DAY", 1)
+    held = create(:review_card, :pearl, user: user, due_on: user.study_date)
+
+    result = grade("good")
+
+    expect(result.errors.of_kind?(:base, :new_allowance_spent)).to be(true)
+    expect(result.errors.full_messages).to eq([I18n.t("pearls.new_allowance_spent", limit: 1)])
+    expect(ReviewCard.pluck(:id)).to eq([held.id])
+    expect(described_class.call(user, held.recommendation, grade: "good")).to be_success
+  end
+
   it "refuses a grade the buttons never send" do
     result = grade("perfect")
 

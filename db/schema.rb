@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,8 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.bigint "record_id", null: false
     t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness",
-      unique: true
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
@@ -122,8 +121,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.string "remote_path", null: false
     t.string "source", default: "gpc", null: false
     t.datetime "updated_at", null: false
-    t.index ["guideline_section_id", "position"], name: "index_clinical_images_on_guideline_section_id_and_position",
-      unique: true
+    t.index ["guideline_section_id", "position"], name: "index_clinical_images_on_guideline_section_id_and_position", unique: true
     t.index ["guideline_section_id"], name: "index_clinical_images_on_guideline_section_id"
     t.index ["kind"], name: "index_clinical_images_on_kind"
     t.index ["label"], name: "index_clinical_images_on_label"
@@ -218,8 +216,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.string "question_label"
     t.bigint "source_section_id"
     t.datetime "updated_at", null: false
-    t.index ["guideline_id", "external_id"], name: "index_guideline_sections_on_guideline_id_and_external_id",
-      unique: true
+    t.index ["guideline_id", "external_id"], name: "index_guideline_sections_on_guideline_id_and_external_id", unique: true
     t.index ["guideline_id", "position"], name: "index_guideline_sections_on_guideline_id_and_position"
     t.index ["guideline_id"], name: "index_guideline_sections_on_guideline_id"
     t.index ["kind"], name: "index_guideline_sections_on_kind"
@@ -273,8 +270,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.index ["question_id"], name: "index_question_reports_on_question_id"
     t.index ["resolved_by_id"], name: "index_question_reports_on_resolved_by_id"
     t.index ["status", "created_at"], name: "index_question_reports_on_status_and_created_at"
-    t.index ["user_id", "question_id"], name: "index_question_reports_one_open_per_user", unique: true,
-      where: "((status)::text = 'open'::text)"
+    t.index ["user_id", "question_id"], name: "index_question_reports_one_open_per_user", unique: true, where: "((status)::text = 'open'::text)"
   end
 
   create_table "questions", force: :cascade do |t|
@@ -302,8 +298,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.text "text", null: false
     t.datetime "updated_at", null: false
     t.index ["grade"], name: "index_recommendations_on_grade"
-    t.index ["guideline_section_id", "position"], name: "index_recommendations_on_guideline_section_id_and_position",
-      unique: true
+    t.index ["guideline_section_id", "position"], name: "index_recommendations_on_guideline_section_id_and_position", unique: true
     t.index ["guideline_section_id"], name: "index_recommendations_on_guideline_section_id"
     t.index ["scale"], name: "index_recommendations_on_scale"
   end
@@ -323,11 +318,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.bigint "user_id", null: false
     t.index ["clinical_case_id"], name: "index_review_cards_on_clinical_case_id"
     t.index ["recommendation_id"], name: "index_review_cards_on_recommendation_id"
-    t.index ["user_id", "clinical_case_id"], name: "index_review_cards_on_user_id_and_clinical_case_id", unique: true,
-      where: "(clinical_case_id IS NOT NULL)"
+    t.index ["user_id", "clinical_case_id"], name: "index_review_cards_on_user_id_and_clinical_case_id", unique: true, where: "(clinical_case_id IS NOT NULL)"
     t.index ["user_id", "due_on"], name: "index_review_cards_on_user_id_and_due_on"
-    t.index ["user_id", "recommendation_id"], name: "index_review_cards_on_user_id_and_recommendation_id",
-      unique: true, where: "(recommendation_id IS NOT NULL)"
+    t.index ["user_id", "recommendation_id"], name: "index_review_cards_on_user_id_and_recommendation_id", unique: true, where: "(recommendation_id IS NOT NULL)"
     t.check_constraint "num_nonnulls(clinical_case_id, recommendation_id) = 1", name: "review_cards_one_subject"
   end
 
@@ -536,8 +529,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
     t.integer "position", null: false
     t.bigint "study_plan_day_id", null: false
     t.bigint "topic_id", null: false
-    t.index ["study_plan_day_id", "topic_id"], name: "index_study_plan_day_topics_on_study_plan_day_id_and_topic_id",
-      unique: true
+    t.index ["study_plan_day_id", "topic_id"], name: "index_study_plan_day_topics_on_study_plan_day_id_and_topic_id", unique: true
     t.index ["topic_id"], name: "index_study_plan_day_topics_on_topic_id"
   end
 
@@ -582,7 +574,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_130000) do
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
-    t.integer "exam_year"
     t.datetime "granted_premium_until"
     t.string "locale", default: "es", null: false
     t.string "name"

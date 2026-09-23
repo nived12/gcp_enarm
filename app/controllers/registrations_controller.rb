@@ -23,7 +23,12 @@ class RegistrationsController < ApplicationController
 
   private
 
+  # The time zone is what the browser reports, not something the student typed, so one it
+  # could not name, or named in a way tzinfo does not know, leaves the default rather than
+  # refusing the account. It can be changed on /account.
   def registration_params
-    params.expect(user: [:name, :email, :password, :password_confirmation])
+    params.expect(user: [:name, :email, :password, :password_confirmation, :time_zone]).tap do |attributes|
+      attributes.delete(:time_zone) unless User::TIME_ZONES.include?(attributes[:time_zone])
+    end
   end
 end

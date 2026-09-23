@@ -8,7 +8,13 @@
   <p class="numeric shrink-0 text-sm text-ink-faint"><%= t("pearls.show.progress", position: @step + 1, total: PearlsController::SESSION_SIZE) %></p>
 </section>
 
-<% if @pearl.nil? %>
+<% if @new_allowance_spent %>
+  <div class="mt-8 rounded-card border border-dashed border-line-strong p-6 text-center">
+    <p class="text-sm font-medium text-ink"><%= t("pearls.show.new_allowance_spent.title", limit: Pearl::NEW_PER_DAY) %></p>
+    <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("pearls.show.new_allowance_spent.body") %></p>
+    <%= link_to t("pearls.show.empty.back"), root_path, class: "btn btn--ghost mt-4" %>
+  </div>
+<% elsif @pearl.nil? %>
   <div class="mt-8 rounded-card border border-dashed border-line-strong p-6 text-center">
     <p class="text-sm font-medium text-ink"><%= t("pearls.show.empty.title") %></p>
     <p class="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-muted"><%= t("pearls.show.empty.body") %></p>

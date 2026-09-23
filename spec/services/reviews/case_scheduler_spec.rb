@@ -67,6 +67,14 @@ RSpec.describe Reviews::CaseScheduler do
     expect(card).to have_attributes(due_on: today + 1, lapses: 1)
   end
 
+  it "leaves out a case the student never reached, as when the clock ran out" do
+    exam = sit([nil, nil], timing: "at_end")
+
+    exam.complete!
+
+    expect(card).to be_nil
+  end
+
   it "drops the case again when the single page's miss is changed to a right answer" do
     exam = sit(%i[right wrong], timing: "at_end", finish: true)
     expect(card).to be_present

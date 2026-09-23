@@ -3,9 +3,7 @@
 #
 # Concentrating on Medicina Interna while neglecting Medicina Familiar and Salud Pública
 # is a named way of failing the ENARM, so the transversal contexts are measured beside the
-# troncales. A case counts as seen once any of its questions has been answered — in any
-# exam, a discarded one included, because the student still read it. A case only drawn
-# into an exam they never reached has not been seen.
+# troncales. "Seen" is `ExamQuestion.answered_by`: answered, discarded exams included.
 module Stats
   class CoverageCalculator < ApplicationService
     # Below this many cases there is no pattern to name yet, only a first session.
@@ -44,7 +42,7 @@ module Stats
     attr_reader :user
 
     def seen_cases
-      ExamQuestion.joins(:exam, :answer).where(exams: { user_id: user.id }).select(:clinical_case_id)
+      ExamQuestion.answered_by(user).select(:clinical_case_id)
     end
 
     def neglected(result)

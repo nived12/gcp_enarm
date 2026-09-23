@@ -17,6 +17,11 @@
 # * a miss they gave no reason for, or a blank: quality 2. Unknown is not "did not know";
 #   it is the middle of the lapses rather than the bottom.
 #
+# A case with no answer at all in an exam is no attempt: the clock ran out before it, or
+# it was skipped unread, and "seen" means answered everywhere else (coverage, the
+# builder's unseen filter). A blank beside an answer of the same case is a miss — the
+# vignette was read.
+#
 # With several misses in one attempt the worst one grades it. A case enters the deck at
 # its first attempt with a miss; right answers before that are not reviews of anything.
 # Discarded exams count: discarding takes a sitting out of the average, but the case was
@@ -79,6 +84,8 @@ module Reviews
       _case_id, exam_id, status, timing, completed_at = questions.first
       completed = status == "completed"
       answered = questions.select { |row| row[5] }
+      return if answered.empty?
+
       misses = answered.reject { |row| row[6] }
       misses += questions.reject { |row| row[5] } if completed
 

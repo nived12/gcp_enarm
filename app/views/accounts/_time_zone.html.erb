@@ -1,0 +1,7 @@
+<section class="card mt-6 px-5 py-5">
+  <%= form_with url: account_path, method: :patch do |form| %>
+    <%= render "shared/pill_radios", legend: t("time_zones.title"), name: "time_zone", id_prefix: "time_zone",
+          selected: user.time_zone, options: time_zone_options(user), hint: t("time_zones.hint") %>
+    <%= form.submit t("time_zones.submit"), class: "btn btn--ghost mt-4 w-full sm:w-auto" %>
+  <% end %>
+</section>

@@ -24,6 +24,25 @@ RSpec.describe StudyDay do
     end
   end
 
+  describe ".time_range" do
+    it "runs from the day's 4 a.m. to the next one, in the student's zone" do
+      range = described_class.time_range(Date.new(2026, 9, 23), "America/Cancun")
+
+      expect(range).to eq(Time.utc(2026, 9, 23, 9)...Time.utc(2026, 9, 24, 9))
+      expect([range.begin, range.end - 1.second].map { |time| described_class.date_for(time, "America/Cancun") })
+        .to eq([Date.new(2026, 9, 23)] * 2)
+    end
+
+    it "keeps both ends at 4 a.m. across a change of clocks" do
+      zone = "America/Tijuana"
+      range = described_class.time_range(Date.new(2026, 3, 7), zone)
+
+      expect(range.end - range.begin).to eq(23.hours)
+      expect(described_class.date_for(range.end, zone)).to eq(Date.new(2026, 3, 8))
+      expect(described_class.date_for(range.end - 1.second, zone)).to eq(Date.new(2026, 3, 7))
+    end
+  end
+
   describe ".qualifies?" do
     it "takes ten questions, or one whole pearls session of ten cards" do
       expect(described_class.qualifies?(9, 0)).to be(false)
