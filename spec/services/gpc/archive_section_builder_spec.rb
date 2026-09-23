@@ -72,6 +72,26 @@ RSpec.describe Gpc::ArchiveSectionBuilder do
     expect(cited.reload.position).to eq(3)
   end
 
+  # A survivor whose place did not change used to look unchanged, was never saved, and
+  # stayed parked below zero; a later rebuild flipped it back on top of another row.
+  it "leaves every survivor at its real position" do
+    build
+    evidence = section("4-2-1-1-diagnostico-clinico-y-paraclinico-en-el-adulto-joven-evidence")
+    document.update!(body: table.sub(/^ +E +En estudios de laboratorio.*?bandemia\..*?\n/m, ""))
+
+    expect(build).to be_success
+    expect(evidence.recommendations.order(:position).pluck(:position)).to eq([1, 2, 3, 4, 5])
+  end
+
+  it "rebuilds a section an earlier rebuild left parked, even when its statements did not change" do
+    build
+    evidence = section("4-2-1-1-diagnostico-clinico-y-paraclinico-en-el-adulto-joven-evidence")
+    evidence.recommendations.where(position: [1, 2]).update_all("position = -position")
+
+    expect(build.payload[:rebuilt]).to eq(1)
+    expect(evidence.recommendations.order(:position).pluck(:position)).to eq([1, 2, 3, 4, 5, 6])
+  end
+
   it "refuses to drop a recommendation a question cites, and changes nothing" do
     build
     cited = section("4-2-1-1-diagnostico-clinico-y-paraclinico-en-el-adulto-joven-good_practice").recommendations.sole
