@@ -56,6 +56,38 @@ RSpec.describe "Password resets", type: :request do
       expect(user.reload.authenticate("nueva-contrasena")).to be_truthy
     end
 
+    it "refuses an empty password instead of reporting success" do
+      token = user.password_reset_token
+
+      patch password_path(token), params: { password: "", password_confirmation: "" }
+
+      expect(response).to redirect_to(edit_password_path(token))
+      expect(flash[:alert]).to include("Contraseña no puede estar en blanco")
+    end
+
+    it "refuses a password longer than bcrypt reads" do
+      token = user.password_reset_token
+
+      patch password_path(token), params: { password: "a" * 73, password_confirmation: "a" * 73 }
+
+      expect(flash[:alert]).to include("Contraseña es demasiado larga")
+    end
+
+    it "lets an account created through Google set its first password" do
+      google_only = create(:user, email: "solo.google@gmail.com", password: nil)
+      expect(google_only.password?).to be(false)
+
+      expect { post passwords_path, params: { email: "solo.google@gmail.com" } }
+        .to have_enqueued_mail(PasswordsMailer, :reset)
+
+      patch password_path(google_only.password_reset_token),
+        params: { password: "nueva-contrasena", password_confirmation: "nueva-contrasena" }
+
+      expect(flash[:notice]).to eq(I18n.t("passwords.update.success"))
+      post session_path, params: { email: "solo.google@gmail.com", password: "nueva-contrasena" }
+      expect(response).to redirect_to(root_path)
+    end
+
     it "sends the user back when the confirmation does not match" do
       token = user.password_reset_token
 

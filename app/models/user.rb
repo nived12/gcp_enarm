@@ -1,8 +1,12 @@
 class User < ApplicationRecord
   include SubscriptionAccess
 
-  has_secure_password
+  # An account created through Google has no password until the student sets one through
+  # "¿Olvidaste tu contraseña?", so the gem's own always-on presence check is replaced by
+  # the validations below. authenticate_by already refuses an account with no digest.
+  has_secure_password validations: false
   has_many :sessions, dependent: :destroy
+  has_many :identities, dependent: :destroy
   has_many :exams, dependent: :destroy
   has_many :study_days, dependent: :delete_all
   has_many :entitlements, dependent: :destroy
@@ -34,6 +38,9 @@ class User < ApplicationRecord
   validates :last_name, length: { maximum: 100 }
   validates :last_name, presence: true, on: :sign_up
   validates :email, presence: true, uniqueness: true
+  validates :password, presence: true, on: %i[sign_up password_reset]
+  validates :password, confirmation: { allow_nil: true }
+  validate :password_fits_bcrypt
   validates :locale, inclusion: { in: %w[es en] }
   validates :time_zone, inclusion: { in: TIME_ZONES }
 
@@ -42,6 +49,10 @@ class User < ApplicationRecord
   # the account is recovered.
   generates_token_for :password_reset, expires_in: 15.minutes do
     password_salt&.last(10)
+  end
+
+  def password?
+    password_digest.present?
   end
 
   def full_name
@@ -55,5 +66,14 @@ class User < ApplicationRecord
 
   def study_day_times(date = study_date)
     StudyDay.time_range(date, time_zone)
+  end
+
+  private
+
+  # bcrypt reads only the first 72 bytes; a longer password would be silently truncated.
+  def password_fits_bcrypt
+    return unless password.present? && password.bytesize > ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED
+
+    errors.add(:password, :password_too_long)
   end
 end
