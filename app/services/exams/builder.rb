@@ -88,13 +88,41 @@ module Exams
       filters["question_count"] || Exam::QUESTION_COUNTS.fetch(mode)
     end
 
-    # Cases are added until the target is met, so an exam can run a question or two
-    # over it rather than split a case.
+    # Exactly the number asked for, as the real exam's 280 are, from whole cases. How
+    # many cases of each size to take is settled first — the mix that adds up exactly
+    # and stays closest to the bank's own share of two- and three-question cases — and
+    # the interleaved draw is then read in order until each size has its count. A bank
+    # smaller than the target gives what it has; one that cannot add up exactly runs
+    # over by as little as a case allows, as the draw always did.
     def pick
+      rows = ordered(candidates)
+      quotas = exact_quotas(rows.map(&:last).tally)
+      chosen = quotas ? rows.select { |row| (quotas[row.last] -= 1) >= 0 } : overshoot(rows)
+      filters["interleave"] ? chosen : blocked(chosen)
+    end
+
+    def exact_quotas(available)
+      bank = available.sum { |size, count| size * count }
+      return available.dup if bank <= target
+
+      combinations(available.to_a, target).min_by do |quotas|
+        quotas.sum { |size, count| ((size * count) - (target * size * available[size] / bank.to_f))**2 }
+      end
+    end
+
+    # Every way of taking cases of these sizes, within what is available, to make `left`.
+    def combinations(sizes, left)
+      return (left.zero? ? [{}] : []) if sizes.empty?
+
+      (size, available), *rest = sizes
+      (0..[available, left / size].min).flat_map do |count|
+        combinations(rest, left - (size * count)).map { |quotas| quotas.merge(size => count) }
+      end
+    end
+
+    def overshoot(rows)
       total = 0
-      ordered(candidates).take_while do |_id, _specialty_id, questions|
-        (total < target).tap { total += questions }
-      end.then { |rows| filters["interleave"] ? rows : blocked(rows) }
+      rows.take_while { |row| (total < target).tap { total += row.last } }
     end
 
     def candidates

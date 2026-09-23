@@ -48,12 +48,38 @@ RSpec.describe Exams::Builder do
     expect(exam.exam_questions.map(&:position)).to eq([1, 2, 3])
   end
 
-  it "stops adding cases once the target is met, overshooting rather than splitting a case" do
+  it "draws exactly the number asked for, from whole cases" do
+    3.times { create(:published_case, questions_count: 3) }
+    2.times { create(:published_case, questions_count: 2) }
+
+    (5..10).each do |count|
+      expect(build(filters: { question_count: count }, seed: count).payload[:exam].question_count).to eq(count)
+    end
+  end
+
+  it "keeps to the bank's own mix of two- and three-question cases" do
+    6.times { create(:published_case, questions_count: 3) }
+    6.times { create(:published_case, questions_count: 2) }
+
+    exam = build(filters: { question_count: 15 }).payload[:exam]
+
+    sizes = cases_in(exam).map { |kase| kase.questions.count }.tally
+    expect(exam.question_count).to eq(15)
+    expect(sizes).to eq(3 => 3, 2 => 3)
+  end
+
+  it "runs over by as little as a case allows only when nothing adds up exactly" do
     4.times { create(:published_case, questions_count: 3) }
 
     exam = build(filters: { question_count: 5 }).payload[:exam]
 
     expect(exam.question_count).to eq(6)
+  end
+
+  it "gives what there is when the bank is smaller than the exam" do
+    create(:published_case, questions_count: 3)
+
+    expect(build(filters: { question_count: 10 }).payload[:exam].question_count).to eq(3)
   end
 
   it "gives the exam-length modes the real exam's conditions unless the student changes them" do
