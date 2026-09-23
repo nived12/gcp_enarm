@@ -1,8 +1,14 @@
 namespace :questions do
-  desc "Generate clinical cases: rake questions:generate[calls,budget_usd,source] (source: live_site|web_archive)"
-  task :generate, %i[calls budget source] => :environment do |_task, args|
+  desc "Generate clinical cases: rake questions:generate[calls,budget_usd,source,order,specialty] " \
+       "(source: live_site|web_archive; order: newest|by_specialty; specialty: a slug, to top one up)"
+  task :generate, %i[calls budget source order specialty] => :environment do |_task, args|
     calls = (args[:calls] || 10).to_i
     budget = args[:budget].presence&.to_f
+    order = args[:order].presence || "newest"
+    abort("Orden desconocido: #{order}. Usa #{Questions::WindowPlan::ORDERS.join(" o ")}") \
+      unless Questions::WindowPlan::ORDERS.include?(order)
+    specialty = Specialty.find_by(slug: args[:specialty]) if args[:specialty].present?
+    abort("No existe la especialidad #{args[:specialty]}") if args[:specialty].present? && specialty.nil?
     provider = Llm::Provider.for(:generator)
     abort("Falta la clave del generador. Revisa .env") unless provider.configured?
 
@@ -15,7 +21,8 @@ namespace :questions do
     )
 
     result = Questions::GenerationRunner.call(
-      run: run, calls: calls, budget_usd: budget, guidelines: guidelines, on_progress: ->(line) { puts line }
+      run: run, calls: calls, budget_usd: budget, guidelines: guidelines, order: order, specialty: specialty,
+      on_progress: ->(line) { puts line }
     )
     run.update!(status: result.success? ? "completed" : "failed", finished_at: Time.current)
     abort(result.errors.full_messages.to_sentence) if result.failure?
@@ -163,5 +170,25 @@ namespace :questions do
     puts "\ncasos=#{tally[:ok]} fallidos=#{tally[:failed]} tokens=#{run.total_tokens} " \
          "costo=$#{format("%.4f", run.cost_usd)}"
     puts "Las razones reescritas quedan sin revisar: corre questions:verify_rationales."
+  end
+
+  desc "The whole bank, in chunks: generate, back up, verify, publish, to a dollar cap. Totals are per label, " \
+       "so re-running the same command continues: rake questions:full_run[calls,budget_usd,label,chunk]"
+  task :full_run, %i[calls budget label chunk] => :environment do |_task, args|
+    abort("Uso: rake questions:full_run[calls,budget_usd,label,chunk]") if args[:calls].blank? || args[:budget].blank?
+    missing = Llm::Provider.all.reject(&:configured?)
+    abort("Faltan claves: #{missing.map(&:role).join(", ")}. Revisa .env") if missing.any?
+
+    result = Questions::FullRunner.call(
+      calls: args[:calls].to_i, budget_usd: args[:budget].to_f, label: args[:label].presence || "full",
+      chunk: (args[:chunk].presence || Questions::FullRunner::CHUNK_CALLS).to_i,
+      on_progress: ->(line) { puts line }
+    )
+    abort(result.errors.full_messages.to_sentence) if result.failure?
+
+    summary = result.payload
+    puts "\nDetenida por: #{summary[:stopped]} · llamadas=#{summary[:calls]} casos=#{summary[:cases]} " \
+         "descartadas=#{summary[:rejected]} en_el_banco=#{summary[:live]} costo=$#{summary[:cost_usd]}"
+    puts "Respaldo final: #{summary[:backups].last}" if summary[:backups].any?
   end
 end
