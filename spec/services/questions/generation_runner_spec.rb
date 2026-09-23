@@ -102,10 +102,10 @@ RSpec.describe Questions::GenerationRunner do
     result = generate(on_progress: ->(line) { lines << line })
 
     expect(result.payload).to include(calls: 2, cases: 2, rejected: 1, failed: 1, stopped_at_budget: false)
-    expect(lines).to eq(["IMSS-003-22 [full_workup/es/figura] 2 casos", "IMSS-004-22 [focused/en] sin JSON"])
+    expect(lines).to eq(["IMSS-003-22 [full_workup/es] 2 casos", "IMSS-004-22 [focused/en] sin JSON"])
   end
 
-  it "rotates vignette length, language and figures on a fixed schedule" do
+  it "rotates vignette length and language on a fixed schedule" do
     guideline_with(8 * 14)
 
     described_class.call(run: run, calls: 14)
@@ -113,7 +113,8 @@ RSpec.describe Questions::GenerationRunner do
     # One case in 12.5 is English, so the first falls on the fourteenth call.
     expect(calls.map { |c| c[:detail] }.first(2)).to eq(%i[full_workup focused])
     expect(calls.each_index.select { |i| calls[i][:locale] == "en" }).to eq([13])
-    expect(calls.each_index.select { |i| calls[i][:with_image] }).to eq([0, 7])
+    # Guideline figures are the answer key, so no call asks for one.
+    expect(calls.flat_map(&:keys)).not_to include(:with_image)
   end
 
   it "draws from generatable guidelines only" do

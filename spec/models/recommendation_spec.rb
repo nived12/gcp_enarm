@@ -26,6 +26,21 @@ RSpec.describe Recommendation do
     expect(recommendation.guideline).to eq(guideline)
   end
 
+  describe "#figure" do
+    let(:section) { create(:guideline_section) }
+
+    it "is the guideline figure the statement sends the reader to" do
+      image = create(:clinical_image, :stored, guideline_section: section, label: "CUADRO 2")
+      recommendation = create(:recommendation, guideline_section: section, text: "Estratificar según el cuadro 2.")
+
+      expect(recommendation.figure).to eq(image)
+    end
+
+    it "is nil for a statement that points at no figure" do
+      expect(create(:recommendation, guideline_section: section).figure).to be_nil
+    end
+  end
+
   describe "#cited_as" do
     it "reads as grade, scale and study" do
       expect(build(:recommendation).cited_as).to eq("A · NICE · Hong K, 2021")

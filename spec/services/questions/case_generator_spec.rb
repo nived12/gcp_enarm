@@ -108,8 +108,8 @@ RSpec.describe Questions::CaseGenerator do
     expect(result.payload[:cases].sole.questions.sole.recommendation).to eq(later)
   end
 
-  # The detail level, the language and the figure are each the prompt's and the builder's
-  # business; this only proves the generator hands them on.
+  # The detail level and the language are the prompt's and the builder's business; this
+  # only proves the generator hands them on.
   it "passes the rotation's choices through to the prompt and the saved case" do
     stub_model(one_case(question))
 
@@ -118,37 +118,6 @@ RSpec.describe Questions::CaseGenerator do
     expect(kase.locale).to eq("en")
     expect(Llm::Completion).to have_received(:call) do |prompt:, **|
       expect(prompt).to include("paciente COMPLETO", "EN INGLÉS")
-    end
-  end
-
-  describe "a figure" do
-    let!(:with_figure) do
-      create(
-        :recommendation, guideline_section: section,
-        text: "Se recomienda estratificar el riesgo según el cuadro 1."
-      )
-    end
-    let!(:image) { create(:clinical_image, :stored, guideline_section: section, label: "CUADRO 1") }
-
-    it "picks one before writing the prompt and attaches it to the case that used it" do
-      stub_model(one_case(question(index: 2, quote: "estratificar el riesgo")))
-
-      result = described_class.call(guideline, with_image: true)
-
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).to include("recomendación 2, que remite a «CUADRO 1")
-      end
-      expect(result.payload[:cases].sole.clinical_image).to eq(image)
-    end
-
-    it "picks none when the rotation did not ask for one" do
-      stub_model(one_case(question))
-
-      described_class.call(guideline)
-
-      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
-        expect(prompt).not_to include("CUADRO 1")
-      end
     end
   end
 

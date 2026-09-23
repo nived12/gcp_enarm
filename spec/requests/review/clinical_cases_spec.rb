@@ -269,6 +269,33 @@ RSpec.describe "Review::ClinicalCases", type: :request do
       expect(response.body).to include("GPC SS-219-24 · 2024")
     end
 
+    # Where the simulator will show it: with the explanation, after the answer, because a
+    # guideline's own figure carries the answer.
+    it "shows the figure a cited statement points at under that statement, not with the vignette" do
+      section = create(:guideline_section)
+      create(:clinical_image, :stored, guideline_section: section, label: "ALGORITMO 1", caption: "TAMIZAJE")
+      cited = create(:recommendation, guideline_section: section, text: "Evaluar la pérdida de peso (algoritmo 1).")
+      create(:question, clinical_case: clinical_case, recommendation: cited, source_quote: "Evaluar la pérdida de peso")
+      sign_in(reviewer)
+
+      get review_clinical_case_path(clinical_case)
+
+      body = response.body
+      expect(body).to include("ALGORITMO 1")
+      expect(body.index("ALGORITMO 1")).to be > body.index(I18n.t("review.show.source"))
+    end
+
+    it "marks a withdrawn case on the list and on the case" do
+      clinical_case.update!(status: "retired")
+      sign_in(reviewer)
+
+      get review_clinical_cases_path
+      expect(response.body).to include(I18n.t("review.retired"))
+
+      get review_clinical_case_path(clinical_case)
+      expect(response.body).to include(I18n.t("review.show.retired_notice"))
+    end
+
     # Guideline figures are drawn for a printed page and are unreadable at phone width.
     it "opens the figure full size, where it can be zoomed" do
       clinical_case.update!(clinical_image: create(:clinical_image, :stored))

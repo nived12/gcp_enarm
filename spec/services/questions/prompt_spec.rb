@@ -48,23 +48,9 @@ RSpec.describe Questions::Prompt do
     end
   end
 
-  describe "a figure" do
-    let(:image) { build(:clinical_image, label: "CUADRO 1", caption: "CRITERIOS DE ESTRATIFICACIÓN") }
-
-    it "names the figure and the statement that points at it, so the vignette is written towards it" do
-      text = prompt(figure: [aspirin, image])
-
-      expect(text).to include("recomendación 2, que remite a «CUADRO 1: CRITERIOS DE ESTRATIFICACIÓN»")
-    end
-
-    # The model never sees the image. Asking it about the contents would invent them, and
-    # the citation gate only checks the quote — it could not catch a fabricated table row.
-    it "tells the model not to describe what it cannot see" do
-      expect(prompt(figure: [aspirin, image])).to include("No describas el contenido de la figura")
-    end
-
-    it "says nothing about figures when none was chosen" do
-      expect(prompt).not_to include("figura")
-    end
+  # The statements themselves say "(algoritmo 1)", and the pilot wrote a correct option
+  # reading "iniciar tamizaje mediante el Algoritmo 1".
+  it "forbids pointing at the guideline's figures, which the student does not see" do
+    expect(prompt).to include("no los ve mientras responde")
   end
 end

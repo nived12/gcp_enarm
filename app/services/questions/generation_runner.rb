@@ -77,7 +77,7 @@ module Questions
     def report(guideline, options, result)
       return if on_progress.nil?
 
-      tags = [options[:detail], options[:locale], ("figura" if options[:with_image])].compact.join("/")
+      tags = options.values_at(:detail, :locale).join("/")
       state = result.success? ? "#{result.payload[:cases].size} casos" : result.errors.full_messages.first
       on_progress.call("#{guideline.catalog_key} [#{tags}] #{state}")
     end
@@ -103,23 +103,20 @@ module Questions
     end
 
     # A fixed rotation rather than a random draw, so a run is reproducible. Long vignettes
-    # alternate with short ones, English lands on a schedule, and so do figures.
+    # alternate with short ones, and English lands on a schedule.
     #
     # ENGLISH_SHARE is right for the full corpus and wrong for a small batch: at 8% the
     # first English case falls on the 14th call, so a smaller sample gets none and nobody
     # reviewing it ever sees one. Below that the last call made is forced to English —
     # the sample is deliberately over-representative, which is what a sample is for.
-    # Figures are over-represented in a small batch for the same reason.
     def rotation(index)
       english_every = (1 / CaseGenerator::ENGLISH_SHARE).round
-      image_every = (1 / CaseGenerator::IMAGE_SHARE).round
       forced_english = @planned < english_every ? @planned - 1 : nil
       scheduled = index.positive? && (index % english_every).zero?
 
       {
         detail: index.even? ? :full_workup : :focused,
-        locale: index == forced_english || scheduled ? "en" : "es",
-        with_image: (index % image_every).zero?
+        locale: index == forced_english || scheduled ? "en" : "es"
       }
     end
   end

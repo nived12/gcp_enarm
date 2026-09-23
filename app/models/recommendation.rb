@@ -18,4 +18,12 @@ class Recommendation < ApplicationRecord
   def cited_as
     [grade, scale, citation].compact_blank.join(" · ").presence || label
   end
+
+  # The guideline figure this statement sends the reader to ("ver cuadro 2"), if we hold
+  # it. Shown with the answer's explanation, never with the question: a guideline's
+  # algorithms, tables and scales are its reference material, and during the question
+  # they would be the answer key.
+  def figure
+    ClinicalImage.cited_by([self])&.last
+  end
 end

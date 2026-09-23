@@ -106,14 +106,14 @@ say, and weak-spot targeting has to treat that as unknown rather than as `did_no
 must be one language, and the `quote` stays in Spanish whatever the case language: the
 substring gate checks it against a Spanish guideline, so an English quote fails every time.
 
-**A figure is chosen before the prompt, never attached after.** A vignette that was not
-written towards an image reads as one with a picture stapled to it, so
-`Questions::CaseGenerator` takes `with_image:` and picks the figure itself. **The model
-never sees the image**, so nothing may ask it about the figure's contents — it would
-invent rows, and the citation gate checks the quote against the recommendation, not the
-figure. The item rests on the quoted recommendation; the figure is what that
-recommendation already sends the reader to. Attach it only if the model actually cited
-that recommendation.
+**A guideline's own figures are the answer key, so they never appear with a question.**
+Its algorithms, criteria tables and scales are reference material: shown beside the
+vignette they turn an item into an open-book lookup (the pilot's case 134 showed the very
+pathway its questions asked about). They belong to the explanation, after the answer —
+`Recommendation#figure` finds the one a cited statement points at ("ver cuadro 2"). The
+generator is told nothing about figures, and the prompt forbids questions and options
+that mention one. `ClinicalCase#clinical_image` is kept for images that *are* the question
+— an ECG or a film to interpret — which the GPCs do not contain; see the plan.
 
 **The corpus files its working papers as figures too.** A GRADE appraisal is published
 under "CUADRO 4" exactly like a criteria table is, so the heading decides whether a section

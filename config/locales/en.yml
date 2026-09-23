@@ -93,6 +93,7 @@ en:
   review:
     denied: "This section is for clinical review only."
     expired: "%{year} guideline"
+    retired: "Withdrawn"
     verdicts:
       supported: "Supported"
       ambiguous: "Ambiguous"
@@ -136,6 +137,7 @@ en:
       open_guideline: "Open the guideline ↗"
       undated: "undated"
       expired_warning: "This guideline is past its stated validity period. Check that the recommendation still holds."
+      retired_notice: "Withdrawn case: it will not reach students."
       second_opinion: "Second opinion"
       open_figure: "Open the full figure ↗"
       verdict_meaning:

@@ -36,6 +36,9 @@
 
           <p class="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-faint">
             <%= render "verdict_badge", clinical_case: clinical_case %>
+            <% if clinical_case.status_retired? %>
+              <span class="rounded-full border border-line-strong px-2 py-0.5 text-ink"><%= t("review.retired") %></span>
+            <% end %>
             <span><%= t("difficulties.#{clinical_case.difficulty}") %></span>
             <span aria-hidden="true">·</span>
             <span><%= clinical_case.guideline&.catalog_key %></span>

@@ -113,31 +113,4 @@ RSpec.describe Questions::CaseBuilder do
       expect(difficulty_for(nil)).to eq("medium")
     end
   end
-
-  describe "a figure" do
-    let(:pointing) do
-      create(
-        :recommendation, guideline_section: section,
-        text: "Se recomienda estratificar el riesgo según el cuadro 1."
-      )
-    end
-    let(:image) { create(:clinical_image, :stored, guideline_section: section, label: "CUADRO 1") }
-    let(:window) { [recommendation, pointing] }
-
-    it "goes on the case that cited the statement pointing at it" do
-      built = build_from(
-        one_case(question(number: 2, quote: "estratificar el riesgo")),
-        recommendations: window, figure: [pointing, image]
-      )
-
-      expect(built[:cases].sole.clinical_image).to eq(image)
-    end
-
-    # It is told which statement to use, but nothing forces it to comply.
-    it "is left off when the model wrote about something else" do
-      built = build_from(one_case(question), recommendations: window, figure: [pointing, image])
-
-      expect(built[:cases].sole.clinical_image).to be_nil
-    end
-  end
 end

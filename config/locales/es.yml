@@ -93,6 +93,7 @@ es:
   review:
     denied: "Esta sección es solo para revisión clínica."
     expired: "Guía de %{year}"
+    retired: "Retirado"
     verdicts:
       supported: "Respaldado"
       ambiguous: "Ambiguo"
@@ -136,6 +137,7 @@ es:
       open_guideline: "Abrir la guía ↗"
       undated: "sin año"
       expired_warning: "Esta guía está fuera de su periodo de vigencia. Verifica que la recomendación siga siendo válida."
+      retired_notice: "Caso retirado: no llegará a los alumnos."
       second_opinion: "Segunda opinión"
       open_figure: "Abrir la figura completa ↗"
       verdict_meaning:

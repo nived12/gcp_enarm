@@ -13,15 +13,10 @@ module Questions
     # questions must be in one language.
     ENGLISH_SHARE = 0.08
 
-    # Roughly one item in six carries a figure. A real exam shows far fewer images than a
-    # competitor's marketing suggests, and this number is an estimate until a doctor has
-    # read a batch and said otherwise.
-    IMAGE_SHARE = 0.15
-
     # `recommendations` lets a runner walk a guideline window by window; left out, the
     # call takes the guideline's first `limit` actionable statements.
     def initialize(guideline, run: nil, limit: RECOMMENDATIONS_PER_CALL, recommendations: nil,
-                   detail: :focused, locale: "es", with_image: false)
+                   detail: :focused, locale: "es")
       super()
       @guideline = guideline
       @run = run
@@ -29,7 +24,6 @@ module Questions
       @recommendations = recommendations&.to_a
       @detail = detail
       @locale = locale
-      @with_image = with_image
     end
 
     def call
@@ -42,7 +36,7 @@ module Questions
       return failure("El modelo no devolvió JSON legible") if payload.nil?
 
       built = CaseBuilder.call(
-        payload, guideline: guideline, recommendations: recommendations, run: run, locale: locale, figure: figure
+        payload, guideline: guideline, recommendations: recommendations, run: run, locale: locale
       ).payload
       record(completion.payload, built)
 
@@ -55,7 +49,7 @@ module Questions
 
     private
 
-    attr_reader :guideline, :run, :limit, :detail, :locale, :with_image
+    attr_reader :guideline, :run, :limit, :detail, :locale
 
     def recommendations
       @recommendations ||= Recommendation.actionable
@@ -64,17 +58,9 @@ module Questions
     end
 
     def prompt
-      Prompt.new(guideline, recommendations, detail: detail, locale: locale, figure: figure).to_s
+      Prompt.new(guideline, recommendations, detail: detail, locale: locale).to_s
     end
 
-    # Chosen before the prompt is written, not attached to a finished case: a vignette
-    # that was not written towards an image reads as a vignette with a picture stapled
-    # to it, and the real exam does not do that.
-    def figure
-      return @figure if defined?(@figure)
-
-      @figure = with_image ? ClinicalImage.cited_by(recommendations) : nil
-    end
 
     # Models wrap JSON in a markdown fence often enough, even when told not to.
     def parse(content)

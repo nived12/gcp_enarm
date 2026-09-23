@@ -1,0 +1,15 @@
+<%# Guideline tables and algorithms are drawn for a printed page. At phone width their text
+    is too small to read, so the figure opens full size, where it can be zoomed. %>
+<figure class="<%= spacing %>">
+  <%= link_to url_for(image.file), target: "_blank", rel: "noopener" do %>
+    <%= image_tag image.file, alt: image.caption.presence || image.label,
+          class: "w-full rounded-card border border-line bg-surface" %>
+  <% end %>
+  <figcaption class="mt-3 text-xs leading-relaxed text-ink-faint">
+    <span class="font-medium text-ink-muted"><%= image.label %></span><%
+      if image.caption.present? %> — <%= image.caption %><% end %>
+    <span class="mt-1 block"><%= image.attribution %></span>
+  </figcaption>
+  <%= link_to t("review.show.open_figure"), url_for(image.file), target: "_blank", rel: "noopener",
+        class: "mt-2 inline-flex min-h-11 items-center text-sm text-accent underline underline-offset-2 hover:text-accent-hover" %>
+</figure>

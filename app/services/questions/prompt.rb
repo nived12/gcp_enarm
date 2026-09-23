@@ -32,14 +32,12 @@ module Questions
       de hospitalización genérica.
     TEXT
 
-    # `figure` is a [recommendation, image] pair from ClinicalImage.cited_by, or nil.
     # An unknown detail level falls back to focused rather than failing the call.
-    def initialize(guideline, recommendations, detail: :focused, locale: "es", figure: nil)
+    def initialize(guideline, recommendations, detail: :focused, locale: "es")
       @guideline = guideline
       @recommendations = recommendations
       @detail = DETAIL_LEVELS.include?(detail) ? detail : :focused
       @locale = locale
-      @figure = figure
     end
 
     def to_s
@@ -62,11 +60,14 @@ module Questions
         - Una explicación breve de por qué la correcta lo es.
         - El número de la recomendación en la que se basa, y una cita textual de esa
           recomendación.
+        - Ni la pregunta ni las opciones mencionan cuadros, algoritmos, figuras ni escalas de
+          la guía: el alumno no los ve mientras responde, y una opción que dice "según el
+          algoritmo 1" delata la respuesta.
 
         Sobre la cita: copia un fragmento CONTINUO, palabra por palabra, tal como aparece.
         NUNCA uses puntos suspensivos ni omitas palabras intermedias. Si el fragmento útil
         es largo, cita una parte contigua más corta.
-        #{language_instructions}#{figure_instructions}
+        #{language_instructions}
         Devuelve SOLO JSON, sin markdown ni texto alrededor. Las llaves van en inglés:
         {"cases":[{"stem":"...","questions":[{"text":"...","explanation":"...",
         "recommendation":1,"quote":"...","options":[{"text":"...","correct":true},
@@ -80,7 +81,7 @@ module Questions
 
     private
 
-    attr_reader :guideline, :recommendations, :detail, :locale, :figure
+    attr_reader :guideline, :recommendations, :detail, :locale
 
     # Numbered from 1. The model cites a statement by this number, and
     # Questions::CaseBuilder maps it back to the row.
@@ -129,24 +130,6 @@ module Questions
 
       "\nEscribe la viñeta, las preguntas, las opciones y las explicaciones EN INGLÉS. " \
         "La cita textual se queda en español, tal como aparece en la recomendación.\n"
-    end
-
-    # The model is not shown the image and must not be asked about what is in it. What it
-    # is told is that the recommendation it is citing sends the reader to a figure, and
-    # that the figure will be on screen — so the item still rests entirely on the quoted
-    # text, which is the only thing the citation gate can check.
-    def figure_instructions
-      return "" if figure.nil?
-
-      recommendation, image = figure
-      number = recommendations.index(recommendation) + 1
-
-      "\nUno de los casos debe apoyarse en la recomendación #{number}, que remite a " \
-        "«#{[image.label, image.caption].compact_blank.join(": ")}». Esa figura se mostrará " \
-        "junto al caso, así que la viñeta debe llegar de forma natural a consultarla y una " \
-        "de sus preguntas debe referirse a ella.\n" \
-        "No describas el contenido de la figura ni inventes cifras, filas ni valores suyos: " \
-        "no la estás viendo. La pregunta debe poder responderse con la recomendación citada.\n"
     end
   end
 end

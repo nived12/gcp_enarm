@@ -13,28 +13,26 @@ module Questions
     WEAK_GRADES = /\A(D|4|IV|muy baja|baja|d[ée]bil)\b/i
 
     # `recommendations` must be in the order the prompt numbered them, since that number
-    # is how the model says which one it used. `figure` is the pair the prompt named.
-    def initialize(payload, guideline:, recommendations:, run: nil, locale: "es", figure: nil)
+    # is how the model says which one it used.
+    def initialize(payload, guideline:, recommendations:, run: nil, locale: "es")
       super()
       @payload = payload
       @guideline = guideline
       @recommendations = recommendations
       @run = run
       @locale = locale
-      @figure = figure
       @rejected = 0
     end
 
     def call
       cases = Array(payload["cases"]).filter_map { |attributes| build_case(attributes) }
-      attach_figure(cases)
 
       success(cases: cases, rejected: rejected)
     end
 
     private
 
-    attr_reader :payload, :guideline, :recommendations, :run, :locale, :figure, :rejected
+    attr_reader :payload, :guideline, :recommendations, :run, :locale, :rejected
 
     def build_case(attributes)
       questions = Array(attributes["questions"])
@@ -99,17 +97,6 @@ module Questions
       return "high" if grades.any? { |grade| grade.match?(WEAK_GRADES) }
 
       "medium"
-    end
-
-    # Only if the model actually cited the recommendation that points at the figure. It
-    # is told which one to use, but a case that went elsewhere gets no image rather than
-    # an image belonging to something it never mentions.
-    def attach_figure(cases)
-      return if figure.nil?
-
-      recommendation, image = figure
-      cited = cases.find { |kase| kase.questions.any? { |question| question.recommendation == recommendation } }
-      cited&.update!(clinical_image: image)
     end
 
     def topic
