@@ -158,6 +158,23 @@ RSpec.describe Exams::Builder do
         .to contain_exactly(emergency_in_emergency, emergency_unknown)
     end
 
+    # A study day in a context: its topics, or anything set in the context.
+    it "widens a topic filter with the cases set in a context" do
+      topic = create(:topic)
+      on_topic = create(:published_case, specialty: pediatrics, topic: topic, questions_count: 1)
+
+      exam = build(filters: { topic_ids: [topic.id], also_setting_ids: [emergency.id] }).payload[:exam]
+
+      expect(cases_in(exam)).to contain_exactly(on_topic, internal_in_emergency, emergency_in_emergency)
+      expect(exam.filters).to include("also_setting_ids" => [emergency.id])
+    end
+
+    it "draws the cases set in a context when the day's topics have none" do
+      exam = build(filters: { topic_ids: [], also_setting_ids: [emergency.id] }).payload[:exam]
+
+      expect(cases_in(exam)).to contain_exactly(internal_in_emergency, emergency_in_emergency)
+    end
+
     it "draws exactly the cases the form counts beside the box" do
       count = ClinicalCase.status_published.count_by_area.fetch(emergency.id)
       exam = build(filters: { specialty_ids: [emergency.id], question_count: 100 }).payload[:exam]

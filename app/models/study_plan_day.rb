@@ -39,9 +39,19 @@ class StudyPlanDay < ApplicationRecord
     topics.where(id: ClinicalCase.status_published.select(:topic_id))
   end
 
+  # A day of Medicina Familiar, Urgencias or Salud Pública also quizzes the cases set in
+  # that context. The bank files cases by subject, so a context's own topics hold almost
+  # none, and without these its days would stay reading days however many consults and
+  # emergencies the bank holds.
+  def setting_cases
+    return ClinicalCase.none unless kind_topics? && specialty&.kind_cross_cutting?
+
+    ClinicalCase.status_published.where(setting: specialty)
+  end
+
   def quiz?
     return false if kind_catch_up?
-    return quiz_topics.exists? if kind_topics?
+    return quiz_topics.exists? || setting_cases.exists? if kind_topics?
 
     true
   end
@@ -51,7 +61,9 @@ class StudyPlanDay < ApplicationRecord
   def exam_request
     case kind
     when "topics"
-      { mode: "custom", filters: { topic_ids: quiz_topics.ids, question_count: TOPIC_QUIZ_QUESTIONS } }
+      filters = { topic_ids: quiz_topics.ids, question_count: TOPIC_QUIZ_QUESTIONS }
+      filters[:also_setting_ids] = [specialty_id] if setting_cases.exists?
+      { mode: "custom", filters: filters }
     when "case_workshop"
       { mode: "custom", filters: { specialty_ids: [specialty_id], question_count: WORKSHOP_QUESTIONS } }
     when "review"

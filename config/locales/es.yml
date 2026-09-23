@@ -832,6 +832,9 @@ es:
         one: "1 caso en el banco"
         other: "%{count} casos en el banco"
       no_cases: "Sin casos todavía: tema de lectura"
+      setting_cases:
+        one: "El examen del día también toma el caso que ocurre en %{setting}."
+        other: "El examen del día también toma los %{count} casos que ocurren en %{setting}."
       reading: "Todavía no hay casos publicados de estos temas, así que hoy es de lectura. Márcalo cuando termines."
       about:
         case_workshop: "Casos de toda la especialidad que acabas de recorrer, mezclados, para cerrar el bloque."

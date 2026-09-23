@@ -45,6 +45,53 @@ RSpec.describe StudyPlanDay do
     expect(day("catch_up")).not_to be_quiz
   end
 
+  describe "a day of one of the three contexts" do
+    let(:emergency) { create(:emergency_setting) }
+    let(:emergency_topic) { create(:topic, branch: create(:branch, specialty: emergency)) }
+
+    def context_day(specialty = emergency)
+      create(:study_plan_day, study_plan: plan, kind: "topics", specialty: specialty).tap do |topics_day|
+        topics_day.day_topics.create!(topic: emergency_topic, position: 1)
+      end
+    end
+
+    it "is a reading day while nothing is about its topics or set in it" do
+      expect(context_day).not_to be_quiz
+      expect(context_day.setting_cases).to be_empty
+    end
+
+    it "quizzes the cases set in it when its own topics have none" do
+      set_there = create(:published_case, specialty: specialty, setting: emergency)
+
+      expect(context_day).to be_quiz
+      expect(context_day.setting_cases).to eq([set_there])
+      expect(context_day.exam_request).to eq(
+        mode: "custom", filters: { topic_ids: [], question_count: 10, also_setting_ids: [emergency.id] }
+      )
+    end
+
+    it "counts only published cases set in it" do
+      create(:published_case, specialty: specialty, setting: emergency, status: "retired")
+
+      expect(context_day).not_to be_quiz
+    end
+
+    it "leaves a troncal's day to its topics, whatever its cases' settings" do
+      create(:published_case, specialty: specialty, setting: emergency)
+      topics_day = day
+      topics_day.day_topics.create!(topic: without_cases, position: 1)
+
+      expect(topics_day.setting_cases).to be_empty
+      expect(topics_day).not_to be_quiz
+    end
+
+    it "adds nothing to a workshop, which already draws the whole area" do
+      create(:published_case, specialty: specialty, setting: emergency)
+
+      expect(day("case_workshop", specialty: emergency).setting_cases).to be_empty
+    end
+  end
+
   it "belongs to one of three passes" do
     expect(build(:study_plan_day, pass_number: 4)).not_to be_valid
   end

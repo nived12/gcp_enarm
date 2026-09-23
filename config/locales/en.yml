@@ -830,6 +830,9 @@ en:
         one: "1 case in the bank"
         other: "%{count} cases in the bank"
       no_cases: "No cases yet: a reading topic"
+      setting_cases:
+        one: "The day's quiz also draws the case set in %{setting}."
+        other: "The day's quiz also draws the %{count} cases set in %{setting}."
       reading: "There are no published cases on these topics yet, so today is for reading. Mark it when you finish."
       about:
         case_workshop: "Cases from the whole specialty you just covered, mixed, to close the block."

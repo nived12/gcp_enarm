@@ -70,6 +70,7 @@ module Exams
           "question_count" => raw_filters[:question_count].presence&.to_i&.clamp(CUSTOM_COUNTS) || DEFAULT_CUSTOM_COUNT,
           "specialty_ids" => Array(raw_filters[:specialty_ids]).compact_blank.map(&:to_i),
           "topic_ids" => Array(raw_filters[:topic_ids]).compact_blank.map(&:to_i),
+          "also_setting_ids" => Array(raw_filters[:also_setting_ids]).compact_blank.map(&:to_i),
           "difficulties" => Array(raw_filters[:difficulties]) & ClinicalCase.difficulties.keys,
           "unseen_only" => boolean(:unseen_only, default: false),
           "previously_wrong_only" => boolean(:previously_wrong_only, default: false),
@@ -102,13 +103,23 @@ module Exams
     def candidates
       cases = ClinicalCase.status_published
       cases = cases.in_area(filters["specialty_ids"]) if filters["specialty_ids"]
-      cases = cases.where(topic_id: filters["topic_ids"]) if filters["topic_ids"]
+      cases = with_topics(cases)
       cases = cases.where(difficulty: filters["difficulties"]) if filters["difficulties"]
       cases = cases.where.not(id: seen_cases) if filters["unseen_only"]
       cases = cases.where(id: missed_cases) if filters["previously_wrong_only"]
 
       cases.joins(:questions).group(:id, :specialty_id)
            .order(:id).pluck(:id, :specialty_id, Arel.sql("COUNT(questions.id)"))
+    end
+
+    # `also_setting_ids` widens the topics rather than narrowing them: a study day in one
+    # of the three contexts quizzes its own topics or anything set in that context, since
+    # the bank files hardly a case under a context's topics.
+    def with_topics(cases)
+      topic_ids, setting_ids = filters.values_at("topic_ids", "also_setting_ids")
+      return cases unless topic_ids || setting_ids
+
+      cases.where(topic_id: Array(topic_ids)).or(cases.where(setting_id: Array(setting_ids)))
     end
 
     def seen_cases
