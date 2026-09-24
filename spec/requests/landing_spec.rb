@@ -48,6 +48,15 @@ RSpec.describe "Landing page", type: :request do
     expect(response.body).to include(%(<link rel="canonical" href="https://gpcenarm.com/">))
   end
 
+  it "serves its fonts itself and preloads the face the headline is set in" do
+    get root_path
+
+    expect(response.body).not_to include("fonts.googleapis.com", "fonts.gstatic.com")
+    expect(response.body).to include(
+      %(<link rel="preload" href="#{ActionController::Base.helpers.asset_path("alan-sans-latin.woff2")}" as="font")
+    )
+  end
+
   it "keeps the app's reading width and the sign-up button off the sign-up page" do
     get new_registration_path
 

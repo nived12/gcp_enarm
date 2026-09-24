@@ -28,9 +28,10 @@
       })();
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=Literata:opsz,wght@7..72,400..600&display=swap">
+    <%# The landing <h1> is the LCP element and is set in Alan Sans; without this the
+        font is only discovered once application.css has downloaded. Font preloads
+        need crossorigin even from the same origin, or the fetch is not reused. %>
+    <link rel="preload" href="<%= asset_path("alan-sans-latin.woff2") %>" as="font" type="font/woff2" crossorigin>
 
     <%= yield :head %>
 
