@@ -18,6 +18,11 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# The suite never reads the developer's .env: once it holds real Google or VAPID keys,
+# every spec that checks a feature stays hidden without them fails on that one machine
+# and passes in CI. Dotenv loads in before_configuration, so this must precede the class.
+Dotenv::Rails.files -= [".env"] if Rails.env.test?
+
 module GpcEnarm
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
