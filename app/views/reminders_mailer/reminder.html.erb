@@ -1,0 +1,11 @@
+<%= render "mailers/title", text: @message[:title] %>
+<% @message[:lines].each do |line| %>
+  <%= render "mailers/paragraph", text: line %>
+<% end %>
+<%= render "mailers/button", url: @url, label: t("reminders_mailer.reminder.button") %>
+<p style="margin:24px 0 0; padding-top:20px; border-top:1px solid #dbe2f4; font-size:13px; line-height:1.5; color:#656779;">
+  <%= t("reminders_mailer.reminder.why") %>
+  <a href="<%= account_url(anchor: "reminders") %>" style="color:#5c59f3;"><%= t("reminders_mailer.reminder.settings") %></a>
+  ·
+  <a href="<%= @unsubscribe_url %>" style="color:#5c59f3;"><%= t("reminders_mailer.reminder.unsubscribe") %></a>
+</p>

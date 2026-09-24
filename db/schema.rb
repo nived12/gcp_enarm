@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_210200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -273,6 +273,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_200000) do
     t.index ["user_id", "provider"], name: "index_identities_on_user_id_and_provider", unique: true
   end
 
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.string "auth_key", null: false
+    t.datetime "created_at", null: false
+    t.text "endpoint", null: false
+    t.string "p256dh_key", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.bigint "user_id", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "question_reports", force: :cascade do |t|
     t.text "comment"
     t.datetime "created_at", null: false
@@ -318,6 +330,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_200000) do
     t.index ["guideline_section_id", "position"], name: "index_recommendations_on_guideline_section_id_and_position", unique: true
     t.index ["guideline_section_id"], name: "index_recommendations_on_guideline_section_id"
     t.index ["scale"], name: "index_recommendations_on_scale"
+  end
+
+  create_table "reminder_deliveries", force: :cascade do |t|
+    t.jsonb "channels", default: [], null: false
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.date "local_date", null: false
+    t.string "slot", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "local_date", "slot"], name: "index_reminder_deliveries_on_user_id_and_local_date_and_slot", unique: true
+  end
+
+  create_table "reminder_preferences", force: :cascade do |t|
+    t.boolean "by_email", default: false, null: false
+    t.datetime "created_at", null: false
+    t.boolean "exam_countdown", default: false, null: false
+    t.integer "minute_of_day", default: 480, null: false
+    t.boolean "streak_at_risk", default: false, null: false
+    t.boolean "study_days", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_reminder_preferences_on_user_id", unique: true
   end
 
   create_table "review_cards", force: :cascade do |t|
@@ -637,12 +672,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_200000) do
   add_foreign_key "guideline_topics", "guidelines"
   add_foreign_key "guideline_topics", "topics"
   add_foreign_key "identities", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "question_reports", "questions"
   add_foreign_key "question_reports", "users"
   add_foreign_key "question_reports", "users", column: "resolved_by_id"
   add_foreign_key "questions", "clinical_cases"
   add_foreign_key "questions", "recommendations"
   add_foreign_key "recommendations", "guideline_sections"
+  add_foreign_key "reminder_deliveries", "users"
+  add_foreign_key "reminder_preferences", "users"
   add_foreign_key "review_cards", "clinical_cases", on_delete: :cascade
   add_foreign_key "review_cards", "recommendations", on_delete: :cascade
   add_foreign_key "review_cards", "users", on_delete: :cascade

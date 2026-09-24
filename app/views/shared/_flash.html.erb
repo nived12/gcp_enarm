@@ -1,5 +1,6 @@
 <% flash.each do |type, message| %>
-  <% next if message.blank? %>
+  <%# Only messages are shown here; other keys are one-time switches a page reads. %>
+  <% next unless message.is_a?(String) && message.present? %>
   <%
     tone = case type.to_s
            when "alert", "error" then "bg-incorrect-soft text-incorrect"

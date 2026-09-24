@@ -14,6 +14,9 @@ class User < ApplicationRecord
   has_many :resolved_question_reports, class_name: "QuestionReport", foreign_key: :resolved_by_id,
     inverse_of: :resolved_by, dependent: :nullify
   has_one :study_plan, dependent: :destroy
+  has_one :reminder_preference, dependent: :destroy
+  has_many :push_subscriptions, dependent: :delete_all
+  has_many :reminder_deliveries, dependent: :delete_all
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.to_set.freeze
 
@@ -57,6 +60,11 @@ class User < ApplicationRecord
     email
   end
 
+  # The link at the foot of every reminder email, which has to work signed out and for as
+  # long as the email sits in an inbox, so it never expires. It only ever turns email
+  # reminders off.
+  generates_token_for :reminder_unsubscribe
+
   def email_verified?
     email_verified_at.present?
   end
@@ -84,6 +92,11 @@ class User < ApplicationRecord
 
   def study_day_times(date = study_date)
     StudyDay.time_range(date, time_zone)
+  end
+
+  # The saved preference, or an all-off one that saving would create.
+  def reminder_settings
+    reminder_preference || build_reminder_preference
   end
 
   private

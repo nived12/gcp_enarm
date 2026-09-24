@@ -17,9 +17,11 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # The web app manifest makes the site installable ("Agregar a pantalla de inicio"), which
+  # is also what lets iPhone receive Web Push at all. The service worker is only there for
+  # push: it caches nothing.
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   resources :exams, only: %i[index new create show destroy] do
     member do
@@ -41,7 +43,15 @@ Rails.application.routes.draw do
   resources :checkouts, only: :create
   resource :account, only: %i[show update] do
     resource :name, only: :update, controller: "account_names"
+    resource :reminders, only: :update, controller: "reminder_preferences"
   end
+
+  # Study reminders. A browser's push subscription is addressed by its endpoint, which is
+  # all the page knows about it; the unsubscribe link in each reminder email works signed
+  # out, and its POST is the one-click unsubscribe mail clients send (RFC 8058).
+  resource :push_subscription, only: %i[create destroy]
+  get "reminders/unsubscribe/:token" => "reminder_unsubscribes#show", as: :reminder_unsubscribe
+  post "reminders/unsubscribe/:token" => "reminder_unsubscribes#create"
   post "webhooks/stripe" => "stripe_webhooks#create", as: :stripe_webhook
   get "legal/:page" => "legal#show", as: :legal, constraints: { page: /terms|privacy|refunds/ }
 

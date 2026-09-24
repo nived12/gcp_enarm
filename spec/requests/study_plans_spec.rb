@@ -75,6 +75,28 @@ RSpec.describe "Study plans", type: :request do
     end
   end
 
+  describe "the reminder invitation" do
+    it "is offered once, on the calendar the new plan opens on" do
+      post study_plan_path, params: { study_plan: { exam_date: "2027-09-28", template: "five_days" } }
+      follow_redirect!
+
+      expect(response.body).to include(I18n.t("reminders.invitation.title"))
+      expect(response.body).not_to include("true</div>")
+
+      get study_plan_path
+      expect(response.body).not_to include(I18n.t("reminders.invitation.title"))
+    end
+
+    it "is not offered to someone who already has reminders" do
+      create(:reminder_preference, user: student, streak_at_risk: true)
+
+      post study_plan_path, params: { study_plan: { exam_date: "2027-09-28", template: "five_days" } }
+      follow_redirect!
+
+      expect(response.body).not_to include(I18n.t("reminders.invitation.title"))
+    end
+  end
+
   describe "the calendar's month" do
     it "names each day's topics for the month, today first" do
       create_plan

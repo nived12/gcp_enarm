@@ -29,6 +29,9 @@ class StudyPlansController < ApplicationController
     )
     if result.success?
       track_plan_created(result.payload[:plan])
+      # Asked once, on the page the new plan opens on, and only of someone with no
+      # reminders yet. Home stays reminder-free.
+      flash[:reminder_invitation] = true unless Current.user.reminder_preference&.any_reminder?
       return redirect_to(study_plan_path, notice: t("study_plans.create.done"))
     end
 

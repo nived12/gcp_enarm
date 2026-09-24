@@ -90,6 +90,15 @@ gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2", "~> 1.2"
 gem "omniauth-rails_csrf_protection", "~> 2.0"
 
+# Web Push for study reminders: VAPID signing and RFC 8291 payload encryption. Pushpad's
+# maintained fork, the one Rails' own PWA template and 37signals' Campfire use.
+gem "web-push", "~> 3.1"
+# web-push pulls the openssl gem in as a real dependency, and left alone Bundler takes the
+# 4.x major. Everything else (Stripe, Resend, the LLM clients) has only ever run on the 3.x
+# line Ruby 3.3 ships, so stay on it. It is a C extension either way: the Dockerfile's
+# build stage installs libssl-dev for it.
+gem "openssl", "~> 3.2"
+
 # Rate limiting
 gem "rack-attack"
 

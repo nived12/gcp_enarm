@@ -4,6 +4,10 @@
     <title><%= content_for(:title) || t("app.name") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="<%= t("app.name") %>">
+    <%# The browser chrome takes the page's ground: cream by day, night ink in the dark. %>
+    <meta name="theme-color" content="#fffcf5" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0e0e18" media="(prefers-color-scheme: dark)">
     <meta name="application-name" content="<%= t("app.name") %>">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="<%= content_for(:description) || t("app.tagline") %>">
@@ -30,9 +34,9 @@
 
     <%= yield :head %>
 
+    <link rel="manifest" href="<%= pwa_manifest_path(format: :json) %>">
     <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>

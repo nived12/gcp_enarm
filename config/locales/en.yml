@@ -1162,3 +1162,92 @@ en:
     misses:
       one: "1 miss"
       other: "%{count} misses"
+  reminders:
+    preferences:
+      title: "Reminders"
+      promise: "At most one message a day, and none if you already studied. Everything starts off."
+      what: "What we remind you of"
+      rules:
+        study_days:
+          label: "Today's plan"
+          hint: "At the time you choose, only on days your plan has something and you have not studied yet."
+        streak_at_risk:
+          label: "Streak at risk"
+          hint: "At %{time}, if you have a streak and today does not count yet. Never on days we already reminded you of your plan."
+        exam_countdown:
+          label: "Exam countdown"
+          hint: "At the time you choose, 30, 7 and 1 day before your exam."
+      no_plan: "Today's plan and the countdown come from your study plan, and you do not have one yet."
+      create_plan: "Build my plan"
+      time: "Time"
+      time_hint: "%{zone} time, your time zone."
+      where: "Where they reach you"
+      email:
+        label: "By email"
+        hint: "To %{email}. Every email carries a link to stop them."
+      submit: "Save reminders"
+      saved: "Reminders saved."
+      saved_without_channel: "Reminders saved, but none will reach you: choose email or turn on notifications on this device."
+      invalid: "Choose a time from the list."
+    device:
+      label: "Notifications on this device"
+      checking: "Checking whether this browser can receive them…"
+      "off": "Off here. They turn on straight away, no need to save."
+      enable: "Turn on notifications here"
+      working: "One moment…"
+      "on": "On for this device."
+      disable: "Turn off here"
+      install:
+        body: "On iPhone and iPad notifications only arrive if you open GPCEnarm from your Home Screen (iOS 16.4 or later):"
+        share: "In Safari, tap the Share button."
+        add: "Choose “Add to Home Screen”."
+        open: "Open GPCEnarm from the new icon and come back to this section."
+      update_ios: "This iPhone or iPad needs iOS 16.4 or later to receive notifications. Use email in the meantime."
+      unsupported: "This browser cannot receive notifications. Use email, or turn them on from another browser."
+      denied: "Notifications from this site are blocked in this browser. Allow them in its settings and come back to this page."
+      error: "Notifications could not be turned on. Try again."
+      retry: "Try again"
+    invitation:
+      title: "Shall we remind you of your plan?"
+      body: "One nudge at the time you choose, only on days your plan has something and never if you already studied."
+      accept: "Choose reminders"
+      dismiss: "Not now"
+    unsubscribe:
+      title: "Stop reminder emails"
+      subtitle: "Study reminders will stop going to %{email}."
+      confirm: "Stop them"
+      keeps: "Account emails, like password resets, keep arriving."
+      done:
+        title: "Done"
+        subtitle: "We will not send reminders to %{email} any more."
+        change: "If you change your mind, you can turn them back on in your account."
+        settings: "Go to my reminders"
+      invalid:
+        title: "This link does not work"
+        subtitle: "It may be incomplete. Sign in to change your reminders."
+    message:
+      study_day:
+        title: "Today's plan"
+        body: "Today: %{day}."
+        streak:
+          one: "You are on a 1-day streak."
+          other: "You are on a %{count}-day streak."
+      streak_at_risk:
+        title:
+          one: "Your 1-day streak is still alive"
+          other: "Your %{count}-day streak is still alive"
+        body: "Today does not count yet: %{minimum} questions or one pearls session before midnight keeps it."
+      exam_countdown:
+        title:
+          one: "1 day to your exam"
+          other: "%{count} days to your exam"
+        body:
+          days_30: "A good moment for a full mock exam to see where you stand."
+          days_7: "This week, put what you miss most first."
+          days_1: "Tomorrow is the day. Review lightly today and sleep well."
+  reminders_mailer:
+    reminder:
+      button: "Open GPCEnarm"
+      why: "You get this email because you turned reminders on."
+      settings: "Change reminders"
+      unsubscribe: "Stop them by email"

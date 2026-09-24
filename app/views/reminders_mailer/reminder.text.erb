@@ -1,0 +1,11 @@
+<%= @message[:title] %>
+
+<% @message[:lines].each do |line| -%>
+<%= line %>
+
+<% end -%>
+<%= @url %>
+
+<%= t("reminders_mailer.reminder.why") %>
+<%= t("reminders_mailer.reminder.settings") %>: <%= account_url(anchor: "reminders") %>
+<%= t("reminders_mailer.reminder.unsubscribe") %>: <%= @unsubscribe_url %>
