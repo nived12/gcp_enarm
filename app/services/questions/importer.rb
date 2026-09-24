@@ -1,7 +1,10 @@
 # Loads a file written by Questions::Exporter into this environment's database.
 #
 # Idempotent on `export_key`, so a file can be replayed over a database that already holds
-# part of it without paying for those cases twice.
+# part of it without paying for those cases twice. A replay overwrites what it finds —
+# status included — which is right while cases are reviewed where they were generated.
+# Once review happens in production, `only_new:` leaves every case the database already
+# has exactly as it is, questions and all, and brings in only the ones it lacks.
 #
 # Every reference in the file is resolved against what this database actually has, and a
 # reference that does not resolve fails the import. That is deliberate: a case whose
@@ -14,9 +17,10 @@ module Questions
     # the file. Nothing escapes; the caller still gets a Response.
     MissingReference = Class.new(StandardError)
 
-    def initialize(path)
+    def initialize(path, only_new: false)
       super()
       @path = path
+      @only_new = only_new
     end
 
     def call
@@ -24,7 +28,9 @@ module Questions
 
       counts = Hash.new(0)
       Zlib::GzipReader.open(path) { |file| file.each_line { |line| import(line, counts) } }
-      return failure if has_errors?
+      # The counts travel with a failure too: refusals are named one by one, and the
+      # caller still has to say how much of the file did land.
+      return failure(payload: counts) if has_errors?
 
       success(counts)
     rescue Zlib::GzipFile::Error => e
@@ -33,7 +39,7 @@ module Questions
 
     private
 
-    attr_reader :path
+    attr_reader :path, :only_new
 
     def import(line, counts)
       attributes = ActiveSupport::JSON.decode(line)
@@ -58,16 +64,33 @@ module Questions
       figure = attributes.delete("image")
       references = attributes.extract!("run_key", "catalog_key", "topic_slug", "specialty_slug", "setting_slug")
 
+      if only_new && ClinicalCase.exists?(export_key: attributes["export_key"])
+        counts[:cases_skipped] += 1
+        return
+      end
+
+      # Tallied apart and added only once the case commits, so a refused case is counted
+      # as refused and not also as created.
+      tally = Hash.new(0)
       ClinicalCase.transaction do
         kase = ClinicalCase.find_or_initialize_by(export_key: attributes["export_key"])
-        counts[kase.new_record? ? :cases_created : :cases_updated] += 1
+        tally[kase.new_record? ? :cases_created : :cases_updated] += 1
         kase.update!(attributes.merge(resolve(references), clinical_image: image_for(figure)))
-        Array(questions).each { |question| import_question(kase, question, counts) }
+        Array(questions).each { |question| import_question(kase, question, tally) }
       end
+      counts.merge!(tally) { |_key, total, added| total + added }
     rescue MissingReference => e
-      failure("El caso #{attributes["export_key"]} cita #{e.message}")
+      refuse(counts, "El caso #{attributes["export_key"]} cita #{e.message}")
     rescue ActiveRecord::RecordInvalid => e
-      failure("El caso #{attributes["export_key"]} no se pudo guardar: #{e.record.errors.full_messages.to_sentence}")
+      refuse(
+        counts,
+        "El caso #{attributes["export_key"]} no se pudo guardar: #{e.record.errors.full_messages.to_sentence}"
+      )
+    end
+
+    def refuse(counts, message)
+      counts[:cases_refused] += 1
+      failure(message)
     end
 
     def resolve(references)

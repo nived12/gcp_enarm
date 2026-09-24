@@ -16,6 +16,10 @@ if ENV["COVERAGE"]
     skip "/spec/"
     skip "/config/"
     skip "/db/"
+    # A spec loads a rake file to drive one task through it, and the tasks beside it
+    # would then read as uncovered. Tasks are thin shells over services; the services
+    # carry the coverage.
+    skip "/lib/tasks/"
 
     group "Services", "app/services"
     group "Models", "app/models"

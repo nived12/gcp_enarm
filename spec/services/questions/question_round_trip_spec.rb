@@ -265,6 +265,94 @@ RSpec.describe "question bank export and import" do
     end
   end
 
+  # After launch, review happens in production: a status set there, or a stem corrected
+  # there, must survive the next batch arriving from the file.
+  describe "importing new cases only" do
+    def import_new = Questions::Importer.call(path, only_new: true)
+
+    it "leaves a case the database already has, and its questions, exactly as they are" do
+      kase = build_bank
+      export
+      kase.update!(status: "retired", stem: "Corregido en producción.")
+      kase.questions.sole.update!(text: "¿Cuál es el siguiente paso, corregido?")
+      kase.questions.sole.answer_options.first.update!(text: "ECG de 12 derivaciones")
+
+      result = import_new
+
+      expect(result).to be_success
+      expect(result.payload).to include(cases_skipped: 1)
+      expect(result.payload[:cases_updated]).to eq(0)
+      expect(result.payload[:questions_updated]).to eq(0)
+      expect(kase.reload).to have_attributes(status: "retired", stem: "Corregido en producción.")
+      expect(kase.questions.sole.text).to eq("¿Cuál es el siguiente paso, corregido?")
+      expect(kase.questions.sole.answer_options.first.text).to eq("ECG de 12 derivaciones")
+    end
+
+    it "imports the cases the database lacks exactly as a full import would" do
+      build_bank
+      export
+      clear_generated
+
+      result = import_new
+
+      expect(result).to be_success
+      expect(result.payload).to include(cases_created: 1, questions_created: 1, runs_created: 1)
+      expect(result.payload[:cases_skipped]).to eq(0)
+      expect(ClinicalCase.sole.questions.sole.recommendation.text).to include("12 derivaciones")
+      expect(AnswerOption.count).to eq(2)
+    end
+
+    it "skips the existing case and imports the new one from the same file" do
+      kept = build_bank
+      create(
+        :clinical_case, guideline: nil, topic: nil, specialty: nil, generation_run: nil,
+        source: "authored", stem: "Paciente de 30 años con fiebre."
+      )
+      export
+      ClinicalCase.where.not(id: kept.id).destroy_all
+      kept.update!(status: "flagged")
+
+      result = import_new
+
+      expect(result.payload).to include(cases_created: 1, cases_skipped: 1)
+      expect(ClinicalCase.count).to eq(2)
+      expect(kept.reload.status).to eq("flagged")
+    end
+
+    it "still refuses and names a new case whose citation does not resolve" do
+      build_bank
+      export
+      clear_generated
+      Recommendation.destroy_all
+
+      result = import_new
+
+      expect(result).to be_failure
+      expect(result.errors.full_messages.first).to include("El caso", "la recomendación 3 de la sección 34142")
+      expect(result.payload).to include(cases_refused: 1)
+      expect(ClinicalCase.count).to eq(0)
+    end
+  end
+
+  describe "the counts" do
+    it "counts a refused case as refused, not as created" do
+      build_bank
+      export
+      clear_generated
+      Recommendation.destroy_all
+
+      result = import
+
+      expect(result.payload).to include(cases_refused: 1)
+      expect(result.payload[:cases_created]).to eq(0)
+      expect(result.payload[:questions_created]).to eq(0)
+    end
+
+    it "carries no counts when the file could not be read at all" do
+      expect(Questions::Importer.call("#{path}-nope").payload).to be_nil
+    end
+  end
+
   describe "the figure a case was written around" do
     def build_with_figure
       kase = build_bank
