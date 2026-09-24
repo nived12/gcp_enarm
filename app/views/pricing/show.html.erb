@@ -45,7 +45,7 @@
                 class: "btn w-full #{highlighted ? "btn--primary" : "btn--ghost"}", form: { data: { turbo: false } } %>
         <% else %>
           <%= link_to t("pricing.sign_up_to_buy"),
-                new_registration_path(return_to: pricing_path(plan: plan.code, anchor: "plan-#{plan.code}"), from: "pricing_page"),
+                app_host_url(new_registration_path(return_to: pricing_path(plan: plan.code, anchor: "plan-#{plan.code}"), from: "pricing_page")),
                 class: "btn btn--ghost w-full" %>
         <% end %>
       </div>

@@ -49,6 +49,13 @@ module GpcEnarm
     # replace this once users have one.
     config.time_zone = "America/Mexico_City"
 
+    # gpcenarm.com is the marketing site and app.gpcenarm.com the product, both answered
+    # by this one service. Without LANDING_HOST there is no split and every page is served
+    # on whatever host was asked, as in development and on the Railway preview domain.
+    # See SiteHosts.
+    config.x.landing_host = ENV["LANDING_HOST"].presence
+    config.x.app_host = ENV["APP_HOST"].presence
+
     config.generators do |g|
       g.test_framework :rspec, view_specs: false, helper_specs: false, routing_specs: false
       g.factory_bot suffix: "factory"

@@ -6,7 +6,7 @@
     <%= t("landing.closing.title", trial_days: SubscriptionAccess.trial_days) %>
   </h2>
   <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-    <%= link_to t("landing.cta"), new_registration_path(from: "closing"), class: "btn btn--primary px-7" %>
+    <%= link_to t("landing.cta"), app_host_url(new_registration_path(from: "closing")), class: "btn btn--primary px-7" %>
     <%= link_to t("landing.closing.share"), "https://wa.me/?text=#{ERB::Util.url_encode(share)}",
           target: "_blank", rel: "noopener", class: "btn btn--ghost" %>
   </div>
