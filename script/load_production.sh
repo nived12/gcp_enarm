@@ -41,13 +41,13 @@ if [[ "${1:-}" != "--bank" ]]; then
 
   echo "==> Loading the corpus into production"
   bin/rails "gpc:import[$corpus]"
-  bin/rails gpc:reparse
 
-  # Figures are files, so they are fetched inside the container, onto its volume.
-  echo "==> Fetching guideline figures on Railway (this takes a while)"
-  railway ssh --service web -- bin/rails gpc:images
-
-  bin/rails taxonomy:seed gpc:link
+  # Rebuilding recommendations writes tens of thousands of rows; from this machine each
+  # is a round trip to Railway's region and the step crawls. Inside the container the
+  # database is next door. Figures are files, so they must be fetched there anyway, onto
+  # its volume. Every one of these is safe to rerun if the connection drops.
+  echo "==> Rebuilding recommendations and fetching figures on Railway (several minutes)"
+  railway ssh --service web -- bin/rails gpc:reparse gpc:images taxonomy:seed gpc:link
 fi
 
 echo "==> Loading the question bank into production"
