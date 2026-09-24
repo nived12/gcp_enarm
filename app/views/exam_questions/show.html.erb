@@ -26,6 +26,7 @@
             elsif answer.correct? then t("exams.question.right")
             else t("exams.question.wrong") end %>
       </p>
+      <%= render "confidence_note", answer: answer %>
       <%= render "options_revealed", exam_question: @exam_question, answer: answer %>
       <%= render "feedback", exam_question: @exam_question %>
       <% if answer && !answer.correct? %>

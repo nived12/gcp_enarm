@@ -17,6 +17,12 @@ class Answer < ApplicationRecord
     },
     prefix: :error, validate: { allow_nil: true }
 
+  # How sure the student said they were, chosen with the answer so the feedback cannot
+  # colour it. A correct guess is not knowledge, and a confident miss is the error most
+  # worth catching before exam day. Nil means they did not say, never "sure".
+  CONFIDENCES = %w[sure unsure guess].freeze
+  enum :confidence, CONFIDENCES.index_by(&:itself), prefix: :confidence, validate: { allow_nil: true }
+
   validates :answered_at, presence: true
   validates :exam_question_id, uniqueness: true
   validate :option_belongs_to_the_question

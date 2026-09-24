@@ -4,7 +4,9 @@ class AnswersController < ApplicationController
   before_action :set_exam_question
 
   def create
-    result = Exams::AnswerRecorder.call(@exam_question, answer_option_id: params[:answer_option_id])
+    result = Exams::AnswerRecorder.call(
+      @exam_question, answer_option_id: params[:answer_option_id], confidence: params[:confidence]
+    )
     return respond_saved if result.success?
     return redirect_to_upgrade(result) if daily_limit_reached?(result)
 

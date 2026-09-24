@@ -13,5 +13,7 @@
     </div>
   </fieldset>
 
+  <%= render "exam_questions/confidence", exam_question: exam_question %>
+
   <%= button_tag t("exams.question.submit"), class: "btn btn--primary mt-8 w-full sm:w-auto" %>
 <% end %>

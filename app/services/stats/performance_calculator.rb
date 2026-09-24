@@ -1,5 +1,6 @@
 # How the student is doing and where they are weak: their average, and accuracy by
-# specialty and by difficulty.
+# specialty, by difficulty, and by how sure they said they were — the last tells them
+# whether to trust their first instinct on exam day.
 #
 # The average is the one the home screen shows — the mean of finished exams' scores,
 # each a plain percentage as CIFRHS reports it. The breakdowns count questions: every
@@ -25,7 +26,7 @@ module Stats
       def +(other) = Tally.new(correct: correct + other.correct, asked: asked + other.asked)
     end
 
-    Result = Data.define(:average, :completed_exams, :overall, :by_specialty, :by_difficulty) do
+    Result = Data.define(:average, :completed_exams, :overall, :by_specialty, :by_difficulty, :by_confidence) do
       def empty? = overall.asked.zero?
 
       # True when some question sits in two rows, which the page has to explain.
@@ -44,7 +45,8 @@ module Stats
       success(
         Result.new(
           average: average, completed_exams: completed,
-          overall: rows.values.sum(Tally.none), by_specialty: by_specialty, by_difficulty: by_difficulty(rows)
+          overall: rows.values.sum(Tally.none), by_specialty: by_specialty, by_difficulty: by_difficulty(rows),
+          by_confidence: by_confidence
         )
       )
     end
@@ -79,6 +81,13 @@ module Stats
     def by_specialty
       tallies = tally(counted_questions.joins(ClinicalCase::AREAS_JOIN), "areas.area_id").to_h
       Specialty.in_reading_order.where(id: tallies.keys).map { |specialty| [specialty, tallies[specialty.id]] }
+    end
+
+    # Only the levels the student has used, in Answer::CONFIDENCES order; empty until they
+    # mark one, so the page can leave the section out.
+    def by_confidence
+      tallies = tally(counted_questions.where.not(answers: { confidence: nil }), "answers.confidence").to_h
+      Answer::CONFIDENCES.filter_map { |level| [level, tallies[level]] if tallies[level] }
     end
 
     def by_difficulty(tallies)

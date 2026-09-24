@@ -1,0 +1,15 @@
+<%# What the confidence says once the answer is known. The two worth a word are a miss
+    the student was sure of — the error that costs points on exam day — and a right
+    answer they guessed, which is not yet knowledge. %>
+<% if answer&.confidence %>
+  <% key = if answer.confidence_sure? && !answer.correct? then "confident_miss"
+           elsif answer.correct? && !answer.confidence_sure? then "lucky_#{answer.confidence}"
+           end %>
+  <p class="mt-2 flex items-start gap-2 text-sm <%= key == "confident_miss" ? "font-medium text-incorrect" : "text-ink-muted" %>">
+    <%= render "exam_questions/confidence_icon", level: answer.confidence, size: "size-5 mt-px" %>
+    <span>
+      <%= t("exams.confidence.you_marked", level: t("exams.confidence.levels.#{answer.confidence}")) %>
+      <% if key %> <%= t("exams.confidence.notes.#{key}") %><% end %>
+    </span>
+  </p>
+<% end %>

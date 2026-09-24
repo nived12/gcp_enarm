@@ -197,6 +197,19 @@ en:
       title: "Exam paused"
       progress: "%{answered} of %{total} questions answered"
       resume: "Continue"
+    confidence:
+      legend: "Your confidence"
+      optional: "Optional"
+      sheet_hint: "Next to each question you can mark how well you knew it. At the end you'll see how often you're right at each level, and the ones you guessed come back in your reviews."
+      levels:
+        sure: "I know it"
+        unsure: "Unsure"
+        guess: "Guessed"
+      you_marked: "You marked “%{level}”."
+      notes:
+        confident_miss: "A confident miss is the costliest error on exam day: worth reviewing."
+        lucky_unsure: "Right, but unsure: it will come back in your reviews soon."
+        lucky_guess: "Right by guessing: it will come back in your reviews as if you had missed it."
     results:
       title: "Results"
       tally: "%{correct} correct out of %{total} questions"
@@ -680,6 +693,8 @@ en:
       no_questions: "No questions yet"
       by_difficulty: "By difficulty"
       by_difficulty_note: "In a tie, the ENARM counts correct answers in High first, then in Medium."
+      by_confidence: "By confidence"
+      by_confidence_note: "How often you are right at each level you mark. Right a lot when unsure? Trust your first answer more. Wrong when sure? Review those topics first."
       by_specialty: "By specialty"
       by_specialty_overlap: "Each question counts under its case's specialty and also under the setting it happens in (Emergency, Family Medicine or Public Health), so the rows add up to more than the total."
       empty:

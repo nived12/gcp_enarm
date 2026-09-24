@@ -43,10 +43,19 @@
               class: "card flex items-start gap-4 px-5 py-4 text-sm transition-shadow hover:ring-2 hover:ring-accent" do %>
           <span class="numeric w-6 shrink-0 text-ink-faint"><%= exam_question.position %></span>
           <span class="min-w-0 flex-1 leading-relaxed text-ink"><%= exam_question.question.text.truncate(140) %></span>
-          <span class="shrink-0 text-xs font-medium <%= answer&.correct? ? "text-correct" : answer ? "text-incorrect" : "text-ink-faint" %>">
-            <%= if answer.nil? then t("exams.results.blank")
-                elsif answer.correct? then "✓ #{t("exams.results.right")}"
-                else "✗ #{t("exams.results.wrong")}" end %>
+          <span class="flex shrink-0 flex-col items-end gap-1 text-xs font-medium">
+            <span class="<%= answer&.correct? ? "text-correct" : answer ? "text-incorrect" : "text-ink-faint" %>">
+              <%= if answer.nil? then t("exams.results.blank")
+                  elsif answer.correct? then "✓ #{t("exams.results.right")}"
+                  else "✗ #{t("exams.results.wrong")}" end %>
+            </span>
+            <% if answer&.confidence %>
+              <span class="inline-flex items-center gap-1 <%= answer.confidence_sure? && !answer.correct? ? "text-incorrect" : "text-ink-faint" %>"
+                    title="<%= t("exams.confidence.levels.#{answer.confidence}") %>">
+                <%= render "exam_questions/confidence_icon", level: answer.confidence, size: "size-4" %>
+                <span class="sr-only"><%= t("exams.confidence.levels.#{answer.confidence}") %></span>
+              </span>
+            <% end %>
           </span>
         <% end %>
       </li>

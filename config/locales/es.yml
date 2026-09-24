@@ -199,6 +199,19 @@ es:
       title: "Examen en pausa"
       progress: "%{answered} de %{total} preguntas respondidas"
       resume: "Continuar"
+    confidence:
+      legend: "Tu confianza"
+      optional: "Opcional"
+      sheet_hint: "Junto a cada pregunta puedes marcar qué tanto la sabías. Al final verás cuánto aciertas en cada caso, y las que adivinaste volverán a tu repaso."
+      levels:
+        sure: "Lo sé"
+        unsure: "Con duda"
+        guess: "Adiviné"
+      you_marked: "Marcaste «%{level}»."
+      notes:
+        confident_miss: "Un error con seguridad es el que más cuesta el día del examen: vale la pena repasarlo."
+        lucky_unsure: "Acertaste con duda: volverá a tu repaso pronto."
+        lucky_guess: "Acertaste adivinando: volverá a tu repaso como si la hubieras fallado."
     results:
       title: "Resultados"
       tally: "%{correct} aciertos de %{total} preguntas"
@@ -682,6 +695,8 @@ es:
       no_questions: "Sin preguntas todavía"
       by_difficulty: "Por dificultad"
       by_difficulty_note: "En un empate, el ENARM cuenta primero los aciertos en Alta y luego en Media."
+      by_confidence: "Según tu confianza"
+      by_confidence_note: "Cuánto aciertas cuando marcas cada nivel. Si aciertas mucho con duda, confía más en tu primera respuesta; si fallas con seguridad, repasa esos temas antes que otros."
       by_specialty: "Por especialidad"
       by_specialty_overlap: "Cada pregunta cuenta en la especialidad de su caso y también en el contexto donde ocurre (Urgencias, Medicina Familiar o Salud Pública), así que las filas suman más que el total."
       empty:

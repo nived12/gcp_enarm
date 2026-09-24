@@ -34,6 +34,34 @@ RSpec.describe Reviews::CaseScheduler do
     expect(card.ease_factor).to be_within(0.001).of(2.36)
   end
 
+  describe "what the student said about their confidence" do
+    it "puts a case answered right by guessing in the deck, as a lapse" do
+      sit(%i[right right]).answers.first.update!(confidence: "guess")
+
+      expect(card).to have_attributes(due_on: today + 1, lapses: 1, repetitions: 0)
+    end
+
+    it "puts a case answered right with doubt in the deck, as a pass that costs ease" do
+      sit(%i[right right]).answers.first.update!(confidence: "unsure")
+
+      expect(card).to have_attributes(due_on: today + 1, lapses: 0, repetitions: 1)
+      expect(card.ease_factor).to be_within(0.001).of(2.36)
+    end
+
+    it "leaves a case answered right and sure out of the deck" do
+      sit(%i[right right]).answers.each { |answer| answer.update!(confidence: "sure") }
+
+      expect(card).to be_nil
+    end
+
+    it "grades a miss by its reason, not by the confidence it was given with" do
+      exam = sit(%i[wrong right])
+      exam.answers.find_by(correct: false).update!(confidence: "guess", error_reason: "misread_case")
+
+      expect(card).to have_attributes(lapses: 0, repetitions: 1)
+    end
+  end
+
   it "grades an attempt by its worst miss, and not knowing costs the most ease" do
     sit([[:wrong, "did_not_know"], [:wrong, "ran_out_of_time"]])
 

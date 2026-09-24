@@ -32,7 +32,7 @@ RSpec.describe Stats::PerformanceCalculator do
 
   it "has nothing to say before the first answer" do
     expect(performance).to be_empty
-    expect(performance).to have_attributes(average: nil, completed_exams: 0, by_specialty: [])
+    expect(performance).to have_attributes(average: nil, completed_exams: 0, by_specialty: [], by_confidence: [])
     expect(performance.by_difficulty).to eq(
       %w[high medium low].map { |difficulty|
         [difficulty, described_class::Tally.none]
@@ -49,6 +49,21 @@ RSpec.describe Stats::PerformanceCalculator do
     expect(performance).to have_attributes(average: 60, completed_exams: 1)
     expect(performance.overall).to eq(described_class::Tally.new(correct: 4, asked: 6))
     expect(performance.overall.percentage).to be_within(0.01).of(66.67)
+  end
+
+  it "breaks accuracy down by the confidence marked, only for the levels used" do
+    exam = sit([hard_internal, easy_pediatrics, unfiled], [true, false, true, false, true])
+    answers = exam.answers.joins(:exam_question).order("exam_questions.position")
+    { 0 => "sure", 1 => "sure", 2 => "guess", 3 => "guess" }.each do |index, level|
+      answers[index].update!(confidence: level)
+    end
+
+    expect(performance.by_confidence).to eq(
+      [
+        ["sure", described_class::Tally.new(correct: 1, asked: 2)],
+        ["guess", described_class::Tally.new(correct: 1, asked: 2)]
+      ]
+    )
   end
 
   it "breaks accuracy down by specialty in reading order and by difficulty in the tie-break order" do
@@ -76,7 +91,7 @@ RSpec.describe Stats::PerformanceCalculator do
     counter = ->(*, payload) { queries += 1 unless payload[:name] == "SCHEMA" }
     ActiveSupport::Notifications.subscribed(counter, "sql.active_record") { performance }
 
-    expect(queries).to be <= 4
+    expect(queries).to be <= 5
   end
 
   describe "a question counted by subject and by setting" do

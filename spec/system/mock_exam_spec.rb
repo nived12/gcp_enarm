@@ -41,6 +41,24 @@ RSpec.describe "Simulacro ENARM", type: :system do
     expect_no_sideways_scroll
   end
 
+  it "holds a confidence icon tapped first until an option is chosen, then saves both", viewport: :phone do
+    start_mock_exam
+    guess = I18n.t("exams.confidence.levels.guess")
+
+    within(all("article").first) do
+      find("label[title='#{guess}']").click
+      expect(page).to have_no_text(I18n.t("exams.sheet.saved"))
+      find("label", text: "Troponina I").click
+      expect(page).to have_text(I18n.t("exams.sheet.saved"))
+    end
+    expect(Exam.last.answers.sole).to have_attributes(confidence: "guess", correct: false)
+
+    within(all("article").first) { find("label[title='#{I18n.t("exams.confidence.levels.sure")}']").click }
+    visit current_path
+    within(all("article").first) { expect(page).to have_checked_field("confidence", with: "sure", visible: :all) }
+    expect_no_sideways_scroll
+  end
+
   it "ends the sitting by itself when the clock reaches zero" do
     start_mock_exam
     within(all("article").first) { find("label", text: "Electrocardiograma de 12 derivaciones").click }

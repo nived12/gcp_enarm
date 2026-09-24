@@ -17,6 +17,11 @@
 # * a miss they gave no reason for, or a blank: quality 2. Unknown is not "did not know";
 #   it is the middle of the lapses rather than the bottom.
 #
+# What the student said about their confidence counts too, since a right answer is not
+# always a known one: right but unsure is quality 3, a pass that still costs ease, and
+# right by guessing is quality 2, a lapse like an unexplained miss. Either one puts the
+# case in the deck, as a miss would.
+#
 # A case with no answer at all in an exam is no attempt: the clock ran out before it, or
 # it was skipped unread, and "seen" means answered everywhere else (coverage, the
 # builder's unseen filter). A blank beside an answer of the same case is a miss — the
@@ -30,6 +35,7 @@ module Reviews
   class CaseScheduler < ApplicationService
     CORRECT_QUALITY = 4
     UNKNOWN_MISS_QUALITY = 2
+    DOUBTFUL_QUALITIES = { "unsure" => 3, "guess" => 2 }.freeze
     MISS_QUALITIES = {
       "misread_case" => 3, "ran_out_of_time" => 3, "confused_diagnoses" => 2, "did_not_know" => 1
     }.freeze
@@ -68,7 +74,8 @@ module Reviews
                          .where(exams: { user_id: user.id }, clinical_case_id: clinical_case_ids)
                          .pluck(
                            :clinical_case_id, :exam_id, "exams.status", "exams.feedback_timing", "exams.completed_at",
-                           "answers.id", "answers.correct", "answers.error_reason", "answers.answered_at"
+                           "answers.id", "answers.correct", "answers.error_reason", "answers.confidence",
+                           "answers.answered_at"
                          )
 
       rows.group_by { |row| row.first(2) }
@@ -92,14 +99,18 @@ module Reviews
       over = completed || (timing == "after_each" && (misses.any? || answered.size == questions.size))
       return unless over
 
+      doubtful = answered.select { |row| row[6] && DOUBTFUL_QUALITIES.key?(row[8]) }
       at = [*answered.map(&:last), (completed_at if completed)].compact.max
-      Attempt.new(date: user.study_date(at), exam_id: exam_id, quality: quality(misses), missed: misses.any?)
+      Attempt.new(
+        date: user.study_date(at), exam_id: exam_id, quality: quality(misses, doubtful),
+        missed: misses.any? || doubtful.any?
+      )
     end
 
-    def quality(misses)
-      return CORRECT_QUALITY if misses.empty?
-
-      misses.map { |row| MISS_QUALITIES.fetch(row[7], UNKNOWN_MISS_QUALITY) }.min
+    def quality(misses, doubtful)
+      qualities = misses.map { |row| MISS_QUALITIES.fetch(row[7], UNKNOWN_MISS_QUALITY) } +
+                  doubtful.map { |row| DOUBTFUL_QUALITIES.fetch(row[8]) }
+      qualities.min || CORRECT_QUALITY
     end
   end
 end

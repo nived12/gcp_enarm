@@ -40,6 +40,19 @@
     </ul>
   </section>
 
+  <% if @performance.by_confidence.any? %>
+    <section class="mt-10" aria-labelledby="confidence-title">
+      <h2 id="confidence-title" class="eyebrow"><%= t("stats.show.by_confidence") %></h2>
+      <p class="mt-2 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("stats.show.by_confidence_note") %></p>
+      <ul class="mt-3 divide-y divide-line border-y border-line">
+        <% @performance.by_confidence.each do |level, tally| %>
+          <%= render "stats/bar", label: t("exams.confidence.levels.#{level}"), percentage: tally.percentage,
+                detail: t("stats.show.tally", count: tally.correct, total: tally.asked) %>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
   <% if @performance.by_specialty.any? %>
     <section class="mt-10" aria-labelledby="specialty-title">
       <h2 id="specialty-title" class="eyebrow"><%= t("stats.show.by_specialty") %></h2>

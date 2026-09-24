@@ -9,20 +9,25 @@
 # answer — so a pause is never billed to the question that was on screen when it began.
 # A skipped question's seconds go to the next one answered; the clock cannot tell reading
 # from skipping.
+#
+# Confidence is optional and travels with the answer. On the single page it can be set
+# or changed on its own once an option is chosen, like the option itself; an unknown
+# value is ignored rather than refusing the answer.
 module Exams
   class AnswerRecorder < ApplicationService
-    def initialize(exam_question, answer_option_id:)
+    def initialize(exam_question, answer_option_id:, confidence: nil)
       super()
       @exam_question = exam_question
       @answer_option_id = answer_option_id
+      @confidence = confidence.presence_in(Answer::CONFIDENCES)
     end
 
     def call
       return failure(I18n.t("exams.answers.not_running")) unless exam.status_in_progress?
       return time_up if exam.time_up?
       return failure(I18n.t("exams.answers.already_answered")) if exam.feedback_after_each? && exam_question.answer
+      return success(answer: change) if exam_question.answer && (option || confidence)
       return failure(I18n.t("exams.answers.choose_option")) if option.nil?
-      return success(answer: change) if exam_question.answer
 
       access = exam.user.subscription_access_result
       unless access[:allowed]
@@ -39,7 +44,7 @@ module Exams
 
     private
 
-    attr_reader :exam_question, :answer_option_id
+    attr_reader :exam_question, :answer_option_id, :confidence
 
     def exam
       exam_question.exam
@@ -51,7 +56,7 @@ module Exams
       Answer.transaction do
         answered_at = Time.current
         answer = exam_question.create_answer!(
-          answer_option: option, correct: option.correct?, answered_at: answered_at,
+          answer_option: option, correct: option.correct?, confidence: confidence, answered_at: answered_at,
           seconds_spent: [exam.current_elapsed - exam.answers.sum(:seconds_spent), 0].max
         )
         StudyDay.count_answer!(exam.user, at: answered_at)
@@ -60,9 +65,12 @@ module Exams
     end
 
     # A changed mind costs no extra daily allowance, keeps the time first spent, and is
-    # not a second question answered today.
+    # not a second question answered today. Either half may change alone.
     def change
-      exam_question.answer.tap { |answer| answer.update!(answer_option: option, correct: option.correct?) }
+      changes = {}
+      changes.merge!(answer_option: option, correct: option.correct?) if option
+      changes[:confidence] = confidence if confidence
+      exam_question.answer.tap { |answer| answer.update!(changes) }
     end
 
     def option

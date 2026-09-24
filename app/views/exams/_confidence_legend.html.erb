@@ -1,0 +1,16 @@
+<%# The single page shows confidence as icons alone, so they are named once, here. %>
+<aside class="mt-6 rounded-card bg-surface-sunk px-5 py-4 text-sm leading-relaxed text-ink-muted">
+  <p>
+    <span class="font-medium text-ink"><%= t("exams.confidence.legend") %></span>
+    <span class="text-ink-faint">· <%= t("exams.confidence.optional") %></span>
+  </p>
+  <p class="mt-1"><%= t("exams.confidence.sheet_hint") %></p>
+  <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+    <% Answer::CONFIDENCES.each do |level| %>
+      <li class="inline-flex items-center gap-2 text-ink">
+        <%= render "exam_questions/confidence_icon", level: level %>
+        <%= t("exams.confidence.levels.#{level}") %>
+      </li>
+    <% end %>
+  </ul>
+</aside>

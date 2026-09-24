@@ -1,0 +1,37 @@
+<%# How sure the student is, asked with the answer and before any feedback, so knowing
+    the result cannot colour it. Optional, and nothing is chosen for them.
+
+    `compact` is the single page: icons only, beside each question and out of the way,
+    explained once at the top of the exam. One question at a time there is room for the
+    word too. %>
+<% compact = local_assigns.fetch(:compact, false) %>
+<% chosen = local_assigns[:answer]&.confidence %>
+<% if compact %>
+  <fieldset class="flex items-center gap-1">
+    <legend class="sr-only"><%= t("exams.confidence.legend") %></legend>
+    <% Answer::CONFIDENCES.each do |level| %>
+      <label title="<%= t("exams.confidence.levels.#{level}") %>"
+             class="flex size-11 cursor-pointer items-center justify-center rounded-full text-ink-faint transition-colors hover:text-accent has-checked:bg-accent-soft has-checked:text-accent has-focus-visible:ring-2 has-focus-visible:ring-accent">
+        <%= radio_button_tag :confidence, level, chosen == level, id: dom_id(exam_question, "confidence_#{level}"),
+              class: "sr-only", aria: { label: t("exams.confidence.levels.#{level}") } %>
+        <%= render "exam_questions/confidence_icon", level: level %>
+      </label>
+    <% end %>
+  </fieldset>
+<% else %>
+  <fieldset class="mt-8">
+    <legend class="flex items-center gap-2 text-sm font-medium text-ink">
+      <%= t("exams.confidence.legend") %>
+      <span class="rounded-full bg-surface-sunk px-2 py-0.5 text-xs font-normal text-ink-faint"><%= t("exams.confidence.optional") %></span>
+    </legend>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <% Answer::CONFIDENCES.each do |level| %>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-sm text-ink-muted transition-colors hover:border-accent has-checked:border-accent has-checked:bg-accent-soft has-checked:text-ink has-focus-visible:ring-2 has-focus-visible:ring-accent">
+          <%= radio_button_tag :confidence, level, false, id: "confidence_#{level}", class: "sr-only" %>
+          <%= render "exam_questions/confidence_icon", level: level %>
+          <%= t("exams.confidence.levels.#{level}") %>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+<% end %>
