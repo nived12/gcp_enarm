@@ -105,7 +105,7 @@ module Questions
 
       question = kase.questions.find_or_initialize_by(position: attributes["position"])
       counts[question.new_record? ? :questions_created : :questions_updated] += 1
-      question.update!(attributes.merge(recommendation: recommendation_for(reference)))
+      question.update!(attributes.merge(recommendation: recommendation_for(reference, attributes["source_quote"])))
 
       Array(options).each do |option|
         question.answer_options.find_or_initialize_by(position: option["position"]).update!(option)
@@ -113,16 +113,29 @@ module Questions
     end
 
     # The far side rebuilds recommendations with its own parser rather than receiving
-    # them, so this is the one reference that can resolve to the *wrong* row instead of to
-    # nothing: a parser that numbers a section differently hands back a different
-    # statement. Question's own citation gate catches exactly that — the quote will not be
-    # inside the recommendation — and the case fails instead of arriving mis-cited.
-    def recommendation_for(reference)
+    # them, so the path in the file — section and position — is only as stable as the
+    # parser. Sections carved out of an archived PDF are named by it: a database that
+    # kept an older carving because a case cited it (gpc:reparse never drops a cited row)
+    # exports names a fresh reparse elsewhere does not produce. So the path is tried
+    # first, and when it is gone or lands on a statement without the quote, the one
+    # recommendation of that guideline that does contain the quote is used instead.
+    # None or several and the path's answer stands: nothing, which fails as missing, or
+    # the wrong statement, which Question's citation gate refuses. A case never arrives
+    # mis-cited.
+    def recommendation_for(reference, quote)
       return if reference.nil?
 
-      section = section_for(reference)
-      section.recommendations.find_by(position: reference["position"]) ||
-        missing("la recomendación #{reference["position"]} de la sección #{reference["section"]}")
+      guideline = find_by!(Guideline, :catalog_key, reference["catalog_key"], "la guía")
+      at_path = guideline.guideline_sections.find_by(external_id: reference["section"])
+        &.recommendations&.find_by(position: reference["position"])
+      return at_path if quote.blank? || (at_path && Question.quote_in?(at_path.text, quote))
+
+      by_quote = guideline.recommendations.select { |candidate| Question.quote_in?(candidate.text, quote) }
+      return by_quote.sole if by_quote.one?
+
+      at_path || missing(
+        "la recomendación #{reference["position"]} de la sección #{reference["section"]} de #{guideline.catalog_key}"
+      )
     end
 
     def section_for(reference)

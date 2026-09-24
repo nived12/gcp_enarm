@@ -17,6 +17,15 @@ class Question < ApplicationRecord
   validates :position, presence: true, uniqueness: { scope: :clinical_case_id }
   validate :quote_must_come_from_the_recommendation
 
+  # Whether a recommendation's text contains a quote, by the gate's own rule below.
+  def self.quote_in?(text, quote)
+    normalize(text).include?(normalize(quote))
+  end
+
+  def self.normalize(text)
+    text.to_s.squish.downcase
+  end
+
   def correct_option
     answer_options.find(&:correct?)
   end
@@ -42,12 +51,8 @@ class Question < ApplicationRecord
   # quotes. Neither normalisation changes a word, so a paraphrase still cannot pass.
   def quote_must_come_from_the_recommendation
     return if source_quote.blank? || recommendation.nil?
-    return if normalize(recommendation.text).include?(normalize(source_quote))
+    return if self.class.quote_in?(recommendation.text, source_quote)
 
     errors.add(:source_quote, :not_in_recommendation)
-  end
-
-  def normalize(text)
-    text.to_s.squish.downcase
   end
 end

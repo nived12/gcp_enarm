@@ -62,6 +62,8 @@ if [[ "$mode" != "--bank" ]]; then
 fi
 
 echo "==> Loading the question bank into production"
-bin/rails "questions:import[$bank]"
+# A case whose citation cannot be found in production's own parse is refused and named
+# (the rest still import), so a refusal must not hide the totals below.
+bin/rails "questions:import[$bank]" || echo "==> Some cases were refused; they are named above."
 
 bin/rails runner 'puts "Production: #{Guideline.count} guías, #{ClinicalCase.status_published.count} casos publicados, #{Question.count} preguntas"'

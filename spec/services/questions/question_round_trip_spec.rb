@@ -221,6 +221,39 @@ RSpec.describe "question bank export and import" do
       expect(import.errors.full_messages.first).to include("no se pudo guardar")
     end
 
+    # What production hit on its first load: a database that kept an older carving of
+    # an archived PDF, because a case cited it, exports a section name a fresh reparse
+    # elsewhere never produces. The quote still finds the statement.
+    it "finds the recommendation by its quote when the far side named the section differently" do
+      build_bank
+      export
+      clear_generated
+      section = GuidelineSection.sole
+      section.update!(external_id: "20180701235653/4-1-1-recommendation")
+      Recommendation.sole.update!(position: 7)
+      create(
+        :recommendation, guideline_section: section, position: 3,
+        text: "Se recomienda vigilancia clínica estrecha."
+      )
+
+      expect(import).to be_success
+      expect(Question.sole.recommendation.text).to include("electrocardiograma de 12 derivaciones")
+    end
+
+    it "refuses the question when the quote is in more than one recommendation of the guideline" do
+      build_bank
+      export
+      clear_generated
+      section = GuidelineSection.sole
+      section.update!(external_id: "renamed")
+      create(
+        :recommendation, guideline_section: section, position: 9,
+        text: "Tomar electrocardiograma de 12 derivaciones al ingreso."
+      )
+
+      expect(import.errors.full_messages.first).to include("la recomendación 3 de la sección 34142 de IMSS-028-22")
+    end
+
     it "writes nothing at all when one question of a case fails" do
       build_bank
       export
