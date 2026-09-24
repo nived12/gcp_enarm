@@ -36,6 +36,22 @@ module BillingHelpers
     stripe_event_json(type: "charge.refunded", id: id, session: refunded_charge_payload(**charge))
   end
 
+  # A Dispute as `charge.dispute.created` and `charge.dispute.closed` carry it. `created`
+  # is when the cardholder opened it; `status` on a closing event is lost, won or
+  # warning_closed.
+  def dispute_payload(id: "dp_test_1", payment_intent: "pi_test_1", status: "needs_response", created: 2.days.ago)
+    { id: id, object: "dispute", amount: 44_900, charge: "ch_test_1", currency: "mxn",
+      payment_intent: payment_intent, reason: "fraudulent", status: status, created: created.to_i }
+  end
+
+  def dispute_created_json(id: "evt_dispute_1", **dispute)
+    stripe_event_json(type: "charge.dispute.created", id: id, session: dispute_payload(**dispute))
+  end
+
+  def dispute_closed_json(id: "evt_dispute_closed_1", status: "won", **dispute)
+    stripe_event_json(type: "charge.dispute.closed", id: id, session: dispute_payload(status: status, **dispute))
+  end
+
   def stripe_event_json(type: "checkout.session.completed", id: "evt_test_1", session: {})
     { id: id, object: "event", type: type, api_version: "2025-01-01", created: Time.current.to_i,
       data: { object: session } }.to_json

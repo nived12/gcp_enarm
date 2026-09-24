@@ -9,6 +9,8 @@ module Billing
     CHECKOUT_COMPLETED = "checkout.session.completed".freeze
     ASYNC_PAYMENT_SUCCEEDED = "checkout.session.async_payment_succeeded".freeze
     CHARGE_REFUNDED = "charge.refunded".freeze
+    DISPUTE_CREATED = "charge.dispute.created".freeze
+    DISPUTE_CLOSED = "charge.dispute.closed".freeze
 
     def self.checkout_available?
       secret_key.present?
@@ -71,6 +73,24 @@ module Billing
       charge = event.data.object
       { payment_intent: charge.payment_intent, refunded_amount: BigDecimal(charge.amount_refunded.to_s) / 100,
         full: charge.refunded == true }
+    end
+
+    # A disputed charge, reduced to what suspending its window needs. Stripe closes a
+    # dispute as `lost`, `won` or `warning_closed` — an inquiry that lapsed without becoming
+    # a chargeback, which leaves the money with us exactly as a win does. Inquiries open with
+    # `charge.dispute.created` too, and are suspended like any other dispute: Mexican
+    # domestic card disputes start as one, and Stripe sends no second `created` if the
+    # inquiry escalates.
+    def dispute_from(event)
+      dispute = event.data.object
+      status = case event.type
+      when DISPUTE_CREATED then "open"
+      when DISPUTE_CLOSED then dispute.status == "lost" ? "lost" : "won"
+      else return
+      end
+
+      { payment_intent: dispute.payment_intent, dispute_id: dispute.id, status: status,
+        opened_at: Time.zone.at(dispute.created) }
     end
 
     private

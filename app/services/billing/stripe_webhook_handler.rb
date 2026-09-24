@@ -1,5 +1,5 @@
 # Verifies a Stripe webhook and turns a paid Checkout Session into an Entitlement, and a
-# refunded charge into a refund on the Entitlement it paid for.
+# refunded or disputed charge into a refund or a dispute on the Entitlement it paid for.
 #
 # Stripe delivers at least once and retries anything that is not a 2xx, so the event id
 # is recorded in the same transaction as its effect: a replay is recognised and
@@ -46,6 +46,9 @@ module Billing
       refund = adapter.refund_from(event)
       return record_refund(refund) if refund
 
+      dispute = adapter.dispute_from(event)
+      return record_dispute(dispute) if dispute
+
       purchase = adapter.purchase_from(event)
       return success(status: :ignored) unless purchase
 
@@ -66,12 +69,10 @@ module Billing
       success(status: :processed, entitlement: result.payload[:entitlement])
     end
 
-    # The PaymentIntent is the charge's only link to a sale, and every sale kept it in its
-    # Checkout Session payload. A refund we cannot place is answered with an error, so it
-    # stays visible and retried in the dashboard rather than silently dropped.
+    # A refund or dispute we cannot place is answered with an error, so it stays visible and
+    # retried in the dashboard rather than silently dropped.
     def record_refund(refund)
-      entitlement = refund[:payment_intent] &&
-        Entitlement.source_stripe.find_by("raw_payload ->> 'payment_intent' = ?", refund[:payment_intent])
+      entitlement = sale_for(refund[:payment_intent])
       return failure(I18n.t("billing.webhook.unmatched_refund")) unless entitlement
 
       result = RefundRecorder.call(entitlement: entitlement, **refund.slice(:refunded_amount, :full))
@@ -82,6 +83,30 @@ module Billing
         )
       end
       success(status: :refunded, entitlement: entitlement)
+    end
+
+    def record_dispute(dispute)
+      entitlement = sale_for(dispute[:payment_intent])
+      return failure(I18n.t("billing.webhook.unmatched_dispute")) unless entitlement
+
+      result = DisputeRecorder.call(entitlement: entitlement, **dispute.slice(:dispute_id, :status, :opened_at))
+      capture_dispute(entitlement, dispute[:status]) if result.payload[:changed]
+      success(status: :disputed, entitlement: entitlement)
+    end
+
+    def capture_dispute(entitlement, status)
+      properties = { plan: entitlement.plan, amount: entitlement.amount.to_f }
+      if status == "open"
+        Analytics.capture(entitlement.user, "purchase_disputed", properties)
+      else
+        Analytics.capture(entitlement.user, "dispute_closed", properties.merge(outcome: status))
+      end
+    end
+
+    # The PaymentIntent is a charge's only link to a sale, and every sale kept it in its
+    # Checkout Session payload.
+    def sale_for(payment_intent)
+      payment_intent && Entitlement.source_stripe.find_by("raw_payload ->> 'payment_intent' = ?", payment_intent)
     end
   end
 end

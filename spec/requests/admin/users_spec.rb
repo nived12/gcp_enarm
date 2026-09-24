@@ -59,6 +59,16 @@ RSpec.describe "Admin user lookup", type: :request do
       )
     end
 
+    it "shows an admin which purchases were disputed" do
+      create(:entitlement, user: student, dispute_id: "dp_1", dispute_status: "open", disputed_at: Time.current)
+
+      get admin_user_path(student)
+
+      expect(response.body).to include(
+        I18n.t("billing.account.history.dispute.open", date: I18n.l(Date.current, format: :long))
+      )
+    end
+
     it "names each kind of access" do
       student.update!(granted_premium_until: 1.month.from_now)
       get admin_user_path(student)

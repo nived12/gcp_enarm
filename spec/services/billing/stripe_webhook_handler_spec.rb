@@ -120,4 +120,72 @@ RSpec.describe Billing::StripeWebhookHandler, :stripe do
       expect(handle(charge_refunded_json(payment_intent: nil))).to be_failure
     end
   end
+
+  describe "charge.dispute.created and charge.dispute.closed" do
+    let!(:sale) do
+      create(
+        :entitlement, user: user, plan: "three_months", amount: 449, starts_at: 1.day.ago,
+        expires_at: 3.months.from_now, raw_payload: checkout_session_payload(user: user)
+      )
+    end
+
+    before { allow(Analytics).to receive(:capture) }
+
+    it "withholds the disputed window and records the dispute" do
+      result = handle(dispute_created_json)
+
+      expect(result.payload).to eq(status: :disputed, entitlement: sale)
+      expect(sale.reload).to have_attributes(dispute_id: "dp_test_1", dispute_status: "open")
+      expect(user).not_to be_paid_access
+      expect(WebhookEvent.sole).to have_attributes(external_id: "evt_dispute_1", event_type: "charge.dispute.created")
+      expect(Analytics).to have_received(:capture).with(user, "purchase_disputed", plan: "three_months", amount: 449.0)
+    end
+
+    it "gives access back when the dispute is won" do
+      handle(dispute_created_json)
+
+      handle(dispute_closed_json(status: "won"))
+
+      expect(sale.reload).to be_dispute_won
+      expect(user).to be_paid_access
+      expect(Analytics).to have_received(:capture)
+        .with(user, "dispute_closed", plan: "three_months", amount: 449.0, outcome: "won")
+    end
+
+    it "keeps access withdrawn when the dispute is lost" do
+      handle(dispute_created_json)
+
+      handle(dispute_closed_json(status: "lost"))
+
+      expect(sale.reload).to be_dispute_lost
+      expect(user).not_to be_paid_access
+      expect(Analytics).to have_received(:capture)
+        .with(user, "dispute_closed", plan: "three_months", amount: 449.0, outcome: "lost")
+    end
+
+    it "acknowledges a replayed dispute without acting on it twice" do
+      handle(dispute_created_json)
+
+      expect(handle(dispute_created_json).payload).to eq(status: :duplicate)
+      expect(Analytics).to have_received(:capture).once
+    end
+
+    it "reports nothing to analytics when a late opening event changes nothing" do
+      handle(dispute_closed_json(status: "won"))
+
+      result = handle(dispute_created_json)
+
+      expect(result.payload).to eq(status: :disputed, entitlement: sale)
+      expect(user).to be_paid_access
+      expect(Analytics).to have_received(:capture).once
+    end
+
+    it "fails, so Stripe retries and shows it, when no sale has that PaymentIntent" do
+      result = handle(dispute_created_json(payment_intent: "pi_someone_else"))
+
+      expect(result.errors.full_messages).to eq([I18n.t("billing.webhook.unmatched_dispute")])
+      expect(WebhookEvent.count).to eq(0)
+      expect(user).to be_paid_access
+    end
+  end
 end

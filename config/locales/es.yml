@@ -752,6 +752,7 @@ es:
       invalid_signature: "La firma del webhook no es válida."
       unmatched: "El pago no corresponde a ningún usuario o periodo conocido."
       unmatched_refund: "El reembolso no corresponde a ninguna compra conocida."
+      unmatched_dispute: "La disputa no corresponde a ninguna compra conocida."
     account:
       eyebrow: "Cuenta"
       title: "Mi cuenta"
@@ -767,6 +768,10 @@ es:
         purchased_on: "Comprado el %{date}"
         refunded: "Reembolsado el %{date}. Este periodo ya no da acceso."
         partially_refunded: "Reembolso parcial de %{amount}."
+        dispute:
+          open: "Pago en disputa con el banco desde el %{date}. Mientras se resuelve, este periodo no da acceso."
+          won: "La disputa de este pago se cerró sin devolución. Este periodo vuelve a dar acceso."
+          lost: "El banco devolvió este pago tras una disputa. Este periodo ya no da acceso."
         empty:
           title: "Todavía no has comprado ningún periodo"
           body: "Cuando compres uno, aquí verás sus fechas y lo que pagaste."

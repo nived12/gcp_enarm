@@ -106,6 +106,37 @@ RSpec.describe Billing::StripeAdapter do
         expect(adapter.refund_from(event)).to be_nil
       end
     end
+
+    describe "disputes" do
+      def verified(payload)
+        adapter.verified_event(payload, stripe_signature(payload))
+      end
+
+      it "reads an opened dispute by its PaymentIntent, with when the cardholder opened it" do
+        freeze_time
+
+        expect(adapter.dispute_from(verified(dispute_created_json))).to eq(
+          payment_intent: "pi_test_1", dispute_id: "dp_test_1", status: "open", opened_at: 2.days.ago
+        )
+      end
+
+      it "reads an inquiry as an opened dispute too" do
+        expect(adapter.dispute_from(verified(dispute_created_json(status: "warning_needs_response"))))
+          .to include(status: "open")
+      end
+
+      it "reads a closed dispute as lost only when Stripe says lost" do
+        outcomes = %w[lost won warning_closed].map do |status|
+          adapter.dispute_from(verified(dispute_closed_json(status: status)))[:status]
+        end
+
+        expect(outcomes).to eq(%w[lost won won])
+      end
+
+      it "reads no dispute out of any other event" do
+        expect(adapter.dispute_from(event)).to be_nil
+      end
+    end
   end
 
   describe "without a webhook secret" do
