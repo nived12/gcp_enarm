@@ -20,9 +20,22 @@ railway status --json | grep -q "\"name\": *\"$project\"" || {
   exit 1
 }
 
-# The public URL: this runs on your machine, outside Railway's private network.
-DATABASE_URL=$(railway variable list --service Postgres --json |
-  ruby -rjson -e 'print JSON.parse($stdin.read).fetch("DATABASE_PUBLIC_URL")')
+# The database has no public address. `railway connect --tunnel-only` opens an encrypted
+# SSH tunnel to it on a local port for as long as this script runs; nothing is exposed
+# and there is no public-traffic charge.
+port=55432
+railway connect Postgres --tunnel-only --port "$port" >/tmp/gpcenarm-tunnel.log 2>&1 &
+tunnel=$!
+trap 'kill "$tunnel" 2>/dev/null' EXIT
+for _ in $(seq 1 30); do
+  nc -z localhost "$port" 2>/dev/null && break
+  sleep 1
+done
+nc -z localhost "$port" || { echo "The tunnel did not open:" >&2; cat /tmp/gpcenarm-tunnel.log >&2; exit 1; }
+
+DATABASE_URL=$(railway variable list --service Postgres --json | ruby -rjson -e '
+  v = JSON.parse($stdin.read)
+  print "postgresql://#{v.fetch("PGUSER")}:#{v.fetch("PGPASSWORD")}@localhost:'"$port"'/#{v.fetch("PGDATABASE")}"')
 export DATABASE_URL
 
 echo "==> Exporting the local bank to $bank"
