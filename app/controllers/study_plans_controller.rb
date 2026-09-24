@@ -21,7 +21,10 @@ class StudyPlansController < ApplicationController
     result = StudyPlans::Builder.call(
       user: Current.user, exam_date: plan_params[:exam_date], template: plan_params[:template]
     )
-    return redirect_to(study_plan_path, notice: t("study_plans.create.done")) if result.success?
+    if result.success?
+      track_plan_created(result.payload[:plan])
+      return redirect_to(study_plan_path, notice: t("study_plans.create.done"))
+    end
 
     @plan = Current.user.build_study_plan(plan_params)
     @error = result.errors.full_messages.to_sentence
@@ -54,6 +57,15 @@ class StudyPlansController < ApplicationController
 
   def redirect_existing
     redirect_to study_plan_path if Current.user.study_plan
+  end
+
+  # Weeks rather than the date itself: how far ahead students plan is the question, and
+  # the date alone would only say which sitting they are aiming at.
+  def track_plan_created(plan)
+    Analytics.capture(
+      Current.user, "study_plan_created",
+      template: plan.template, weeks_to_exam: (plan.exam_date - plan.starts_on).to_i / 7
+    )
   end
 
   def reschedule(**changes)

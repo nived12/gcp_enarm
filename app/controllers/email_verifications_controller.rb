@@ -25,6 +25,8 @@ class EmailVerificationsController < ApplicationController
       return redirect_to(back, alert: t("email_verifications.confirm.invalid"))
     end
 
+    # Only the first time: the link can be followed again, and that proves nothing new.
+    Analytics.capture(user, "email_verified") unless user.email_verified?
     user.verify_email!
     if authenticated? && Current.user == user
       redirect_to after_authentication_url, notice: t("email_verifications.confirm.verified")

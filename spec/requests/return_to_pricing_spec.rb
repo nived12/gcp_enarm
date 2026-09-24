@@ -22,7 +22,7 @@ RSpec.describe "Returning to pricing after signing up", type: :request do
   it "links each plan's sign-up button back to that plan", :stripe do
     get pricing_path
 
-    expect(response.body).to include(CGI.escapeHTML(new_registration_path(return_to: chosen)))
+    expect(response.body).to include(CGI.escapeHTML(new_registration_path(return_to: chosen, from: "pricing_page")))
   end
 
   it "sends a new account back to the chosen plan" do

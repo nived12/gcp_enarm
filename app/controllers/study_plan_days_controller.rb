@@ -25,6 +25,7 @@ class StudyPlanDaysController < ApplicationController
 
     exam = result.payload[:exam]
     @day.update!(exam: exam)
+    Analytics.capture(Current.user, "exam_started", exam.usage_properties.merge(from_study_plan: true))
     redirect_to exam.feedback_at_end? ? exam_path(exam) : exam_question_path(exam, 1)
   end
 
