@@ -1,4 +1,17 @@
 Rails.application.routes.draw do
+  legal_pages = /terms|privacy|refunds/
+
+  # The marketing host serves the signed-out landing page, the prices and the legal pages,
+  # and sends every other path to the app host. Assets, icons, robots.txt and the sitemap
+  # are files in public/ and never reach the router. A signed-in visitor is sent on by
+  # LandingHost before any of these pages render.
+  constraints Constraints::LandingHostConstraint.new do
+    get "/" => "home#show"
+    get "pricing" => "pricing#show"
+    get "legal/:page" => "legal#show", constraints: { page: legal_pages }
+    match "*path" => AppHostRedirect, via: :all, format: false
+  end
+
   resource :session
   resource :registration, only: %i[new create]
   resources :passwords, param: :token
@@ -53,7 +66,7 @@ Rails.application.routes.draw do
   get "reminders/unsubscribe/:token" => "reminder_unsubscribes#show", as: :reminder_unsubscribe
   post "reminders/unsubscribe/:token" => "reminder_unsubscribes#create"
   post "webhooks/stripe" => "stripe_webhooks#create", as: :stripe_webhook
-  get "legal/:page" => "legal#show", as: :legal, constraints: { page: /terms|privacy|refunds/ }
+  get "legal/:page" => "legal#show", as: :legal, constraints: { page: legal_pages }
 
   # Reviewer-only. Generated cases are drafts until a doctor has read them.
   namespace :review do

@@ -25,3 +25,13 @@ OmniAuth.config.before_request_phase = lambda do |env|
   time_zone = Rack::Request.new(env).POST["time_zone"]
   env["rack.session"]["omniauth.params"] = env["rack.session"]["omniauth.params"].merge("time_zone" => time_zone.to_s)
 end
+
+# With the hosts split, Google sends the student back to the app host whichever host the
+# sign-in started on: that is the only callback registered with Google, and OmniAuth
+# checks a callback against the session before the router sees it, so one arriving on the
+# marketing host would fail there rather than be forwarded. Unsplit, the callback goes to
+# the host that was asked, as OmniAuth's own default would.
+OmniAuth.config.full_host = lambda do |env|
+  request = Rack::Request.new(env)
+  SiteHosts.split? ? "#{request.scheme}://#{SiteHosts.app}" : request.base_url
+end

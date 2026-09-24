@@ -39,12 +39,37 @@ parser said on the day the file was written.
    else about a provider has a default in `app/models/llm/provider.rb`. Check with
    `railway run bin/rails llm:status`, which prints the model each role resolved to and
    names any key that is missing.
-4. Email: set `RESEND_API_KEY`, `MAILER_FROM` (an address on a domain verified in Resend)
-   and `APP_HOST` (the public host, which the links in emails point to). Without them
+4. Hosts. The marketing site is `https://gpcenarm.com` and the product
+   `https://app.gpcenarm.com`, both attached as custom domains of the Railway `web`
+   service. `www.gpcenarm.com` is not attached — the Hobby plan allows two custom
+   domains — and nothing redirects it yet; if it is ever wanted, redirect it to the apex
+   at the DNS provider, since a request for it never reaches this app. Set
+   `APP_HOST=app.gpcenarm.com` and `LANDING_HOST=gpcenarm.com`. With both set:
+
+   - `gpcenarm.com` serves only the signed-out landing page, `/pricing` and `/legal/*`.
+     Every other path gets a permanent redirect to the same path and query on
+     `APP_HOST` (301 for GET, 308 otherwise so a POST stays a POST), and a signed-in
+     visitor is sent to the same page there (302, since signing out brings the page back).
+   - Sign-up and sign-in links on the landing page point at `APP_HOST`.
+   - The sign-in cookie is set on `gpcenarm.com`, so both hosts see it.
+   - `app.gpcenarm.com/` sends a signed-out visitor to sign in.
+
+   Without `LANDING_HOST` nothing is split and every page is served on whatever host was
+   asked — which is how the `*.up.railway.app` domain keeps working. Set `LANDING_HOST`
+   only once both custom domains answer over HTTPS. Anything registered with a third
+   party points at `APP_HOST`: the Google redirect URI, the Stripe webhook, email links.
+5. Sign in with Google (optional): set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` from
+   an OAuth client of type "Web application" whose authorised redirect URIs include
+   `https://app.gpcenarm.com/auth/google_oauth2/callback`. With the hosts split, Google is
+   always sent back to `APP_HOST`, so that is the only production URI it needs.
+6. Email: set `RESEND_API_KEY`, `MAILER_FROM` (an address on a domain verified in Resend)
+   and `APP_HOST` (see step 4; the links in emails point to it). Without them
    nobody who signs up with a password can confirm their address, and so nobody can use
    the app; Google sign-ins are unaffected. Failed sends show in Sentry and retry.
-5. Payments: set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. The secret is the
-   signing secret of a webhook endpoint pointing at `https://<APP_HOST>/webhooks/stripe`,
+7. Payments: set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. The secret is the
+   signing secret of a webhook endpoint pointing at
+   `https://app.gpcenarm.com/webhooks/stripe` (`APP_HOST`; Stripe does not follow the
+   landing host's redirect),
    subscribed to exactly these events:
 
    - `checkout.session.completed`: a card payment; grants the window.
@@ -61,13 +86,13 @@ parser said on the day the file was written.
    student keeps access they should have lost, or never receives access they paid for.
    Disputes show on the purchase history of the student's account page and of the admin
    user page.
-6. Study reminders (optional): run `bin/rails web_push:generate_keys` **once**, locally, and
+8. Study reminders (optional): run `bin/rails web_push:generate_keys` **once**, locally, and
    set the three lines it prints — `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
    `VAPID_SUBJECT` — as Railway variables. Without the pair the push option is simply not
    shown; email reminders work without it. Never regenerate it: every browser subscribed
    with the old public key stops receiving notifications until the student turns them on
    again.
-7. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
+9. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
 
 At this point the app runs and has its taxonomy, and no guidelines.
 

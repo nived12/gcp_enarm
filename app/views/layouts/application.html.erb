@@ -34,7 +34,10 @@
 
     <%= yield :head %>
 
-    <link rel="manifest" href="<%= pwa_manifest_path(format: :json) %>">
+    <%# The app is what installs, and a manifest only applies to pages on its own origin. %>
+    <% unless landing_host? %>
+      <link rel="manifest" href="<%= pwa_manifest_path(format: :json) %>">
+    <% end %>
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
