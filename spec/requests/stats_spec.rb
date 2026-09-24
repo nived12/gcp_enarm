@@ -132,6 +132,26 @@ RSpec.describe "Stats", type: :request do
       expect(response.body).to include(I18n.t("stats.streak.best", count: 12), I18n.t("stats.streak.freezes", count: 1))
     end
 
+    it "draws the heart for each state and asks to revive a lost streak" do
+      heart = -> { Nokogiri::HTML(response.body).at_css("[data-streak-state]")["data-streak-state"] }
+
+      get stats_path
+      expect(heart.call).to eq("none")
+      expect(response.body).to include(I18n.t("stats.streak.start", minimum: 10))
+
+      studied(3)
+      get stats_path
+      expect(heart.call).to eq("lost")
+      expect(response.body).to include(I18n.t("stats.streak.revive", minimum: 10))
+      create(:published_case)
+      get root_path
+      expect(response.body).to include(I18n.t("home.dashboard.streak_lost"))
+
+      studied(0)
+      get stats_path
+      expect(heart.call).to eq("active")
+    end
+
     it "says when today already counts" do
       studied(0, questions: 12)
 

@@ -278,6 +278,7 @@ en:
         one: "1-day streak"
         other: "%{count}-day streak"
       streak_none: "No streak yet"
+      streak_lost: "Revive your streak"
       streak_today: "today %{answered} of %{minimum}"
       streak_today_done: "today counts"
       streak_link: "Stats"
@@ -710,6 +711,7 @@ en:
       today_done: "Today counts: %{answered} questions"
       today_done_pearls: "Today counts: you did your pearls session"
       start: "Answer %{minimum} questions today to start a streak."
+      revive: "Revive your streak: answer %{minimum} questions today."
       keep: "%{remaining} more and today counts."
       best:
         one: "Your best streak: 1 day"

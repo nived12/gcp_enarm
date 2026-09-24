@@ -16,6 +16,14 @@ module Stats
     Result = Data.define(:current, :best, :freezes, :frozen_dates, :today_questions, :today_done) do
       def minimum = StudyDay::MINIMUM_QUESTIONS
       def today_remaining = [minimum - today_questions, 0].max
+
+      # Running, lost (there was one, and it ended), or never started.
+      def state
+        if current.positive? then :active
+        elsif best.positive? then :lost
+        else :none
+        end
+      end
     end
 
     def initialize(user, today: user.study_date)

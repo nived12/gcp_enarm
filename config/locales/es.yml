@@ -280,6 +280,7 @@ es:
         one: "1 día de racha"
         other: "%{count} días de racha"
       streak_none: "Sin racha todavía"
+      streak_lost: "Reanima tu racha"
       streak_today: "hoy %{answered} de %{minimum}"
       streak_today_done: "hoy ya cuenta"
       streak_link: "Estadísticas"
@@ -712,6 +713,7 @@ es:
       today_done: "Hoy ya cuenta: %{answered} preguntas"
       today_done_pearls: "Hoy ya cuenta: hiciste tu sesión de perlas"
       start: "Responde %{minimum} preguntas hoy para empezar una racha."
+      revive: "Reanima tu racha: responde %{minimum} preguntas hoy."
       keep: "Te faltan %{remaining} para que hoy cuente."
       best:
         one: "Tu mejor racha: 1 día"

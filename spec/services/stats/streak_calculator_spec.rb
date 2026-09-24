@@ -18,6 +18,16 @@ RSpec.describe Stats::StreakCalculator do
       today_done: false
     )
     expect(streak.today_remaining).to eq(10)
+    expect(streak.state).to eq(:none)
+  end
+
+  it "is active while running and lost once one has ended" do
+    studied(1)
+    expect(streak.state).to eq(:active)
+
+    user.study_days.update_all(date: today - 3)
+    expect(streak).to have_attributes(current: 0, best: 1)
+    expect(streak.state).to eq(:lost)
   end
 
   it "counts consecutive days, today included once it reaches the minimum" do

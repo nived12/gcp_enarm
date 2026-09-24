@@ -2,7 +2,7 @@
   <h2 id="streak-title" class="eyebrow"><%= t("stats.streak.title") %></h2>
 
   <div class="mt-3 flex items-center gap-3">
-    <%= render "stats/flame", lit: streak.current.positive?, size: "size-9" %>
+    <%= render "stats/heart", streak: streak, size: "size-9" %>
     <p class="min-w-0 flex-1">
       <span class="numeric text-4xl font-medium tracking-tight <%= streak.current.positive? ? "text-ink" : "text-ink-faint" %>"><%= streak.current %></span>
       <span class="ml-1 text-sm text-ink-muted"><%= t("stats.streak.days", count: streak.current) %></span>
@@ -24,7 +24,10 @@
     </div>
     <% unless streak.today_done %>
       <p class="mt-1.5 text-xs text-ink-faint">
-        <%= streak.current.positive? ? t("stats.streak.keep", remaining: streak.today_remaining) : t("stats.streak.start", minimum: streak.minimum) %>
+        <%= case streak.state
+            when :active then t("stats.streak.keep", remaining: streak.today_remaining)
+            when :lost then t("stats.streak.revive", minimum: streak.minimum)
+            else t("stats.streak.start", minimum: streak.minimum) end %>
       </p>
     <% end %>
   </div>
