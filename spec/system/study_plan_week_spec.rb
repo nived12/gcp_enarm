@@ -44,6 +44,9 @@ RSpec.describe "Study plan week", type: :system do
     first("[data-testid='plan-day']").click
     click_link I18n.t("study_plans.back_to_calendar")
 
+    # Turbo first shows its cached copy of the calendar, then swaps in the fresh one; a
+    # click on the cached copy's link lands on a node that is about to be detached.
+    expect(page).to have_css("html:not([aria-busy]):not([data-turbo-preview])")
     expect(page).to have_css("[aria-current='page']", text: I18n.t("study_plans.show.view.month"))
     click_link I18n.t("study_plans.show.view.week")
     expect(page).to have_current_path(study_plan_path(week: monday.iso8601))
