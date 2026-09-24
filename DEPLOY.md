@@ -170,7 +170,21 @@ citing nothing.
 
 `questions:import` is idempotent on `export_key`, a token each case and run carries from
 birth, so replaying a file over a database that already holds part of it updates instead
-of duplicating.
+of duplicating. Updating means overwriting: a case production already has takes the
+file's status and text, whatever was reviewed or edited there.
+
+**After launch, import new cases only.** Review happens in production from then on, so
+production is the source of truth for every case it holds. `questions:import_new` skips
+any case whose `export_key` production already has — the case and its questions stay
+exactly as they are — and imports the rest with the same checks, refusing and naming a
+case whose citation does not resolve. It ends with how many cases were imported, skipped
+as existing and refused. `script/load_production.sh --bank` uses it; the first full load
+still uses `questions:import`.
+
+```bash
+DATABASE_URL="postgresql://…proxy.rlwy.net:PORT/railway" \
+  bin/rails "questions:import_new[tmp/question-bank.jsonl.gz]"
+```
 
 One check the importer gets for free: production rebuilds recommendations with its own
 parser, so a parser change could renumber a section and hand a question a different
@@ -217,7 +231,8 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | `gpc:images` | Rebuild the figure library from stored section text and download what is missing. Safe to re-run; it skips files it already has. |
 | `gpc:retitle` | Re-derive archived titles from stored text. Same idea, for the PDF title heuristic. |
 | `gpc:export` / `gpc:import` | Move the corpus between environments. |
-| `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. |
+| `questions:export` / `questions:import` | Move the generated bank. Export after every run; the file is the backup. `questions:import` overwrites the cases it finds. |
+| `questions:import_new` | Import only the cases production does not have yet, leaving reviewed ones untouched. The one to use after launch. |
 | `taxonomy:seed` | Rebuild the topic tree after editing `db/seeds/taxonomy.yml`. Runs automatically on deploy. |
 | `questions:refile` | Re-file every case under its guideline's current main topic. Run after `taxonomy:seed` and `gpc:link` whenever the taxonomy changed; free, no model calls. |
 | `questions:generate[calls,budget,source]` | Generate cases. Breadth-first over every generatable guideline, and it resumes where the last run stopped, so it is safe to run in instalments. `budget` is a cap in USD, priced from the provider's published rate (peak rate for DeepSeek, so it stops early rather than late); `source` is `live_site` or `web_archive`. Example: `bin/rails "questions:generate[200,1.00]"`. |

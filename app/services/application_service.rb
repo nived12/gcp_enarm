@@ -31,12 +31,13 @@ class ApplicationService
   end
 
   # Every failure logs itself, plus whatever context_for_logging returns. Services that
-  # fail silently are the ones that cost an afternoon later.
-  def failure(error_message = nil)
+  # fail silently are the ones that cost an afternoon later. A payload is for a service
+  # that did part of its work and has to say how much.
+  def failure(error_message = nil, payload: nil)
     add_error_message(error_message)
     log_errors if has_errors?
 
-    Response.new(success: false, payload: nil, errors: errors)
+    Response.new(success: false, payload: payload, errors: errors)
   end
 
   def has_errors?

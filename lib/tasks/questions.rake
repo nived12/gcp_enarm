@@ -44,12 +44,27 @@ namespace :questions do
          "#{payload[:runs]} corridas · #{ActiveSupport::NumberHelper.number_to_human_size(payload[:bytes])}"
   end
 
-  desc "Load a file written by questions:export into this database [path]"
-  task :import, [:path] => :environment do |_task, args|
-    result = Questions::Importer.call(args[:path] || "tmp/question-bank.jsonl.gz")
+  import_bank = lambda do |path, only_new:|
+    result = Questions::Importer.call(path || "tmp/question-bank.jsonl.gz", only_new: only_new)
+    counts = result.payload
+    if counts
+      puts "casos importados: #{counts[:cases_created] + counts[:cases_updated]}, " \
+           "omitidos por existir: #{counts[:cases_skipped]}, rechazados: #{counts[:cases_refused]}"
+      puts counts.map { |key, value| "#{key}: #{value}" }.join(", ")
+    end
     abort(result.errors.full_messages.to_sentence) unless result.success?
+  end
 
-    puts result.payload.map { |key, value| "#{key}: #{value}" }.join(", ")
+  desc "Load a file written by questions:export into this database, overwriting the cases it already has [path]"
+  task :import, [:path] => :environment do |_task, args|
+    import_bank.call(args[:path], only_new: false)
+  end
+
+  # Once review happens in production, a case there has a status and edits the file
+  # knows nothing about; only the cases production lacks may come in.
+  desc "Load only the cases this database does not have yet, leaving existing ones untouched [path]"
+  task :import_new, [:path] => :environment do |_task, args|
+    import_bank.call(args[:path], only_new: true)
   end
 
   desc "File every case under its guideline's current main topic, after taxonomy:seed and gpc:link"

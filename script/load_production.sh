@@ -3,13 +3,14 @@
 # DEPLOY.md requires. Run from gpc_enarm/ on the machine that holds the corpus.
 #
 #   script/load_production.sh            # corpus + figures + bank (first load)
-#   script/load_production.sh --bank     # only a new question-bank export
+#   script/load_production.sh --bank     # only the cases production does not have yet
 #   script/load_production.sh --resume   # corpus already uploaded: redo the Railway steps and the bank
 #
 # Every step is idempotent: the corpus keys on catalog_key and the bank on export_key,
-# so a rerun updates rather than duplicates. Note that a bank import overwrites the
-# status of cases that already exist in production (see DEPLOY.md) — after launch,
-# review happens in production and only new batches should be imported.
+# so a rerun updates rather than duplicates. Review happens in production after launch,
+# so --bank runs questions:import_new: a case production already holds keeps its status
+# and edits, and only the cases it lacks come in. The first load and --resume still run
+# questions:import, which overwrites the cases it finds (see DEPLOY.md).
 set -euo pipefail
 
 project=gpcenarm
@@ -64,6 +65,11 @@ fi
 echo "==> Loading the question bank into production"
 # A case whose citation cannot be found in production's own parse is refused and named
 # (the rest still import), so a refusal must not hide the totals below.
-bin/rails "questions:import[$bank]" || echo "==> Some cases were refused; they are named above."
+if [[ "$mode" == "--bank" ]]; then
+  import_task=questions:import_new
+else
+  import_task=questions:import
+fi
+bin/rails "${import_task}[$bank]" || echo "==> Some cases were refused; they are named above."
 
 bin/rails runner 'puts "Production: #{Guideline.count} guías, #{ClinicalCase.status_published.count} casos publicados, #{Question.count} preguntas"'
