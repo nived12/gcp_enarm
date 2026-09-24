@@ -8,9 +8,9 @@ RSpec.describe ReminderPreference do
     expect(preference.by_email).to be(false)
   end
 
-  it "accepts only the half hours the form offers" do
-    expect(build(:reminder_preference, minute_of_day: 19 * 60 + 30)).to be_valid
-    expect(build(:reminder_preference, minute_of_day: 19 * 60 + 15)).not_to be_valid
+  it "accepts only the hours the form offers" do
+    expect(build(:reminder_preference, minute_of_day: 19 * 60)).to be_valid
+    expect(build(:reminder_preference, minute_of_day: 19 * 60 + 30)).not_to be_valid
     expect(build(:reminder_preference, minute_of_day: 3 * 60)).not_to be_valid
   end
 

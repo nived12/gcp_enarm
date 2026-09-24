@@ -29,12 +29,12 @@ RSpec.describe "Reminder preferences", type: :request do
   end
 
   it "saves the reminders, the time and the email channel" do
-    save(study_days: "1", exam_countdown: "1", by_email: "1", minute_of_day: "1170")
+    save(study_days: "1", exam_countdown: "1", by_email: "1", minute_of_day: "1140")
 
     expect(response).to redirect_to(account_path(anchor: "reminders"))
     expect(flash[:notice]).to eq(I18n.t("reminders.preferences.saved"))
     expect(student.reminder_preference).to have_attributes(
-      study_days: true, streak_at_risk: false, exam_countdown: true, by_email: true, minute_of_day: 1170
+      study_days: true, streak_at_risk: false, exam_countdown: true, by_email: true, minute_of_day: 1140
     )
   end
 

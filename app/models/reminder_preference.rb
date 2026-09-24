@@ -6,9 +6,10 @@
 class ReminderPreference < ApplicationRecord
   belongs_to :user
 
-  # Every half hour from 05:00 to 23:00. The dispatch job runs every quarter hour, so a
-  # finer choice would promise a precision it cannot keep.
-  MINUTE_CHOICES = (5 * 60..23 * 60).step(30).to_a.freeze
+  # On the hour, 06:00 to 22:00: few enough to show as pills, and a reminder does not
+  # need to be precise to the minute to be useful. Stored in minutes so that finer
+  # choices, should anyone ask, need no migration.
+  MINUTE_CHOICES = (6..22).map { |hour| hour * 60 }.freeze
 
   # The streak nudge goes out in the evening, late enough that the day's study could
   # already have happened and early enough to still do ten questions before midnight.

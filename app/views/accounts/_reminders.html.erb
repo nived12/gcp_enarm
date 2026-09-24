@@ -32,9 +32,9 @@
     </fieldset>
 
     <div class="mt-5">
-      <%= form.label :minute_of_day, t("reminders.preferences.time"), class: "mb-1.5 block text-sm font-medium text-ink" %>
-      <%= form.select :minute_of_day, reminder_time_options, {}, class: "input sm:max-w-40" %>
-      <p class="mt-2 text-xs leading-relaxed text-ink-faint"><%= t("reminders.preferences.time_hint", zone: time_zone_name(user)) %></p>
+      <%= render "shared/pill_radios", legend: t("reminders.preferences.time"), name: "reminder_preference[minute_of_day]",
+            id_prefix: "reminder_minute", selected: preference.minute_of_day, options: reminder_time_options,
+            hint: t("reminders.preferences.time_hint", zone: time_zone_name(user)) %>
     </div>
 
     <fieldset class="mt-5">

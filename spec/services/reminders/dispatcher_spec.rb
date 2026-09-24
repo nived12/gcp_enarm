@@ -113,6 +113,13 @@ RSpec.describe Reminders::Dispatcher do
       expect(sent.map { |day| (plan.exam_date - day).to_i }).to eq([30, 7, 1])
     end
 
+    it "waits for the chosen time on a countdown day" do
+      plan.update!(exam_date: date + 7)
+
+      expect(dispatch(at(7))).to eq([])
+      expect(dispatch(at(8))).to eq(["exam_countdown"])
+    end
+
     it "joins the study reminder in one message when both are due together" do
       preference.update!(study_days: true)
       plan.update!(exam_date: date + 7)
