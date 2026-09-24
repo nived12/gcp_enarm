@@ -2,16 +2,23 @@
     - active: the accent colour, beating — a pulse line across it;
     - lost: faint, with a flat line. Asystole is the joke every doctor gets, and it is
       always shown beside "Reanima tu racha", so it reads as something to fix, not a verdict;
-    - none yet: a faint empty heart, nothing to revive. %>
+    - none yet: a faint empty heart, nothing to revive.
+
+    The flat line is the pulse line squashed flat, so the moment a streak is lost can be
+    shown as the pulse flattening. streak_heart_controller plays that once, and a double
+    beat once on the day's first view after it counts; `moment` is what it remembers. %>
 <% state = streak.state %>
-<svg class="<%= local_assigns.fetch(:size, "size-6") %> shrink-0 <%= state == :active ? "text-accent" : "text-ink-faint" %>"
+<% moment = case state
+            when :active then streak.today_done ? "counted:#{Current.user.study_date}" : "active"
+            else state.to_s end %>
+<svg class="streak-heart <%= local_assigns.fetch(:size, "size-6") %> shrink-0 <%= state == :active ? "text-accent" : "text-ink-faint" %>"
      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-     stroke-linejoin="round" aria-hidden="true" data-streak-state="<%= state %>">
-  <path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z"
+     stroke-linejoin="round" aria-hidden="true" data-streak-state="<%= state %>"
+     data-controller="streak-heart" data-streak-heart-moment-value="<%= moment %>">
+  <path class="streak-heart__body" d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z"
         fill="<%= state == :active ? "currentColor" : "none" %>" fill-opacity="0.15"/>
-  <% if state == :active %>
-    <path d="M5 12h3l1.5-2.5 2 5 1.5-2.5h6"/>
-  <% elsif state == :lost %>
-    <path d="M5 12h14"/>
+  <% unless state == :none %>
+    <path class="streak-heart__pulse <%= "streak-heart__pulse--flat" if state == :lost %>"
+          d="M5 12h3l1.5-2.5 2 5 1.5-2.5h6" pathLength="1"/>
   <% end %>
 </svg>

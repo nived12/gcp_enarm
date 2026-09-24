@@ -16,3 +16,6 @@ application.register("topic-picker", TopicPickerController)
 
 import TimeZoneController from "./time_zone_controller"
 application.register("time-zone", TimeZoneController)
+
+import StreakHeartController from "./streak_heart_controller"
+application.register("streak-heart", StreakHeartController)

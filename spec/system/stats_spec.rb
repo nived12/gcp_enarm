@@ -41,4 +41,26 @@ RSpec.describe "Stats", type: :system, viewport: :phone do
     expect(page).to have_text(I18n.t("stats.coverage.area", seen: 0, published: 1))
     expect_no_sideways_scroll
   end
+
+  describe "the heart's moments" do
+    let(:heart) { "svg[data-controller=streak-heart]" }
+
+    it "beats once when the day has counted, and flattens once when the streak is lost" do
+      student.study_days.create!(date: student.study_date, questions_answered: 10)
+      sign_in_as(student)
+      # Home shows the heart first after signing in, so the beat plays there, once a day.
+      expect(page).to have_css("#{heart}.streak-heart--beat")
+      visit stats_path
+      expect(page).to have_css("#{heart}[data-streak-state=active]")
+      expect(page).to have_no_css("#{heart}.streak-heart--beat", wait: 0)
+
+      student.study_days.update_all(date: student.study_date - 3)
+      visit stats_path
+      expect(page).to have_text(I18n.t("stats.streak.revive", minimum: 10))
+      expect(page).to have_css("#{heart}.streak-heart--flatline")
+      visit stats_path
+      expect(page).to have_css("#{heart}[data-streak-state=lost]")
+      expect(page).to have_no_css("#{heart}.streak-heart--flatline", wait: 0)
+    end
+  end
 end
