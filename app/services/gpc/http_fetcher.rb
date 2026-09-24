@@ -38,7 +38,7 @@ module Gpc
     end
 
     def user_agent
-      ENV.fetch("GPC_USER_AGENT", "GPCEnarm/1.0 (+https://gpcenarm.mx; contacto@gpcenarm.mx)")
+      ENV.fetch("GPC_USER_AGENT", "GPCEnarm/1.0 (+https://gpcenarm.com; soporte@gpcenarm.com)")
     end
   end
 end

@@ -58,7 +58,7 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :resend
   config.action_mailer.raise_delivery_errors = true
 
-  # Links in emails point at the public host, e.g. gpcenarm.mx.
+  # Links in emails point at the public host, e.g. gpcenarm.com.
   config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "example.com"), protocol: "https" }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
