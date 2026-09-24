@@ -52,4 +52,45 @@ RSpec.describe Exams::WeakSpotBuilder do
       expect(in_weaker.size).to be > order.count { |kase| kase.topic == weak }
     end
   end
+
+  context "with a weak setting" do
+    let(:emergency) { create(:emergency_setting) }
+
+    before do
+      3.times do
+        kase = create(:published_case, topic: create(:topic), setting: emergency, questions_count: 1)
+        sit(user, kase, [[:wrong, "did_not_know"]])
+      end
+      8.times { answer(strong, :right) }
+    end
+
+    it "draws the setting's whole area, and records it" do
+      about = create(:published_case, topic: create(:topic), specialty: emergency, questions_count: 1)
+      set_there = create(:published_case, topic: create(:topic), setting: emergency, questions_count: 1)
+      create(:published_case, topic: create(:topic), questions_count: 1)
+
+      exam = build.payload[:exam]
+      cases = exam.exam_questions.map(&:clinical_case)
+
+      expect(cases).to include(about, set_there)
+      expect(cases).to all(satisfy { |kase| [kase.specialty, kase.setting].include?(emergency) })
+      expect(exam.filters).to eq("interleave" => true, "setting_ids" => [emergency.id])
+    end
+
+    it "deals a case in a weak topic and a weak setting once" do
+      3.times do
+        sit(
+          user, create(:published_case, topic: weak, setting: emergency, questions_count: 1),
+          [[:wrong, "did_not_know"]]
+        )
+      end
+
+      exam = build.payload[:exam]
+      case_ids = exam.exam_questions.map(&:clinical_case_id)
+
+      expect(exam.filters).to eq("interleave" => true, "topic_ids" => [weak.id], "setting_ids" => [emergency.id])
+      expect(case_ids).to eq(case_ids.uniq)
+      expect(case_ids).to match_array(ClinicalCase.in_area(emergency).ids)
+    end
+  end
 end

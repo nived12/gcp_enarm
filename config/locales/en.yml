@@ -1113,14 +1113,15 @@ en:
       home: "Back home"
 
   weak_spots:
-    none: "No topic is below your average yet."
+    none: "No topic or setting is below your average yet."
     preset:
       title: "Your weak spots"
-      body: "Topics where you are below your own average, weighing recent answers and knowledge gaps more:"
+      body: "Topics and settings where you are below your own average, weighing recent answers and knowledge gaps more. A right answer you were unsure of or guessed counts for less than a sure one:"
       start:
         one: "Practise 1 question"
         other: "Practise %{count} questions"
-      none: "No topic is below your average. Keep it up."
+      none: "No topic or setting is below your average. Keep it up."
+      setting_overlap: "A setting (Emergency, Family Medicine or Public Health) gathers the questions of cases that happen there, so it shares questions with the topics. In the quiz, each case comes up once."
       not_enough: "Answer at least %{minimum} questions to find your weak spots."
 
   remediation:

@@ -1115,14 +1115,15 @@ es:
       home: "Volver al inicio"
 
   weak_spots:
-    none: "Todavía no hay temas por debajo de tu promedio."
+    none: "Todavía no hay temas ni contextos por debajo de tu promedio."
     preset:
       title: "Tus puntos débiles"
-      body: "Temas donde vas por debajo de tu propio promedio, con más peso a lo reciente y a los errores por no saber:"
+      body: "Temas y contextos donde vas por debajo de tu propio promedio, con más peso a lo reciente y a los errores por no saber. Un acierto con duda o adivinado cuenta menos que uno seguro:"
       start:
         one: "Practicar 1 pregunta"
         other: "Practicar %{count} preguntas"
-      none: "Ningún tema está por debajo de tu promedio. Sigue así."
+      none: "Ningún tema ni contexto está por debajo de tu promedio. Sigue así."
+      setting_overlap: "Un contexto (Urgencias, Medicina Familiar o Salud Pública) reúne las preguntas de los casos que ocurren ahí, así que comparte preguntas con los temas. En la práctica, cada caso sale una sola vez."
       not_enough: "Responde al menos %{minimum} preguntas para encontrar tus puntos débiles."
 
   remediation:
