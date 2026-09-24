@@ -35,6 +35,14 @@ if [[ -n "${DATABASE_URL:-}" ]]; then
   unset DATABASE_URL
 fi
 
+# A local assets:precompile (a production-build check, a Lighthouse run) leaves
+# public/assets behind, and it is served ahead of the fresh app/assets/builds: new
+# Stimulus controllers and styles silently never load. It has bitten twice.
+if [ -d public/assets ]; then
+  echo "==> Removing stale precompiled public/assets"
+  rm -rf public/assets
+fi
+
 if [[ -n "${COVERAGE:-}" ]]; then
   # Stale per-process results merge into the new run and inflate the total.
   rm -rf coverage

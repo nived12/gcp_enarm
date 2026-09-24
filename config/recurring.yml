@@ -9,9 +9,10 @@
 #     priority: 2
 #     schedule: at 5am every day
 
-# Study reminders. Every quarter hour, because students pick any half hour of their own
-# time zone; each run sends only what is due and ReminderDelivery refuses a repeat. In
-# development too, so opted-in accounts can be watched arriving at /letter_opener.
+# Study reminders. Students pick an hour of their own time zone, and zones are not all
+# whole hours apart, so the job runs every quarter hour; each run sends only what is due
+# and ReminderDelivery refuses a repeat. In development too: without RESEND_API_KEY the
+# mail lands at /letter_opener, with it opted-in local accounts get real mail.
 development:
   send_due_reminders: &send_due_reminders
     class: Reminders::DispatchJob

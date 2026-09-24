@@ -5,6 +5,14 @@ if gem list --no-installed --exact --silent foreman; then
   gem install foreman
 fi
 
+# A local assets:precompile (a production-build check, a Lighthouse run) leaves
+# public/assets behind, and it is served ahead of the fresh app/assets/builds: new
+# Stimulus controllers and styles silently never load. It has bitten twice.
+if [ -d public/assets ]; then
+  echo "==> Removing stale precompiled public/assets"
+  rm -rf public/assets
+fi
+
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
