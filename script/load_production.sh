@@ -20,22 +20,16 @@ railway status --json | grep -q "\"name\": *\"$project\"" || {
   exit 1
 }
 
-# The database has no public address. `railway connect --tunnel-only` opens an encrypted
-# SSH tunnel to it on a local port for as long as this script runs; nothing is exposed
-# and there is no public-traffic charge.
-port=55432
-railway connect Postgres --tunnel-only --port "$port" >/tmp/gpcenarm-tunnel.log 2>&1 &
-tunnel=$!
-trap 'kill "$tunnel" 2>/dev/null' EXIT
-for _ in $(seq 1 30); do
-  nc -z localhost "$port" 2>/dev/null && break
-  sleep 1
-done
-nc -z localhost "$port" || { echo "The tunnel did not open:" >&2; cat /tmp/gpcenarm-tunnel.log >&2; exit 1; }
-
-DATABASE_URL=$(railway variable list --service Postgres --json | ruby -rjson -e '
-  v = JSON.parse($stdin.read)
-  print "postgresql://#{v.fetch("PGUSER")}:#{v.fetch("PGPASSWORD")}@localhost:'"$port"'/#{v.fetch("PGDATABASE")}"')
+# Railway's public TCP proxy (Postgres → Settings → Public Access). An SSH tunnel from
+# `railway connect --tunnel-only` was tried first and dropped its channel mid-import.
+# The proxy's traffic is billed as egress — cents for a load — and it can be removed
+# again afterwards; the script then stops here and says so.
+DATABASE_URL=$(railway variable list --service Postgres --json |
+  ruby -rjson -e 'print JSON.parse($stdin.read)["DATABASE_PUBLIC_URL"].to_s')
+if [[ -z "$DATABASE_URL" ]]; then
+  echo "Postgres has no public access. Railway → Postgres → Settings → Add Public Access." >&2
+  exit 1
+fi
 export DATABASE_URL
 
 echo "==> Exporting the local bank to $bank"
