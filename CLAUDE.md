@@ -178,7 +178,8 @@ bin/coverage-check --raise        # lock in an improvement, then commit the floo
   `app/assets/builds/application.css` but missing from what the server serves, and the
   digest in the `<link>` never changes. Fix: `rm -rf public/assets` **and restart** — the
   running server caches the resolved path, so removing the directory alone does nothing.
-  `public/assets` is gitignored, so this never shows up in a diff.
+  `public/assets` is gitignored, so this never shows up in a diff. `bin/dev` and
+  `bin/ci-test` now delete it on start; a server started any other way does not.
 - **Use `bin/dev`, not `bin/rails server`.** The plain server runs no asset watcher, so
   CSS and JS changes silently do not appear.
 - **`rate_limit` captures its store at class-definition time.** The test environment gives
