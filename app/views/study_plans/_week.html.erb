@@ -1,0 +1,41 @@
+<% monday = period.first %>
+<% plan_range = plan.starts_on..plan.exam_date %>
+<%= render "period_nav",
+      title: plan_week_range(period), label: t("study_plans.show.weeks"),
+      previous_path: (study_calendar_path(monday - 7, "week") if monday > plan.starts_on),
+      next_path: (study_calendar_path(monday + 7, "week") if period.last < plan.exam_date),
+      previous_label: t("study_plans.show.previous_week"), next_label: t("study_plans.show.next_week") %>
+
+<% if period.none? { |date| plan_range.cover?(date) } %>
+  <div class="mt-4 rounded-card border border-dashed border-line-strong p-6 text-center text-sm text-ink-muted">
+    <%= t("study_plans.show.empty_week") %>
+  </div>
+<% else %>
+  <% if days.any? %>
+    <p class="mt-1 text-center text-xs text-ink-faint" data-testid="week-progress">
+      <%= t("study_plans.show.week_done", done: days.values.count(&:done?), total: days.size) %>
+    </p>
+  <% end %>
+  <%# All seven days, rest days included: a week with its gaps shown is a week you can
+      plan the rest of your life around. %>
+  <ol class="mt-4 divide-y divide-line border-y border-line" data-testid="week">
+    <% period.each do |date| %>
+      <% if (day = days[date]) %>
+        <%= render "day_row", day: day, today: today, workload: true %>
+      <% else %>
+        <% label = if date == plan.exam_date then t("study_plans.show.exam_day")
+                   elsif plan_range.cover?(date) then t("study_plans.day.rest")
+                   else t("study_plans.show.outside_plan")
+                   end %>
+        <li class="flex min-h-11 items-stretch gap-3 py-3 <%= "opacity-60" unless plan_range.cover?(date) %> <%= "-mx-2 rounded-control bg-accent-soft px-2" if date == today %>">
+          <span class="w-1 shrink-0 rounded-full <%= date == plan.exam_date ? "bg-accent" : "bg-line" %>" aria-hidden="true"></span>
+          <span class="w-12 shrink-0">
+            <span class="block text-xs capitalize <%= date == today ? "font-semibold text-accent" : "text-ink-faint" %>"><%= plan_date(date, :weekday) %></span>
+            <span class="numeric block text-lg <%= date == today ? "text-accent" : "text-ink-faint" %>"><%= date.day %></span>
+          </span>
+          <span class="min-w-0 flex-1 self-center text-sm <%= date == plan.exam_date ? "font-semibold text-accent" : "text-ink-faint" %>"><%= label %></span>
+        </li>
+      <% end %>
+    <% end %>
+  </ol>
+<% end %>

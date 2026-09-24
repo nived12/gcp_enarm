@@ -1,6 +1,6 @@
 <% content_for :title, plan_date(@date, :long) %>
 
-<%= link_to t("study_plans.back_to_calendar"), study_plan_path(month: @date.strftime("%Y-%m")),
+<%= link_to t("study_plans.back_to_calendar"), study_calendar_path(@date),
       class: "inline-flex min-h-11 items-center text-sm text-accent hover:text-accent-hover" %>
 
 <% if @day.nil? %>

@@ -1,0 +1,16 @@
+<%# Previous / next through the plan, never past its first or last period. The empty
+    spans keep the title centred when one side has nowhere to go. %>
+<% arrow_class = "inline-flex size-11 shrink-0 items-center justify-center rounded-full text-lg text-ink-muted hover:bg-surface-sunk" %>
+<nav class="mt-4 flex items-center justify-between gap-2" aria-label="<%= label %>">
+  <% if previous_path %>
+    <%= link_to "‹", previous_path, class: arrow_class, aria: { label: previous_label } %>
+  <% else %>
+    <span class="size-11 shrink-0"></span>
+  <% end %>
+  <h2 class="text-center text-base font-semibold text-ink first-letter:uppercase"><%= title %></h2>
+  <% if next_path %>
+    <%= link_to "›", next_path, class: arrow_class, aria: { label: next_label } %>
+  <% else %>
+    <span class="size-11 shrink-0"></span>
+  <% end %>
+</nav>

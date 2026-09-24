@@ -961,6 +961,10 @@ en:
     eyebrow: "Study plan"
     back_to_calendar: "‹ Calendar"
     done: "Done"
+    status:
+      done: "Done"
+      in_progress: "In progress"
+      missed: "Missed"
     date_formats:
       day: "%B %-d"
       long: "%A, %B %-d, %Y"
@@ -1022,6 +1026,27 @@ en:
       previous_month: "Previous month"
       next_month: "Next month"
       empty_month: "This month has no days of your plan."
+      views: "Calendar view"
+      view:
+        week: "Week"
+        month: "Month"
+      weeks: "Weeks of the plan"
+      previous_week: "Previous week"
+      next_week: "Next week"
+      week_range:
+        same_month: "%{month} %{first_day} – %{last_day}"
+        two_months: "%{from} – %{to}"
+      week_done: "Done: %{done} of %{total}"
+      empty_week: "This week has no days of your plan."
+      exam_day: "ENARM exam"
+      outside_plan: "Outside your plan"
+      reading: "Reading: no cases to quiz yet"
+      quiz:
+        one: "1-question quiz"
+        other: "%{count}-question quiz"
+      questions:
+        one: "1 question"
+        other: "%{count} questions"
     day:
       pass: "Pass %{number} of %{total}"
       rest: "Rest day"
