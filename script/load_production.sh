@@ -4,6 +4,7 @@
 #
 #   script/load_production.sh            # corpus + figures + bank (first load)
 #   script/load_production.sh --bank     # only a new question-bank export
+#   script/load_production.sh --resume   # corpus already uploaded: redo the Railway steps and the bank
 #
 # Every step is idempotent: the corpus keys on catalog_key and the bank on export_key,
 # so a rerun updates rather than duplicates. Note that a bank import overwrites the
@@ -35,19 +36,29 @@ export DATABASE_URL
 echo "==> Exporting the local bank to $bank"
 env -u DATABASE_URL bin/rails "questions:export[$bank]"
 
-if [[ "${1:-}" != "--bank" ]]; then
+mode="${1:-}"
+
+if [[ "$mode" == "" ]]; then
   echo "==> Exporting the local corpus to $corpus"
   env -u DATABASE_URL bin/rails "gpc:export[$corpus]"
 
   echo "==> Loading the corpus into production"
   bin/rails "gpc:import[$corpus]"
+fi
 
+if [[ "$mode" != "--bank" ]]; then
   # Rebuilding recommendations writes tens of thousands of rows; from this machine each
   # is a round trip to Railway's region and the step crawls. Inside the container the
   # database is next door. Figures are files, so they must be fetched there anyway, onto
   # its volume. Every one of these is safe to rerun if the connection drops.
   echo "==> Rebuilding recommendations and fetching figures on Railway (several minutes)"
-  railway ssh --service web -- bin/rails gpc:reparse gpc:images taxonomy:seed gpc:link
+  # Railway closes long SSH sessions (one dropped at figure 426 of 870). Each task skips
+  # what is already done, so a dropped attempt is simply run again.
+  for attempt in 1 2 3 4 5; do
+    railway ssh --service web -- bin/rails gpc:reparse gpc:images taxonomy:seed gpc:link && break
+    [[ $attempt == 5 ]] && { echo "The Railway steps kept dropping; run --resume later." >&2; exit 1; }
+    echo "==> The connection dropped; trying again ($((attempt + 1)) of 5)"
+  done
 fi
 
 echo "==> Loading the question bank into production"
