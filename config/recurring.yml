@@ -9,7 +9,18 @@
 #     priority: 2
 #     schedule: at 5am every day
 
+# Study reminders. Every quarter hour, because students pick any half hour of their own
+# time zone; each run sends only what is due and ReminderDelivery refuses a repeat. In
+# development too, so opted-in accounts can be watched arriving at /letter_opener.
+development:
+  send_due_reminders: &send_due_reminders
+    class: Reminders::DispatchJob
+    queue: default
+    schedule: every 15 minutes
+
 production:
+  send_due_reminders: *send_due_reminders
+
   # The GPC catalog is not frozen: guidelines are republished, new ones appear, and
   # every guideline ages out of its five-year validity window. Quarterly is the cadence
   # the source itself moves at, and it costs nothing — Solid Queue runs inside Puma.

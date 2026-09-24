@@ -13,6 +13,10 @@
   </p>
 </section>
 
+<% if flash[:reminder_invitation] %>
+  <%= render "study_plans/reminder_invitation" %>
+<% end %>
+
 <% if @missed.positive? %>
   <%# Named plainly, with the way out beside it: the plan moves, the syllabus is not restarted. %>
   <div class="mt-6 rounded-card bg-ground-tint px-5 py-4" data-testid="behind">

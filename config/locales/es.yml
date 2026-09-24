@@ -1133,3 +1133,92 @@ es:
     misses:
       one: "1 error"
       other: "%{count} errores"
+  reminders:
+    preferences:
+      title: "Recordatorios"
+      promise: "Como máximo un mensaje al día, y ninguno si ya estudiaste. Todo empieza apagado."
+      what: "Qué te recordamos"
+      rules:
+        study_days:
+          label: "Tu plan del día"
+          hint: "A la hora que elijas, solo los días en que tu plan tiene algo y aún no has estudiado."
+        streak_at_risk:
+          label: "Racha en riesgo"
+          hint: "A las %{time}, si llevas racha y hoy todavía no cuenta. No llega los días en que ya te recordamos tu plan."
+        exam_countdown:
+          label: "Cuenta regresiva al examen"
+          hint: "A la hora que elijas, 30, 7 y 1 día antes de tu examen."
+      no_plan: "El plan del día y la cuenta regresiva salen de tu plan de estudio, y aún no tienes uno."
+      create_plan: "Armar mi plan"
+      time: "Hora"
+      time_hint: "Hora de %{zone}, la de tu zona horaria."
+      where: "Dónde te llegan"
+      email:
+        label: "Por correo"
+        hint: "A %{email}. Cada correo trae un enlace para dejar de recibirlos."
+      submit: "Guardar recordatorios"
+      saved: "Recordatorios guardados."
+      saved_without_channel: "Recordatorios guardados, pero no te llegará ninguno: elige el correo o activa las notificaciones en este dispositivo."
+      invalid: "Elige una hora de la lista."
+    device:
+      label: "Notificaciones en este dispositivo"
+      checking: "Revisando si este navegador puede recibirlas…"
+      "off": "Apagadas aquí. Se activan al momento, sin necesidad de guardar."
+      enable: "Activar notificaciones aquí"
+      working: "Un momento…"
+      "on": "Activas en este dispositivo."
+      disable: "Desactivar aquí"
+      install:
+        body: "En iPhone y iPad las notificaciones solo llegan si abres GPCEnarm desde tu pantalla de inicio (iOS 16.4 o posterior):"
+        share: "En Safari, toca el botón Compartir."
+        add: "Elige «Agregar a pantalla de inicio»."
+        open: "Abre GPCEnarm desde el ícono nuevo y vuelve a esta sección."
+      update_ios: "Para recibir notificaciones en este iPhone o iPad hace falta iOS 16.4 o posterior. Mientras tanto, usa el correo."
+      unsupported: "Este navegador no puede recibir notificaciones. Usa el correo, o actívalas desde otro navegador."
+      denied: "Las notificaciones de este sitio están bloqueadas en este navegador. Permítelas en sus ajustes y vuelve a esta página."
+      error: "No se pudieron activar las notificaciones. Intenta de nuevo."
+      retry: "Intentar de nuevo"
+    invitation:
+      title: "¿Te recordamos tu plan?"
+      body: "Un aviso a la hora que elijas, solo los días con algo en tu plan y nunca si ya estudiaste."
+      accept: "Elegir recordatorios"
+      dismiss: "Ahora no"
+    unsubscribe:
+      title: "Dejar de recibir recordatorios por correo"
+      subtitle: "Los recordatorios de estudio dejarán de llegar a %{email}."
+      confirm: "Dejar de recibirlos"
+      keeps: "Los correos de tu cuenta, como el de restablecer la contraseña, siguen llegando."
+      done:
+        title: "Listo"
+        subtitle: "Ya no enviaremos recordatorios a %{email}."
+        change: "Si cambias de opinión, puedes volver a activarlos en tu cuenta."
+        settings: "Ir a mis recordatorios"
+      invalid:
+        title: "Este enlace no funciona"
+        subtitle: "Puede que esté incompleto. Entra a tu cuenta para cambiar tus recordatorios."
+    message:
+      study_day:
+        title: "Tu plan de hoy"
+        body: "Hoy toca: %{day}."
+        streak:
+          one: "Llevas 1 día de racha."
+          other: "Llevas %{count} días de racha."
+      streak_at_risk:
+        title:
+          one: "Tu racha de 1 día sigue en pie"
+          other: "Tu racha de %{count} días sigue en pie"
+        body: "Hoy todavía no cuenta: %{minimum} preguntas o una sesión de perlas antes de la medianoche y la mantienes."
+      exam_countdown:
+        title:
+          one: "Falta 1 día para tu examen"
+          other: "Faltan %{count} días para tu examen"
+        body:
+          days_30: "Buen momento para un simulacro completo y ver dónde estás."
+          days_7: "Esta semana, dale prioridad a lo que más fallas."
+          days_1: "Mañana es el día. Hoy repasa poco y duerme bien."
+  reminders_mailer:
+    reminder:
+      button: "Abrir GPCEnarm"
+      why: "Recibes este correo porque activaste los recordatorios."
+      settings: "Cambiar recordatorios"
+      unsubscribe: "Dejar de recibirlos por correo"

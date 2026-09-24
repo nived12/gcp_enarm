@@ -43,7 +43,13 @@ parser said on the day the file was written.
    and `APP_HOST` (the public host, which the links in emails point to). Without them
    nobody who signs up with a password can confirm their address, and so nobody can use
    the app; Google sign-ins are unaffected. Failed sends show in Sentry and retry.
-5. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
+5. Study reminders (optional): run `bin/rails web_push:generate_keys` **once**, locally, and
+   set the three lines it prints — `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
+   `VAPID_SUBJECT` — as Railway variables. Without the pair the push option is simply not
+   shown; email reminders work without it. Never regenerate it: every browser subscribed
+   with the old public key stops receiving notifications until the student turns them on
+   again.
+6. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
 
 At this point the app runs and has its taxonomy, and no guidelines.
 
@@ -147,7 +153,13 @@ Railway service and no extra cost: Solid Queue runs inside Puma.
 It does **not** refresh the web archive. Those captures are history and will not change;
 run `gpc:archive` by hand if you ever want to look again.
 
-Nothing else is scheduled. If you want it more or less often, that cron is the one knob.
+`Reminders::DispatchJob` runs every 15 minutes and sends the study reminders that are due
+in each student's own time zone. Everything it sends is claimed first in
+`reminder_deliveries`, so an overlapping or repeated run never sends twice. It does
+nothing for students who have not opted in, which at first is everyone.
+
+Nothing else is scheduled. If you want the catalog refreshed more or less often, that cron
+is the one knob.
 
 The live catalog changes — `SS-757-25` appeared after the first survey. Re-running
 `gpc:catalog` then `gpc:ingest` is safe at any time: a guideline whose `content_hash` is
@@ -167,6 +179,7 @@ stay distinct facts, and only the second should ever invalidate generated questi
 | `questions:refile` | Re-file every case under its guideline's current main topic. Run after `taxonomy:seed` and `gpc:link` whenever the taxonomy changed; free, no model calls. |
 | `questions:generate[calls,budget,source]` | Generate cases. Breadth-first over every generatable guideline, and it resumes where the last run stopped, so it is safe to run in instalments. `budget` is a cap in USD, priced from the provider's published rate (peak rate for DeepSeek, so it stops early rather than late); `source` is `live_site` or `web_archive`. Example: `bin/rails "questions:generate[200,1.00]"`. |
 | `questions:verify` | Run the second-opinion pass over unverified cases. A case only becomes publishable once another model family has agreed with its answer. |
+| `web_push:generate_keys` | Print a VAPID key pair for Web Push reminders. Once per environment, ever — see First deploy. |
 | `llm:status` | Show which model each role resolved to and whether its key is set. Run it before any paid generation. |
 
 ## Before the first paying subscriber

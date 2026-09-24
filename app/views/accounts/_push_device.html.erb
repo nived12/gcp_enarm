@@ -1,0 +1,59 @@
+<%# The browser decides which of these applies, so every state is rendered hidden and
+    the push-subscription controller reveals one. Until it has asked, the checking line
+    shows; without JavaScript nothing here can work, and that line is all there is. %>
+<div class="mt-2 rounded-control bg-surface-sunk px-4 py-3"
+     data-controller="push-subscription"
+     data-push-subscription-public-key-value="<%= PushSubscription.public_key %>"
+     data-push-subscription-url-value="<%= push_subscription_path %>">
+  <p class="text-sm font-medium text-ink"><%= t("reminders.device.label") %></p>
+
+  <p class="mt-1 text-xs leading-relaxed text-ink-faint" data-push-subscription-target="state" data-state="checking">
+    <%= t("reminders.device.checking") %>
+  </p>
+
+  <div data-push-subscription-target="state" data-state="off" hidden>
+    <p class="mt-1 text-xs leading-relaxed text-ink-faint"><%= t("reminders.device.off") %></p>
+    <button type="button" class="btn btn--ghost mt-3 w-full sm:w-auto" data-action="push-subscription#enable">
+      <%= t("reminders.device.enable") %>
+    </button>
+  </div>
+
+  <p class="mt-1 text-xs leading-relaxed text-ink-faint" data-push-subscription-target="state" data-state="working" hidden aria-live="polite">
+    <%= t("reminders.device.working") %>
+  </p>
+
+  <div data-push-subscription-target="state" data-state="on" hidden>
+    <p class="mt-1 text-xs font-medium leading-relaxed text-correct"><%= t("reminders.device.on") %></p>
+    <button type="button" class="btn btn--ghost mt-3 w-full sm:w-auto" data-action="push-subscription#disable">
+      <%= t("reminders.device.disable") %>
+    </button>
+  </div>
+
+  <div data-push-subscription-target="state" data-state="install" hidden>
+    <p class="mt-1 text-xs leading-relaxed text-ink-muted"><%= t("reminders.device.install.body") %></p>
+    <ol class="mt-2 list-decimal space-y-1 pl-5 text-xs leading-relaxed text-ink-muted">
+      <li><%= t("reminders.device.install.share") %></li>
+      <li><%= t("reminders.device.install.add") %></li>
+      <li><%= t("reminders.device.install.open") %></li>
+    </ol>
+  </div>
+
+  <p class="mt-1 text-xs leading-relaxed text-ink-muted" data-push-subscription-target="state" data-state="update_ios" hidden>
+    <%= t("reminders.device.update_ios") %>
+  </p>
+
+  <p class="mt-1 text-xs leading-relaxed text-ink-muted" data-push-subscription-target="state" data-state="unsupported" hidden>
+    <%= t("reminders.device.unsupported") %>
+  </p>
+
+  <p class="mt-1 text-xs leading-relaxed text-ink-muted" data-push-subscription-target="state" data-state="denied" hidden>
+    <%= t("reminders.device.denied") %>
+  </p>
+
+  <div data-push-subscription-target="state" data-state="error" hidden>
+    <p class="mt-1 text-xs leading-relaxed text-incorrect" role="alert"><%= t("reminders.device.error") %></p>
+    <button type="button" class="btn btn--ghost mt-3 w-full sm:w-auto" data-action="push-subscription#enable">
+      <%= t("reminders.device.retry") %>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<%# What to be reminded of, when, and where. Everything starts off: a reminder the
+    student did not ask for is the spam this section exists to avoid. %>
+<% preference = user.reminder_settings %>
+<section id="reminders" class="card mt-6 scroll-mt-20 px-5 py-5">
+  <p class="eyebrow"><%= t("reminders.preferences.title") %></p>
+  <p class="mt-2 text-sm leading-relaxed text-ink"><%= t("reminders.preferences.promise") %></p>
+
+  <%= form_with model: preference, url: account_reminders_path, method: :patch, class: "mt-5" do |form| %>
+    <fieldset>
+      <legend class="text-sm font-medium text-ink"><%= t("reminders.preferences.what") %></legend>
+      <div class="mt-1 space-y-1">
+        <% %i[study_days streak_at_risk exam_countdown].each do |rule| %>
+          <label class="flex min-h-11 cursor-pointer items-start gap-3 py-2">
+            <%= form.check_box rule, class: "mt-1 size-4 shrink-0 accent-accent" %>
+            <span>
+              <span class="block text-sm font-medium text-ink"><%= t("reminders.preferences.rules.#{rule}.label") %></span>
+              <span class="mt-0.5 block text-xs leading-relaxed text-ink-faint">
+                <%= t("reminders.preferences.rules.#{rule}.hint",
+                      time: clock_time(ReminderPreference::STREAK_MINUTE)) %>
+              </span>
+            </span>
+          </label>
+        <% end %>
+      </div>
+      <% unless user.study_plan %>
+        <p class="mt-1 text-xs leading-relaxed text-ink-faint">
+          <%= t("reminders.preferences.no_plan") %>
+          <%= link_to t("reminders.preferences.create_plan"), new_study_plan_path,
+                class: "inline-flex min-h-11 items-center text-accent underline underline-offset-2 hover:text-accent-hover" %>
+        </p>
+      <% end %>
+    </fieldset>
+
+    <div class="mt-5">
+      <%= form.label :minute_of_day, t("reminders.preferences.time"), class: "mb-1.5 block text-sm font-medium text-ink" %>
+      <%= form.select :minute_of_day, reminder_time_options, {}, class: "input sm:max-w-40" %>
+      <p class="mt-2 text-xs leading-relaxed text-ink-faint"><%= t("reminders.preferences.time_hint", zone: time_zone_name(user)) %></p>
+    </div>
+
+    <fieldset class="mt-5">
+      <legend class="text-sm font-medium text-ink"><%= t("reminders.preferences.where") %></legend>
+
+      <% if PushSubscription.enabled? %>
+        <%= render "accounts/push_device" %>
+      <% end %>
+
+      <label class="flex min-h-11 cursor-pointer items-start gap-3 py-2">
+        <%= form.check_box :by_email, class: "mt-1 size-4 shrink-0 accent-accent" %>
+        <span>
+          <span class="block text-sm font-medium text-ink"><%= t("reminders.preferences.email.label") %></span>
+          <span class="mt-0.5 block break-all text-xs leading-relaxed text-ink-faint"><%= t("reminders.preferences.email.hint", email: user.email) %></span>
+        </span>
+      </label>
+    </fieldset>
+
+    <%= form.submit t("reminders.preferences.submit"), class: "btn btn--ghost mt-4 w-full sm:w-auto" %>
+  <% end %>
+</section>

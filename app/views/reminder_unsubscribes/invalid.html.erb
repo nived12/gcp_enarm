@@ -1,0 +1,8 @@
+<% content_for :title, t("reminders.unsubscribe.invalid.title") %>
+
+<%= render layout: "shared/auth_panel",
+      locals: { title: t("reminders.unsubscribe.invalid.title"),
+                subtitle: t("reminders.unsubscribe.invalid.subtitle") } do %>
+  <%= link_to t("reminders.unsubscribe.done.settings"), account_path(anchor: "reminders"),
+        class: "btn btn--ghost w-full" %>
+<% end %>

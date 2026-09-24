@@ -21,7 +21,12 @@ class StudyPlansController < ApplicationController
     result = StudyPlans::Builder.call(
       user: Current.user, exam_date: plan_params[:exam_date], template: plan_params[:template]
     )
-    return redirect_to(study_plan_path, notice: t("study_plans.create.done")) if result.success?
+    if result.success?
+      # Asked once, on the page the new plan opens on, and only of someone with no
+      # reminders yet. Home stays reminder-free.
+      flash[:reminder_invitation] = true unless Current.user.reminder_preference&.any_reminder?
+      return redirect_to(study_plan_path, notice: t("study_plans.create.done"))
+    end
 
     @plan = Current.user.build_study_plan(plan_params)
     @error = result.errors.full_messages.to_sentence

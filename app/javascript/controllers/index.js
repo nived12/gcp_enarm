@@ -22,3 +22,9 @@ application.register("streak-heart", StreakHeartController)
 
 import LandingCaseController from "./landing_case_controller"
 application.register("landing-case", LandingCaseController)
+
+import DismissibleController from "./dismissible_controller"
+application.register("dismissible", DismissibleController)
+
+import PushSubscriptionController from "./push_subscription_controller"
+application.register("push-subscription", PushSubscriptionController)
