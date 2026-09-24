@@ -62,5 +62,22 @@ RSpec.describe "Stats", type: :system, viewport: :phone do
       expect(page).to have_css("#{heart}[data-streak-state=lost]")
       expect(page).to have_no_css("#{heart}.streak-heart--flatline", wait: 0)
     end
+
+    it "beats whenever the pointer rests on it while the streak is alive, and never once it is lost" do
+      student.study_days.create!(date: student.study_date - 1, questions_answered: 10)
+      sign_in_as(student)
+      visit stats_path
+      expect(page).to have_no_css("#{heart}.streak-heart--beat", wait: 0)
+
+      find(heart).hover
+      expect(page).to have_css("#{heart}.streak-heart--beat")
+      expect(page).to have_no_css("#{heart}.streak-heart--beat")
+
+      student.study_days.update_all(date: student.study_date - 3)
+      visit stats_path
+      find(heart).hover
+      sleep 0.3
+      expect(page).to have_no_css("#{heart}.streak-heart--beat", wait: 0)
+    end
   end
 end
