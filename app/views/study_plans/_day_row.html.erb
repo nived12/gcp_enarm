@@ -1,0 +1,23 @@
+<%# One planned day as a row: the phone's month and the week share it. `workload` adds
+    whether the day brings a quiz or is for reading, which asks the bank per day. %>
+<% status = plan_day_status(day, today) %>
+<li>
+  <%= link_to study_plan_day_path(day.date), class: "flex min-h-11 items-stretch gap-3 py-3 #{plan_day_color_class(day)} #{"-mx-2 rounded-control bg-accent-soft px-2" if day.date == today}", data: { testid: "plan-day" } do %>
+    <span class="plan-swatch w-1 shrink-0 rounded-full" aria-hidden="true"></span>
+    <span class="w-12 shrink-0">
+      <span class="block text-xs capitalize <%= day.date == today ? "font-semibold text-accent" : "text-ink-faint" %>"><%= plan_date(day.date, :weekday) %></span>
+      <span class="numeric block text-lg <%= day.date == today ? "text-accent" : "text-ink" %>"><%= day.date.day %></span>
+    </span>
+    <span class="min-w-0 flex-1 self-center">
+      <span class="block text-sm leading-snug text-ink"><%= plan_day_title(day) %></span>
+      <% if local_assigns[:workload] && (workload = plan_day_workload(day)) %>
+        <span class="mt-0.5 block text-xs text-ink-faint"><%= workload %></span>
+      <% end %>
+    </span>
+    <% if status %>
+      <span class="shrink-0 self-center text-xs font-medium <%= { done: "text-correct", in_progress: "text-accent", missed: "text-ink-faint" }.fetch(status) %>">
+        <%= t("study_plans.status.#{status}") %>
+      </span>
+    <% end %>
+  <% end %>
+</li>

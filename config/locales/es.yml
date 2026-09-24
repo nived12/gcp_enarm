@@ -963,6 +963,10 @@ es:
     eyebrow: "Plan de estudio"
     back_to_calendar: "‹ Calendario"
     done: "Hecho"
+    status:
+      done: "Hecho"
+      in_progress: "En curso"
+      missed: "Pendiente"
     date_formats:
       day: "%-d de %B"
       long: "%A %-d de %B de %Y"
@@ -1024,6 +1028,27 @@ es:
       previous_month: "Mes anterior"
       next_month: "Mes siguiente"
       empty_month: "Este mes no tiene días de tu plan."
+      views: "Vista del calendario"
+      view:
+        week: "Semana"
+        month: "Mes"
+      weeks: "Semanas del plan"
+      previous_week: "Semana anterior"
+      next_week: "Semana siguiente"
+      week_range:
+        same_month: "%{first_day} – %{last_day} de %{month}"
+        two_months: "%{from} – %{to}"
+      week_done: "Hechos: %{done} de %{total}"
+      empty_week: "Esta semana no tiene días de tu plan."
+      exam_day: "Examen ENARM"
+      outside_plan: "Fuera de tu plan"
+      reading: "Lectura: todavía sin casos para quiz"
+      quiz:
+        one: "Quiz de 1 pregunta"
+        other: "Quiz de %{count} preguntas"
+      questions:
+        one: "1 pregunta"
+        other: "%{count} preguntas"
     day:
       pass: "Vuelta %{number} de %{total}"
       rest: "Día de descanso"
