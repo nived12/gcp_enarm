@@ -54,6 +54,8 @@ RSpec.describe "Simulacro ENARM", type: :system do
     expect(Exam.last.answers.sole).to have_attributes(confidence: "guess", correct: false)
 
     within(all("article").first) { find("label[title='#{I18n.t("exams.confidence.levels.sure")}']").click }
+    # Saved in the background; reloading before it lands would read the old value.
+    Timeout.timeout(Capybara.default_max_wait_time) { sleep 0.05 until Exam.last.answers.sole.reload.confidence_sure? }
     visit current_path
     within(all("article").first) { expect(page).to have_checked_field("confidence", with: "sure", visible: :all) }
     expect_no_sideways_scroll
