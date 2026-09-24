@@ -13,9 +13,11 @@ module SubscriptionAccess
 
   # Free users get a daily allowance rather than a hard wall. A simulator you cannot
   # open is a simulator nobody recommends to a classmate, and word of mouth between
-  # study groups is the only distribution this product has.
+  # study groups is the only distribution this product has. Ten (the owner, 2026-09-23,
+  # down from 20) is one Quiz Express and the streak's daily minimum: enough to keep a
+  # habit, not enough to study on for free beside a paid competitor.
   def self.free_daily_questions
-    ENV.fetch("FREE_DAILY_QUESTIONS", 20).to_i
+    ENV.fetch("FREE_DAILY_QUESTIONS", 10).to_i
   end
 
   def self.trial_days

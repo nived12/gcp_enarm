@@ -26,7 +26,7 @@ RSpec.describe "locale files" do
   # to hold for the shop window: the highlight is part of the quote, not a gloss on it.
   %i[es en].each do |locale|
     it "highlights a span that is really inside the sample recommendation (#{locale})" do
-      html = I18n.t("home.landing.sample_recommendation_html", locale: locale)
+      html = I18n.t("landing.anatomy.recommendation_html", locale: locale)
       highlighted = html[%r{<mark>(.*?)</mark>}, 1]
 
       expect(highlighted).to be_present

@@ -75,7 +75,7 @@ RSpec.describe "Pricing", type: :request do
 
       get pricing_path
 
-      expect(response.body).to include(I18n.t("billing.access.free", limit: 20))
+      expect(response.body).to include(I18n.t("billing.access.free", limit: 10))
     end
   end
 end

@@ -1,0 +1,38 @@
+<%# Who made this and why, in her words: the four things she could not find together are
+    the four reasons to buy, so they follow the story as its proof. It sits just before
+    the prices, where "accessible" is the next thing a visitor checks. No credential line
+    under the quote yet: the owner adds her residency once she has it. The photo appears
+    once the owner adds app/assets/images/landing/dra-guadarrama.jpg. %>
+<% photo = Rails.root.join("app/assets/images/landing/dra-guadarrama.jpg").exist? %>
+<% cheapest = Plan.all.map(&:daily_price).min %>
+<section class="landing-reveal mt-24 sm:mt-36" aria-labelledby="founder-title">
+  <div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16">
+    <div>
+      <% if photo %>
+        <%= image_tag "landing/dra-guadarrama.jpg", alt: t("landing.doctor.photo_alt"), loading: "lazy",
+              class: "mb-6 size-20 rounded-full object-cover" %>
+      <% end %>
+      <p class="eyebrow"><%= t("landing.doctor.eyebrow") %></p>
+      <h2 id="founder-title" class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]"><%= t("landing.doctor.title") %></h2>
+      <blockquote class="mt-8 space-y-4 border-l-2 border-accent pl-5 text-lg leading-relaxed text-ink sm:pl-7 sm:text-xl sm:leading-relaxed">
+        <% t("landing.doctor.story").each do |paragraph| %>
+          <p><%= paragraph %></p>
+        <% end %>
+      </blockquote>
+    </div>
+
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:pt-12">
+      <% %w[price easy current cited].each do |reason| %>
+        <li class="card flex gap-4 p-6">
+          <svg class="mt-0.5 size-5 shrink-0 text-accent" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="m4.5 10.5 3.5 3.5 7.5-8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>
+            <span class="block font-semibold text-ink"><%= t("landing.doctor.reasons.#{reason}.title") %></span>
+            <span class="mt-1 block text-sm leading-relaxed text-ink-muted"><%= t("landing.doctor.reasons.#{reason}.body", amount: money(cheapest)) %></span>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</section>

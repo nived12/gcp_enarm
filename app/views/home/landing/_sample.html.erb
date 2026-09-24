@@ -1,0 +1,94 @@
+<%# One real case from the bank, answered in the browser (landing_case_controller).
+    Its language is the case's own, like everywhere a vignette appears. %>
+<% questions = clinical_case.questions %>
+<article id="caso" class="card landing-rise scroll-mt-24 overflow-hidden [animation-delay:120ms]"
+         data-controller="landing-case"
+         data-landing-case-correct-value="<%= t("landing.sample.announce_correct") %>"
+         data-landing-case-incorrect-value="<%= t("landing.sample.announce_incorrect") %>">
+  <header class="flex items-center gap-3 px-5 pt-5 sm:px-7 sm:pt-6">
+    <p class="eyebrow"><%= t("landing.sample.label") %></p>
+    <% if clinical_case.specialty %>
+      <p class="truncate text-xs text-ink-faint"><%= clinical_case.specialty.name %></p>
+    <% end %>
+    <% if next_key %>
+      <%= link_to t("landing.sample.another"), root_path(caso: next_key, anchor: "caso"),
+            class: "ml-auto inline-flex min-h-11 shrink-0 items-center text-sm font-medium text-accent hover:text-accent-hover" %>
+    <% end %>
+  </header>
+
+  <div class="px-5 pb-6 sm:px-7 sm:pb-7" lang="<%= clinical_case.locale %>">
+    <p class="vignette mt-2 text-[1rem] text-ink sm:text-[1.0625rem]"><%= clinical_case.stem %></p>
+
+    <% questions.each_with_index do |question, index| %>
+      <% recommendation = question.recommendation %>
+      <% guideline = recommendation.guideline %>
+      <div data-landing-case-target="question" class="mt-6 border-t border-line pt-5" <%= "hidden" unless index.zero? %>>
+        <p class="text-xs font-medium text-ink-faint" lang="<%= I18n.locale %>">
+          <%= t("landing.sample.question_of", number: index + 1, total: questions.size) %>
+        </p>
+        <h2 class="mt-1.5 font-semibold leading-snug text-ink outline-none" tabindex="-1" data-landing-case-heading>
+          <%= question.text %>
+        </h2>
+
+        <div class="mt-4 space-y-2.5">
+          <% question.answer_options.each_with_index do |option, option_index| %>
+            <button type="button" data-action="landing-case#answer" data-correct="<%= option.correct? %>"
+                    class="landing-option group flex min-h-12 w-full items-start gap-3.5 rounded-control border border-line px-4 py-3 text-left text-sm leading-relaxed text-ink transition hover:border-accent enabled:active:scale-[0.99] disabled:cursor-default disabled:hover:border-line">
+              <span class="numeric mt-px w-4 shrink-0 font-medium text-ink-faint group-data-[state=correct]:hidden group-data-[state=incorrect]:hidden"><%= option_letter(option_index) %></span>
+              <span class="numeric mt-px hidden w-4 shrink-0 font-medium text-correct group-data-[state=correct]:inline" aria-hidden="true">✓</span>
+              <span class="numeric mt-px hidden w-4 shrink-0 font-medium text-incorrect group-data-[state=incorrect]:inline" aria-hidden="true">✗</span>
+              <span class="min-w-0">
+                <%= option.text %>
+                <span lang="<%= I18n.locale %>" class="mt-0.5 hidden text-xs font-medium text-correct group-data-[state=correct]:block"><%= t("landing.sample.correct") %></span>
+                <span lang="<%= I18n.locale %>" class="mt-0.5 hidden text-xs font-medium text-incorrect group-data-[state=incorrect]:block"><%= t("landing.sample.your_answer") %></span>
+              </span>
+            </button>
+          <% end %>
+        </div>
+
+        <div data-landing-case-after hidden>
+          <div class="landing-citation mt-5 rounded-control bg-surface-sunk px-4 py-4 sm:px-5" lang="es">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <% if recommendation.grade.present? %>
+                <span class="grade-marker grade-marker--strong" lang="<%= I18n.locale %>"><%= t("landing.sample.grade", grade: recommendation.grade) %></span>
+              <% end %>
+              <p class="text-xs font-medium text-ink-muted" lang="<%= I18n.locale %>"><%= t("landing.sample.source") %></p>
+            </div>
+            <p class="vignette mt-3 text-sm leading-loose text-ink"><%= highlighted(recommendation.text, question.source_quote) %></p>
+            <div class="numeric mt-3 space-y-0.5 text-xs leading-relaxed text-ink-faint">
+              <p><%= question.citation %></p>
+              <p>
+                <%= guideline.catalog_key %> · <%= guideline.year || t("landing.sample.undated") %>
+                <% if guideline.expired? %>
+                  · <span class="font-medium text-incorrect"><%= t("landing.sample.expired") %></span>
+                <% end %>
+              </p>
+              <p class="font-sans text-ink-muted"><%= guideline.title %></p>
+              <% if (path = recommendation.guideline_section.menu_path).present? %>
+                <p class="font-sans"><%= path %></p>
+              <% end %>
+            </div>
+          </div>
+
+          <div lang="<%= I18n.locale %>">
+            <% if index < questions.size - 1 %>
+              <button type="button" data-action="landing-case#next" class="btn btn--ghost mt-5 w-full sm:w-auto">
+                <%= t("landing.sample.next") %>
+              </button>
+            <% else %>
+              <p class="mt-5 text-sm leading-relaxed text-ink-muted"><%= t("landing.sample.finale") %></p>
+              <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+                <%= link_to t("landing.cta"), new_registration_path(from: "case"), class: "btn btn--primary" %>
+                <% if next_key %>
+                  <%= link_to t("landing.sample.another"), root_path(caso: next_key, anchor: "caso"), class: "btn btn--ghost" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <p class="sr-only" aria-live="polite" data-landing-case-target="announcer"></p>
+  </div>
+</article>

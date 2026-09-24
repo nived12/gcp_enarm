@@ -1,0 +1,24 @@
+<%# Copy on the left, a case the visitor can answer on the right: the product is the
+    hero's picture. On a phone the case follows the buttons, its top above the fold. %>
+<section class="grid items-start gap-10 pt-2 sm:pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-16 lg:pt-12">
+  <div class="landing-rise lg:sticky lg:top-28">
+    <h1 class="text-[2.4rem] font-semibold leading-[1.06] tracking-tight text-ink sm:text-[3.25rem] lg:text-[3.4rem]">
+      <%= t("landing.hero.headline") %>
+    </h1>
+    <p class="mt-5 max-w-md text-lg leading-relaxed text-ink-muted">
+      <%= t("landing.hero.subhead") %>
+    </p>
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+      <%= link_to t("landing.cta"), new_registration_path(from: "hero"), class: "btn btn--primary px-7" %>
+      <% if sample %>
+        <a href="#caso" class="btn btn--ghost lg:hidden"><%= t("landing.hero.try_case") %></a>
+      <% end %>
+    </div>
+    <%# The two doubts that stop a click on "free": for how long, and whether it wants a card. %>
+    <p class="mt-4 text-sm text-ink-faint"><%= t("landing.hero.reassurance", trial_days: SubscriptionAccess.trial_days) %></p>
+  </div>
+
+  <% if sample %>
+    <%= render "home/landing/sample", clinical_case: sample.clinical_case, next_key: sample.next_key %>
+  <% end %>
+</section>

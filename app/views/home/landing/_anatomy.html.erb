@@ -1,0 +1,50 @@
+<%# One real recommendation, taken apart. The pins in the figure match the list beside
+    it; on a phone the list follows the figure. The text is a fixed sample rather than a
+    live row so the section always has a grade, a highlight, a year and a path to point at. %>
+<% pins = %w[grade quote year path link] %>
+<section class="landing-reveal mt-24 sm:mt-36">
+  <h2 class="max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]">
+    <%= t("landing.anatomy.title") %>
+  </h2>
+
+  <div class="mt-10 grid items-start gap-10 lg:mt-14 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-16">
+    <figure class="card px-6 py-7 sm:px-9 sm:py-9" lang="es">
+      <div class="flex items-center gap-2.5">
+        <span class="grade-marker grade-marker--strong"><%= t("landing.sample.grade", grade: "B") %></span>
+        <span class="anatomy-pin" aria-hidden="true">1</span>
+      </div>
+
+      <blockquote class="vignette mt-5 text-lg text-ink sm:text-xl sm:leading-[1.65]">
+        <%= t("landing.anatomy.recommendation_html") %>
+        <span class="anatomy-pin ml-1" aria-hidden="true">2</span>
+      </blockquote>
+
+      <figcaption class="mt-6 space-y-1 border-t border-line pt-5 text-xs leading-relaxed text-ink-faint sm:text-sm">
+        <p class="numeric"><%= t("landing.anatomy.citation") %></p>
+        <p class="numeric flex items-center gap-2"><%= t("landing.anatomy.source") %> <span class="anatomy-pin" aria-hidden="true">3</span></p>
+        <p class="text-ink-muted"><%= t("landing.anatomy.guideline") %></p>
+        <p class="flex items-center gap-2"><%= t("landing.anatomy.path") %> <span class="anatomy-pin" aria-hidden="true">4</span></p>
+        <%# Drawn like the simulator's link but not one: this is a picture of a citation,
+            and a visitor clicking it should stay on the page. %>
+        <p class="flex items-center gap-2 pt-2">
+          <span class="text-sm text-accent underline underline-offset-2"><%= t("landing.anatomy.open_guideline") %></span>
+          <span class="anatomy-pin" aria-hidden="true">5</span>
+        </p>
+      </figcaption>
+    </figure>
+
+    <ol class="space-y-7 lg:pt-4">
+      <% pins.each.with_index(1) do |pin, number| %>
+        <li class="flex gap-4">
+          <span class="anatomy-pin mt-0.5" aria-hidden="true"><%= number %></span>
+          <div>
+            <h3 class="font-semibold text-ink"><%= t("landing.anatomy.pins.#{pin}.title") %></h3>
+            <p class="mt-1 leading-relaxed text-ink-muted"><%= t("landing.anatomy.pins.#{pin}.body") %></p>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+
+  <p class="mt-10 max-w-2xl text-lg leading-relaxed text-ink lg:mt-14"><%= t("landing.anatomy.contrast") %></p>
+</section>

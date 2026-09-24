@@ -1,5 +1,5 @@
 <footer class="border-t border-line">
-  <nav class="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-5 px-4 py-4 text-sm text-ink-faint sm:px-6"
+  <nav class="mx-auto flex w-full <%= page_width %> flex-wrap items-center gap-x-5 px-4 py-4 text-sm text-ink-faint sm:px-6"
        aria-label="<%= t("legal.footer.label") %>">
     <%= link_to t("pricing.nav"), pricing_path, class: "inline-flex min-h-11 items-center hover:text-ink" %>
     <% LegalPage::NAMES.each do |name| %>

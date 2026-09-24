@@ -17,6 +17,10 @@ RSpec.describe Plan do
     expect(described_class.all.map(&:monthly_price)).to eq([199, 150, 125, 92])
   end
 
+  it "rounds the daily equivalent to whole pesos, on an average month" do
+    expect(described_class.all.map(&:daily_price)).to eq([7, 5, 4, 3])
+  end
+
   it "states the charge in the currency's minor unit" do
     expect(described_class.find("twelve_months").amount_in_cents).to eq(109_900)
   end

@@ -31,6 +31,11 @@ class Plan < Data.define(:code, :months, :price)
     (price.to_d / months).round
   end
 
+  # The landing page's "≈ $3 al día", on an average month of 365/12 days.
+  def daily_price
+    (price.to_d * 12 / (months * 365)).round
+  end
+
   def amount_in_cents
     price * 100
   end

@@ -6,7 +6,7 @@ RSpec.describe "Authentication", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Cada pregunta")
+      expect(response.body).to include(I18n.t("landing.hero.headline"))
     end
   end
 

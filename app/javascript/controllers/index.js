@@ -19,3 +19,6 @@ application.register("time-zone", TimeZoneController)
 
 import StreakHeartController from "./streak_heart_controller"
 application.register("streak-heart", StreakHeartController)
+
+import LandingCaseController from "./landing_case_controller"
+application.register("landing-case", LandingCaseController)

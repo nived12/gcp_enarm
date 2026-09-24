@@ -51,6 +51,9 @@
   --radius-control: 14px;
 
   --shadow-card: 0 1px 2px rgb(40 40 48 / 0.04), 0 8px 24px -12px rgb(40 40 48 / 0.12);
+  /* A phone lifted off the page: the landing's screenshots are cream on cream and
+     vanish under --shadow-card. Same ink, deeper. */
+  --shadow-raised: 0 2px 6px rgb(40 40 48 / 0.08), 0 32px 64px -24px rgb(40 40 48 / 0.35);
   --serif-weight: 400;
   --serif-weight-strong: 600;
 }
@@ -82,6 +85,7 @@
     --highlight-ink: #fcff7e;
 
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-raised: 0 2px 6px rgb(0 0 0 / 0.5), 0 32px 64px -20px rgb(0 0 0 / 0.8);
 
     /* Serif thins optically on a dark ground — step the weight up to match. */
     --serif-weight: 430;
@@ -115,6 +119,7 @@
   --highlight-ink: #fcff7e;
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-raised: 0 2px 6px rgb(0 0 0 / 0.5), 0 32px 64px -20px rgb(0 0 0 / 0.8);
   --serif-weight: 430;
   --serif-weight-strong: 620;
 }
@@ -435,4 +440,130 @@
     background-color: color-mix(in srgb, var(--specialty) 14%, var(--surface));
     box-shadow: inset 3px 0 0 var(--specialty);
   }
+}
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     Landing page (home/landing/*). Motion is kept to what carries meaning:
+     the hero settling in, sections arriving as they scroll into view, and
+     the highlight being drawn across the cited span once a visitor answers,
+     which is the page's one claim acted out. The global reduced-motion rule
+     stills all of it.
+     ------------------------------------------------------------------------ */
+  @keyframes landing-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .landing-rise {
+      animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @supports (animation-timeline: view()) {
+      .landing-reveal {
+        animation: landing-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 35%;
+      }
+    }
+  }
+
+  /* The sample's citation arrives unhighlighted and the span fills in from
+     the left, the way a student would run a marker across it. */
+  .landing-citation .vignette mark {
+    background-color: transparent;
+    background-image: linear-gradient(var(--highlight), var(--highlight));
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    transition: background-size 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+  }
+
+  .landing-citation.is-revealed .vignette mark {
+    background-size: 100% 100%;
+  }
+
+  /* Answer states on the sample. As in the simulator, the mark and the words
+     carry the meaning and colour only agrees with them. */
+  .landing-option[data-state="correct"] {
+    border-color: var(--correct);
+    background-color: var(--correct-soft);
+  }
+
+  .landing-option[data-state="incorrect"] {
+    border-color: var(--incorrect);
+    background-color: var(--incorrect-soft);
+  }
+
+  /* The pricing picker needs no script: the checked radio shows its plan.
+     A browser without :has() shows all four, which is still a price list. */
+  .plan-picker__plan {
+    display: none;
+  }
+
+  .plan-picker:has(input[value="one_month"]:checked) .plan-picker__plan[data-plan="one_month"],
+  .plan-picker:has(input[value="three_months"]:checked) .plan-picker__plan[data-plan="three_months"],
+  .plan-picker:has(input[value="six_months"]:checked) .plan-picker__plan[data-plan="six_months"],
+  .plan-picker:has(input[value="twelve_months"]:checked) .plan-picker__plan[data-plan="twelve_months"] {
+    display: block;
+  }
+
+  @supports not selector(:has(*)) {
+    .plan-picker__plan {
+      display: block;
+    }
+  }
+
+  /* The screens section works the same way: the checked feature shows its
+     screenshot. Without :has() all five show, one under another. */
+  .screen-picker__shot {
+    display: none;
+  }
+
+  .screen-picker:has(input[value="quiz"]:checked) .screen-picker__shot[data-screen="quiz"],
+  .screen-picker:has(input[value="mock"]:checked) .screen-picker__shot[data-screen="mock"],
+  .screen-picker:has(input[value="review"]:checked) .screen-picker__shot[data-screen="review"],
+  .screen-picker:has(input[value="calendar"]:checked) .screen-picker__shot[data-screen="calendar"],
+  .screen-picker:has(input[value="stats"]:checked) .screen-picker__shot[data-screen="stats"] {
+    display: block;
+  }
+
+  @supports not selector(:has(*)) {
+    .screen-picker__shot {
+      display: block;
+    }
+  }
+
+  /* Numbered pins tying the annotated citation to its explanations. */
+  .anatomy-pin {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 9999px;
+    background-color: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    vertical-align: middle;
+  }
+}
+
+@layer components {
+  /* An image made for one theme, following the same cascade as the tokens. */
+  .only-dark {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .only-dark { display: block; }
+    :root:not([data-theme="light"]) .only-light { display: none; }
+  }
+
+  :root[data-theme="dark"] .only-dark { display: block; }
+  :root[data-theme="dark"] .only-light { display: none; }
 }
