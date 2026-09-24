@@ -1,0 +1,13 @@
+<%# WhatsApp groups are how this spreads, so the last thing on the page is a way to post
+    it to one. A plain wa.me link: no script, nothing about the visitor sent anywhere. %>
+<% share = t("landing.closing.share_text", url: ApplicationHelper::CANONICAL_URL) %>
+<section class="landing-reveal mt-24 text-center sm:mt-36">
+  <h2 class="mx-auto max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]">
+    <%= t("landing.closing.title", trial_days: SubscriptionAccess.trial_days) %>
+  </h2>
+  <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+    <%= link_to t("landing.cta"), new_registration_path(from: "closing"), class: "btn btn--primary px-7" %>
+    <%= link_to t("landing.closing.share"), "https://wa.me/?text=#{ERB::Util.url_encode(share)}",
+          target: "_blank", rel: "noopener", class: "btn btn--ghost" %>
+  </div>
+</section>

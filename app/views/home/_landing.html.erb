@@ -1,86 +1,25 @@
-<section class="pt-4 sm:pt-10">
-  <h1 class="text-[2.5rem] font-semibold leading-[1.05] tracking-tight text-ink sm:text-6xl">
-    <%= t("home.landing.headline_lead") %><br>
-    <span class="text-accent"><%= t("home.landing.headline_accent") %></span>
-  </h1>
+<% content_for :wide_page, true %>
+<% content_for :title, t("landing.meta.title") %>
+<% content_for :description, t("landing.meta.description", trial_days: SubscriptionAccess.trial_days) %>
+<% content_for :head do %>
+  <link rel="canonical" href="<%= ApplicationHelper::CANONICAL_URL %>">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="<%= t("app.name") %>">
+  <meta property="og:url" content="<%= ApplicationHelper::CANONICAL_URL %>">
+  <meta property="og:title" content="<%= t("landing.meta.title") %>">
+  <meta property="og:description" content="<%= t("landing.meta.description", trial_days: SubscriptionAccess.trial_days) %>">
+  <meta property="og:image" content="<%= image_url("landing/og.png") %>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+<% end %>
 
-  <p class="mt-5 max-w-prose leading-relaxed text-ink-muted">
-    <%= t("home.landing.subhead") %>
-  </p>
-
-  <div class="mt-7 flex flex-col gap-3 sm:flex-row">
-    <%= link_to t("navigation.sign_up"), new_registration_path, class: "btn btn--primary" %>
-    <%= link_to t("navigation.sign_in"), new_session_path, class: "btn btn--ghost" %>
-  </div>
-</section>
-
-<%# The thesis, shown rather than claimed. Top half is a real graded recommendation
-    with the exact span highlighted; bottom half is the question that span produced.
-    Every question in the bank is built this way, and the review screen shows the
-    same two halves — so the landing page is the product, not an advertisement. %>
-<figure class="card mt-10 overflow-hidden">
-  <div class="bg-ground-tint px-5 py-5 sm:px-6 sm:py-6">
-    <div class="flex items-center gap-3">
-      <span class="grade-marker grade-marker--strong">A</span>
-      <span class="eyebrow"><%= t("home.landing.source_label") %></span>
-    </div>
-
-    <blockquote class="vignette mt-4 text-ink">
-      <%= t("home.landing.sample_recommendation_html") %>
-    </blockquote>
-
-    <figcaption class="numeric mt-4 space-y-0.5 text-xs leading-relaxed text-ink-faint">
-      <span class="block"><%= t("home.landing.sample_citation") %></span>
-      <span class="block"><%= t("home.landing.sample_source") %></span>
-    </figcaption>
-  </div>
-
-  <div class="border-t border-line px-5 py-5 sm:px-6 sm:py-6">
-    <p class="eyebrow"><%= t("home.landing.derived_label") %></p>
-
-    <p class="vignette mt-3 text-ink"><%= t("home.landing.sample_question") %></p>
-
-    <div class="mt-4 flex items-start gap-3 rounded-control bg-correct-soft px-4 py-3">
-      <svg class="mt-0.5 h-5 w-5 shrink-0 text-correct" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="m5 13 4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <div>
-        <p class="text-sm font-medium text-ink"><%= t("home.landing.sample_option") %></p>
-        <p class="mt-0.5 text-xs font-medium text-correct"><%= t("home.landing.sample_option_label") %></p>
-      </div>
-    </div>
-  </div>
-</figure>
-
-<p class="mt-4 max-w-prose text-sm leading-relaxed text-ink-muted">
-  <%= t("home.landing.provenance_note") %>
-</p>
-
-<section class="mt-16">
-  <p class="eyebrow"><%= t("landing.different.eyebrow") %></p>
-  <h2 class="mt-2 text-2xl font-semibold tracking-tight text-ink"><%= t("landing.different.title") %></h2>
-  <ol class="mt-6 space-y-3">
-    <% %w[citation currency cases].each do |point| %>
-      <li class="card px-5 py-5">
-        <h3 class="font-semibold text-ink"><%= t("landing.different.#{point}.title") %></h3>
-        <p class="mt-1.5 text-sm leading-relaxed text-ink-muted"><%= t("landing.different.#{point}.body") %></p>
-      </li>
-    <% end %>
-  </ol>
-</section>
-
-<section class="mt-16 rounded-card bg-ground-tint px-5 py-6 sm:px-6">
-  <p class="eyebrow"><%= t("landing.price.eyebrow") %></p>
-  <h2 class="mt-2 text-2xl font-semibold tracking-tight text-ink">
-    <%= t("landing.price.title", amount: money(Plan.find("twelve_months").monthly_price)) %>
-  </h2>
-  <p class="mt-3 max-w-prose text-sm leading-relaxed text-ink-muted"><%= t("landing.price.body") %></p>
-  <p class="mt-3 max-w-prose text-sm leading-relaxed text-ink-muted">
-    <%= t("landing.price.free", limit: SubscriptionAccess.free_daily_questions, trial_days: SubscriptionAccess.trial_days) %>
-  </p>
-  <div class="mt-5 flex flex-col gap-3 sm:flex-row">
-    <%= link_to t("landing.price.sign_up"), new_registration_path, class: "btn btn--primary" %>
-    <%= link_to t("landing.price.see_plans"), pricing_path, class: "btn btn--ghost" %>
-  </div>
-</section>
+<%= render "home/landing/hero", sample: @sample %>
+<%= render "home/landing/numbers", stats: @stats %>
+<%= render "home/landing/anatomy" %>
+<%= render "home/landing/screens" %>
+<%= render "home/landing/doctor" %>
+<%= render "home/landing/pricing" %>
+<%= render "home/landing/faq" %>
+<%= render "home/landing/closing" %>

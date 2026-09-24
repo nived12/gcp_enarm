@@ -1,0 +1,19 @@
+<section class="landing-reveal mt-24 grid gap-8 sm:mt-36 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
+  <h2 class="text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem] lg:sticky lg:top-28 lg:self-start">
+    <%= t("landing.faq.title") %>
+  </h2>
+
+  <div class="divide-y divide-line border-y border-line">
+    <%# Ordered by what stops a purchase: the trial first, then being charged again. %>
+    <% cheapest = Plan.all.map(&:daily_price).min %>
+    <% %w[trial renewal different currency mock phone].each do |item| %>
+      <details class="group">
+        <summary class="flex min-h-14 cursor-pointer list-none items-center gap-4 py-4 font-medium text-ink [&::-webkit-details-marker]:hidden">
+          <span class="flex-1"><%= t("landing.faq.items.#{item}.question") %></span>
+          <span class="text-xl leading-none text-ink-faint transition group-open:rotate-45" aria-hidden="true">+</span>
+        </summary>
+        <p class="max-w-prose pb-5 leading-relaxed text-ink-muted"><%= t("landing.faq.items.#{item}.answer", trial_days: SubscriptionAccess.trial_days, limit: SubscriptionAccess.free_daily_questions, amount: money(cheapest), mock_questions: Exam::QUESTION_COUNTS.fetch("full_exam")) %></p>
+      </details>
+    <% end %>
+  </div>
+</section>

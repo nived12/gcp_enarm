@@ -245,19 +245,6 @@ es:
       dark: "Oscuro"
 
   home:
-    landing:
-      headline_lead: "Cada pregunta"
-      headline_accent: "tiene un origen."
-      subhead: "Casos clínicos tipo ENARM construidos sobre las Guías de Práctica Clínica vigentes. Cada respuesta cita la recomendación exacta que la sustenta, con su grado de evidencia."
-      source_label: "Recomendación GPC"
-      sample_citation: "NICE · Hong K, 2021"
-      sample_recommendation_html: "Se recomienda <mark>otorgar educación prenatal</mark> para reducir niveles de estrés, disminuir la tasa de nacimientos por cesárea, y para reducir el uso de anestesia epidural."
-      sample_source: "IMSS-028-22 · Atención y cuidados multidisciplinarios en el embarazo"
-      derived_label: "La pregunta que sale de ahí"
-      sample_question: "Primigesta de 24 años, 28 SDG, refiere ansiedad persistente y alteraciones del sueño. ¿Cuál es la intervención inicial recomendada?"
-      sample_option: "Educación prenatal estructurada"
-      sample_option_label: "Respuesta correcta"
-      provenance_note: "Ninguna pregunta existe sin ese subrayado. Puedes abrir la guía y leer el párrafo completo."
     dashboard:
       today: "HOY"
       greeting: "Hola, %{name}"
@@ -822,25 +809,143 @@ es:
         answer: "No por cambio de opinión: por eso puedes probarla completa y gratis antes de pagar. Si te cobramos dos veces o hubo un error nuestro, te lo devolvemos siempre."
 
   landing:
-    different:
-      eyebrow: "Por qué es distinto"
-      title: "Preguntas que puedes comprobar"
-      citation:
-        title: "Cada respuesta cita su recomendación"
-        body: "No decimos que las preguntas están «alineadas» con las GPC: te mostramos la frase exacta de la que salió la respuesta, con su grado de evidencia, el año de la guía y la ruta dentro de la guía para encontrarla."
-      currency:
-        title: "Sabes si la guía sigue vigente"
-        body: "Cada cita lleva el año de su guía, y avisamos cuando una guía ya pasó su periodo de vigencia. Estudias con la evidencia a la vista, no de memoria ajena."
+    meta:
+      title: "Simulador ENARM con la cita exacta de la GPC · GPCEnarm"
+      description: "Simulador ENARM con casos clínicos tipo examen y la frase exacta de la GPC de donde sale cada respuesta. %{trial_days} días gratis, sin tarjeta."
+    cta: "Empieza gratis"
+    hero:
+      headline: "Simulador ENARM con la GPC detrás de cada respuesta."
+      subhead: "Resuelve casos clínicos como los del examen y, al contestar, lee la frase exacta de la guía que da la respuesta. Practicas y estudias la GPC al mismo tiempo."
+      reassurance: "%{trial_days} días sin límite · Sin tarjeta"
+      try_case: "Resuelve un caso"
+    sample:
+      label: "Caso de muestra"
+      another: "Otro caso"
+      question_of: "Pregunta %{number} de %{total}"
+      correct: "Correcta"
+      your_answer: "Tu respuesta"
+      announce_correct: "Correcto."
+      announce_incorrect: "Incorrecto. La respuesta correcta está marcada."
+      source: "De aquí sale la respuesta"
+      grade: "Grado %{grade}"
+      undated: "sin fecha"
+      expired: "Fuera de vigencia"
+      next: "Siguiente pregunta"
+      finale: "Así viene cada pregunta del banco: con su frase, su grado y el año de su guía."
+    numbers:
+      title: "Lo que hay adentro."
+      questions:
+        label: "preguntas"
+        body: "Cada una con la frase de la GPC que respalda su respuesta."
       cases:
-        title: "Casos como los del examen"
-        body: "Viñetas completas —antecedentes, signos vitales, exploración— con dos o tres preguntas cada una, y simulacros con el ritmo real del examen."
-    price:
-      eyebrow: "Precio"
-      title: "Desde %{amount} al mes."
-      body: "Cuatro periodos de acceso —1, 3, 6 o 12 meses—, cada uno de un solo pago y sin renovaciones automáticas. Nuestro costo por estudiante es prácticamente cero, y el precio lo refleja."
-      free: "Además, %{limit} preguntas gratis cada día, y %{trial_days} días sin límite al crear tu cuenta."
-      sign_up: "Crear cuenta gratis"
+        label: "casos clínicos"
+        body: "Con antecedentes, signos vitales y exploración, como los del examen."
+      guidelines:
+        label: "GPC citadas"
+        body: "En su edición más reciente, con su año."
+      mock:
+        label: "preguntas por simulacro"
+        body: "Con reloj y las explicaciones al final, como el día del ENARM."
+    anatomy:
+      title: "Sabes de dónde sale cada respuesta."
+      citation: "B · NICE · Haj-Mirzaian A, 2020"
+      source: "IMSS-236-24 · 2024"
+      guideline: "Diagnóstico y tratamiento integral de la fractura de cadera en la persona adulta mayor"
+      path: "DIAGNÓSTICO › PREGUNTA 1 › RECOMENDACIONES"
+      recommendation_html: "En caso de tener sospecha clínica de fractura de cadera y radiografía simple normal asociado a dolor agudo de cadera, <mark>se recomienda realizar tomografía computarizada o resonancia magnética dentro de las 24 horas al ingreso</mark>."
+      pins:
+        grade:
+          title: "Grado de evidencia"
+          body: "La fuerza de la recomendación, tal como la publica la guía."
+        quote:
+          title: "La frase exacta"
+          body: "Lo subrayado es de donde sale la respuesta. Si la respuesta no está en la guía, la pregunta no se publica."
+        year:
+          title: "Año y vigencia"
+          body: "Cada cita trae el año de su guía. Si ya pasó su vigencia, te lo marcamos."
+        path:
+          title: "Dónde encontrarla"
+          body: "La ruta dentro de la guía: qué capítulo y qué pregunta abrir."
+        link:
+          title: "El enlace a la guía"
+          body: "Un clic te lleva a la GPC en el sitio oficial, para leer el párrafo completo."
+      open_guideline: "Abrir la guía ↗"
+      contrast: "Todos dicen «basado en las GPC». Aquí lo compruebas en cada pregunta."
+    screens:
+      title: "En la computadora o en el celular."
+      body: "Tu avance es el mismo en los dos: empieza en la computadora y sigue en el celular donde te quedaste. Con modo oscuro para estudiar de noche."
+      legend: "Pantallas de la app"
+      quiz:
+        title: "Quiz Express"
+        body: "Diez preguntas, un minuto cada una: el ritmo del examen."
+      mock:
+        title: "Simulacro"
+        body: "280 preguntas con reloj, como el día del ENARM."
+      review:
+        title: "Repaso"
+        body: "Te regresa a las preguntas que fallaste o adivinaste, hasta que te las sepas."
+      calendar:
+        title: "Plan de estudio"
+        body: "Pones la fecha de tu examen y cada día te dice qué temas estudiar, con un quiz de esos temas. Si te atrasas, se reacomoda."
+      stats:
+        title: "Tu avance"
+        body: "Tu promedio por especialidad, para saber dónde reforzar."
+    pricing:
+      title: "¿Cuánto te falta para tu examen?"
+      legend: "Tiempo de acceso"
+      months:
+        one: "1 mes"
+        other: "%{count} meses"
+      per_day: "≈ %{amount} al día"
+      terms: "Un solo pago. No se renueva."
+      free: "Sin pagar tienes %{limit} preguntas al día. Al crear tu cuenta, %{trial_days} días sin límite."
       see_plans: "Ver precios"
+    doctor:
+      eyebrow: "Quién está detrás"
+      title: "Creado por la Dra. Guadarrama"
+      story:
+        - "Probé los simuladores que hay para el ENARM y a todos les faltaba algo. Unos cuestan demasiado. Otros son difíciles de usar, o no están al día. Y casi ninguno te enseña de qué parte de la GPC sale la respuesta."
+        - "Hice GPCEnarm para tener las cuatro cosas en un solo lugar: lo que yo buscaba y no encontré."
+        - "Lo construí con mi esposo, que es ingeniero de software: yo me encargo de la medicina y él de que todo funcione bien, en la computadora o en el celular."
+      photo_alt: "La Dra. Guadarrama"
+      reasons:
+        price:
+          title: "Accesible"
+          body: "Desde ≈ %{amount} al día, en un solo pago que no se renueva."
+        easy:
+          title: "Fácil de usar"
+          body: "Abres, contestas y aprendes, en la computadora o en el celular, sin instalar nada."
+        current:
+          title: "Actualizado"
+          body: "Usa la edición más reciente de cada GPC y te dice su año."
+        cited:
+          title: "Con la GPC de verdad"
+          body: "Cada respuesta trae la frase exacta de la guía, su grado y dónde encontrarla."
+    faq:
+      title: "Preguntas frecuentes"
+      items:
+        trial:
+          question: "¿Cómo funciona la prueba gratis?"
+          answer: "Creas tu cuenta con tu correo y tienes %{trial_days} días sin límite. No te pedimos tarjeta. Al terminar, sigues con %{limit} preguntas gratis cada día o eliges un periodo de acceso."
+        renewal:
+          question: "¿Me van a cobrar cada mes?"
+          answer: "No. Pagas una sola vez por el periodo que elijas y termina en su fecha. No guardamos tu tarjeta y no hay nada que cancelar."
+        different:
+          question: "¿Qué lo hace diferente?"
+          answer: "En cada pregunta ves la frase exacta de la GPC de donde sale la respuesta, con su grado de evidencia y el año de la guía, así que estudias la guía mientras practicas. Además te arma un plan de estudio hasta tu examen, y cuesta desde ≈ %{amount} al día."
+        currency:
+          question: "¿Las GPC están actualizadas?"
+          answer: "Usamos la edición más reciente de cada guía, y cada cita trae su año. Algunas guías que siguen en el temario ya pasaron su vigencia; esas te las marcamos, para que sepas qué estás estudiando."
+        mock:
+          question: "¿El simulacro es como el examen real?"
+          answer: "Sí: %{mock_questions} preguntas en casos clínicos, con el mismo tiempo por pregunta que el examen y las explicaciones al final."
+        phone:
+          question: "¿Lo puedo usar en la computadora y en el celular?"
+          answer: "Sí, en los dos, desde el navegador y sin instalar nada. Tu avance es el mismo en ambos, y tiene modo oscuro para estudiar de noche."
+    closing:
+      title: "Empieza hoy. Los primeros %{trial_days} días no tienen límite."
+      share: "Mándalo a tu grupo"
+      share_text: "Simulador ENARM que te enseña la frase exacta de la GPC en cada respuesta: %{url}"
 
   legal:
     eyebrow: "Legal"
@@ -950,7 +1055,7 @@ es:
     nothing_due: "No tienes casos pendientes de repaso hoy."
     index:
       eyebrow: "Repaso"
-      title: "Lo que vuelve hoy"
+      title: "Tus casos para repasar"
       intro: "Los casos que fallaste regresan en intervalos crecientes: al día siguiente, luego a los pocos días, luego más espaciados mientras los sigas acertando."
       cases: "Casos para repasar"
       cases_due:

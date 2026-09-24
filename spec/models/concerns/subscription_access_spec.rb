@@ -2,12 +2,12 @@ require "rails_helper"
 
 RSpec.describe SubscriptionAccess do
   describe ".free_daily_questions" do
-    it "defaults to 20" do
-      expect(described_class.free_daily_questions).to eq(20)
+    it "defaults to 10" do
+      expect(described_class.free_daily_questions).to eq(10)
     end
 
     it "reads FREE_DAILY_QUESTIONS when set" do
-      allow(ENV).to receive(:fetch).with("FREE_DAILY_QUESTIONS", 20).and_return("5")
+      allow(ENV).to receive(:fetch).with("FREE_DAILY_QUESTIONS", 10).and_return("5")
 
       expect(described_class.free_daily_questions).to eq(5)
     end
@@ -81,13 +81,13 @@ RSpec.describe SubscriptionAccess do
 
     it "denies a free user who has spent the daily allowance" do
       user = create(:user, :trial_expired)
-      allow(user).to receive(:questions_answered_today).and_return(20)
+      allow(user).to receive(:questions_answered_today).and_return(10)
 
       result = user.subscription_access_result
 
       expect(result[:allowed]).to be(false)
       expect(result[:reason]).to eq(:daily_limit_reached)
-      expect(result[:message]).to eq(I18n.t("exams.denied.daily_limit_reached", limit: 20))
+      expect(result[:message]).to eq(I18n.t("exams.denied.daily_limit_reached", limit: 10))
     end
 
     it "counts the student's own calendar day, which ends at midnight where they are" do
@@ -110,12 +110,12 @@ RSpec.describe SubscriptionAccess do
 
     it "takes the message from the scope the caller names" do
       user = create(:user, :trial_expired)
-      allow(user).to receive(:questions_answered_today).and_return(20)
+      allow(user).to receive(:questions_answered_today).and_return(10)
       allow(I18n).to receive(:t).and_call_original
 
       user.subscription_access_result(i18n_scope: "otro.scope")
 
-      expect(I18n).to have_received(:t).with("otro.scope.daily_limit_reached", limit: 20)
+      expect(I18n).to have_received(:t).with("otro.scope.daily_limit_reached", limit: 10)
     end
   end
 
@@ -126,7 +126,7 @@ RSpec.describe SubscriptionAccess do
     end
 
     it "is the free allowance once the trial lapses" do
-      expect(create(:user, :trial_expired).daily_questions_limit).to eq(20)
+      expect(create(:user, :trial_expired).daily_questions_limit).to eq(10)
     end
   end
 
@@ -137,7 +137,7 @@ RSpec.describe SubscriptionAccess do
       freeze_time
       create(:entitlement, user: user, starts_at: 2.months.ago, expires_at: 1.month.ago)
       expect(user).not_to be_paid_access
-      expect(user.daily_questions_limit).to eq(20)
+      expect(user.daily_questions_limit).to eq(10)
 
       create(:entitlement, user: user, starts_at: 1.day.ago, expires_at: 1.month.from_now)
       expect(user).to be_paid_access

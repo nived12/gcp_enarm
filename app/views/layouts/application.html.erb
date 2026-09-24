@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="<%= t("app.name") %>">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="<%= t("app.tagline") %>">
+    <meta name="description" content="<%= content_for(:description) || t("app.tagline") %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -45,7 +45,7 @@
 
     <%= render "shared/header" %>
 
-    <main id="main" class="mx-auto w-full max-w-3xl px-4 pb-24 pt-6 sm:px-6">
+    <main id="main" class="mx-auto w-full <%= page_width %> px-4 pb-24 pt-6 sm:px-6">
       <%= render "shared/flash" %>
       <%= yield %>
     </main>

@@ -1,0 +1,44 @@
+<%# Asked as a question because the answer picks the plan: someone with three months
+    left should not be shown a year first. Twelve months is checked by default, since the
+    cohort that forms in October has about eleven. Pure CSS (.plan-picker). %>
+<section class="landing-reveal mt-24 rounded-card bg-ground-tint px-5 py-12 text-center sm:mt-36 sm:px-10 sm:py-16">
+  <h2 class="text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]"><%= t("landing.pricing.title") %></h2>
+
+  <div class="plan-picker mx-auto mt-8 max-w-lg">
+    <fieldset>
+      <legend class="sr-only"><%= t("landing.pricing.legend") %></legend>
+      <div class="grid grid-cols-4 gap-1 rounded-full bg-surface p-1 shadow-[var(--shadow-card)]">
+        <% Plan.all.each do |plan| %>
+          <label class="flex min-h-11 cursor-pointer items-center justify-center rounded-full px-1 text-[0.8125rem] font-medium whitespace-nowrap sm:text-sm text-ink-muted transition hover:text-ink has-checked:bg-accent has-checked:text-accent-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent">
+            <input type="radio" name="landing_plan" value="<%= plan.code %>" class="sr-only" <%= "checked" if plan.code == "twelve_months" %>>
+            <%= t("landing.pricing.months", count: plan.months) %>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <% Plan.all.each do |plan| %>
+      <div class="plan-picker__plan mt-8" data-plan="<%= plan.code %>">
+        <p class="text-ink">
+          <span class="text-5xl font-semibold tabular-nums tracking-tight sm:text-6xl"><%= money(plan.price) %></span>
+          <span class="ml-1 text-sm text-ink-faint"><%= Plan::CURRENCY %></span>
+        </p>
+        <p class="mt-2 text-ink-muted">
+          <span class="sr-only"><%= t("landing.pricing.months", count: plan.months) %>:</span>
+          <%= t("landing.pricing.per_day", amount: money(plan.daily_price)) %>
+        </p>
+      </div>
+    <% end %>
+
+    <p class="mt-5 text-sm font-medium text-ink"><%= t("landing.pricing.terms") %></p>
+
+    <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+      <%= link_to t("landing.cta"), new_registration_path(from: "pricing"), class: "btn btn--primary px-7" %>
+      <%= link_to t("landing.pricing.see_plans"), pricing_path, class: "btn btn--ghost" %>
+    </div>
+
+    <p class="mx-auto mt-6 max-w-sm text-sm leading-relaxed text-ink-muted">
+      <%= t("landing.pricing.free", limit: SubscriptionAccess.free_daily_questions, trial_days: SubscriptionAccess.trial_days) %>
+    </p>
+  </div>
+</section>

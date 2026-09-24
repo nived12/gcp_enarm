@@ -30,7 +30,7 @@ RSpec.describe "Buying an access window", type: :system, viewport: :phone, strip
     click_link I18n.t("pricing.nav")
 
     expect(page).to have_text(I18n.t("pricing.headline"))
-    expect(page).to have_text(I18n.t("billing.access.free", limit: 20))
+    expect(page).to have_text(I18n.t("billing.access.free", limit: 10))
     expect_no_sideways_scroll
 
     within("[data-plan='three_months']") do

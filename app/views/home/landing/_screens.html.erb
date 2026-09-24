@@ -1,0 +1,56 @@
+<%# Real screens of the app, captured by script/landing_screenshots on a computer and a
+    phone, in both themes. One screen is shown at a time, picked from the five by a radio
+    group (pure CSS, .screen-picker): five side by side shrank the app's text past reading.
+    From md up the computer screen leads with the phone overlapping it, because many
+    students study on a laptop; on a phone only the phone screen shows, large enough to
+    read. An image hidden by display:none is lazy and never fetched, so each visitor loads
+    one theme of one device per screen. Re-run the script when the app changes. %>
+<% screens = %w[quiz mock review calendar stats] %>
+<section class="screen-picker landing-reveal mt-24 sm:mt-36">
+  <div class="max-w-2xl">
+    <h2 class="text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]"><%= t("landing.screens.title") %></h2>
+    <p class="mt-4 text-lg leading-relaxed text-ink-muted"><%= t("landing.screens.body") %></p>
+  </div>
+
+  <div class="mt-8 grid items-start gap-10 lg:mt-12 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-14">
+    <fieldset>
+      <legend class="sr-only"><%= t("landing.screens.legend") %></legend>
+      <div class="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
+        <% screens.each do |screen| %>
+          <label class="cursor-pointer rounded-full border border-line px-4 py-2.5 text-sm font-medium text-ink-muted transition hover:text-ink has-checked:border-accent has-checked:bg-accent has-checked:text-accent-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent lg:rounded-control lg:border-transparent lg:px-5 lg:py-4 lg:has-checked:border-transparent lg:has-checked:bg-surface lg:has-checked:text-ink lg:has-checked:shadow-[var(--shadow-card)]">
+            <input type="radio" name="landing_screen" value="<%= screen %>" class="sr-only" <%= "checked" if screen == screens.first %>>
+            <span class="block lg:text-base lg:font-semibold"><%= t("landing.screens.#{screen}.title") %></span>
+            <span class="mt-1 hidden font-normal leading-relaxed text-ink-muted lg:block"><%= t("landing.screens.#{screen}.body") %></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <div>
+      <% screens.each do |screen| %>
+        <figure class="screen-picker__shot" data-screen="<%= screen %>">
+          <div class="relative mx-auto max-w-[340px] md:max-w-none md:pr-[14%] md:pb-14">
+            <div class="hidden overflow-hidden rounded-[18px] border border-line-strong bg-surface shadow-[var(--shadow-raised)] md:block">
+              <div class="flex h-8 items-center justify-center border-b border-line bg-surface-sunk">
+                <span class="numeric rounded-full bg-surface px-3 text-[0.6875rem] leading-5 text-ink-faint">gpcenarm.com</span>
+              </div>
+              <% %w[light dark].each do |theme| %>
+                <%= image_tag "landing/#{screen}-desktop-#{theme}.jpg", alt: t("landing.screens.#{screen}.title"),
+                      width: 1100, height: 720, loading: "lazy", decoding: "async",
+                      class: "only-#{theme} h-auto w-full" %>
+              <% end %>
+            </div>
+            <div class="overflow-hidden rounded-[32px] border border-line-strong bg-surface shadow-[var(--shadow-raised)] md:absolute md:bottom-0 md:right-0 md:w-[26%] md:rounded-[20px]">
+              <% %w[light dark].each do |theme| %>
+                <%= image_tag "landing/#{screen}-phone-#{theme}.jpg", alt: t("landing.screens.#{screen}.title"),
+                      width: 390, height: 844, loading: "lazy", decoding: "async",
+                      class: "only-#{theme} h-auto w-full" %>
+              <% end %>
+            </div>
+          </div>
+          <figcaption class="mt-4 text-center text-sm leading-relaxed text-ink-muted lg:hidden"><%= t("landing.screens.#{screen}.body") %></figcaption>
+        </figure>
+      <% end %>
+    </div>
+  </div>
+</section>

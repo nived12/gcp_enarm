@@ -1,0 +1,41 @@
+<%# What the bank holds, read live (LandingStats), so the page never claims more than a
+    student can practise. Questions lead because it is the number visitors compare; each
+    card pairs its number with what makes it worth more than a count. Hidden while the
+    bank is empty rather than showing zeros. %>
+<% if stats.questions.positive? %>
+  <section class="landing-reveal mt-24 sm:mt-36" aria-labelledby="numbers-title">
+    <h2 id="numbers-title" class="max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]">
+      <%= t("landing.numbers.title") %>
+    </h2>
+
+    <dl class="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:mt-14 lg:grid-cols-4">
+      <div class="card col-span-2 flex flex-col justify-between gap-8 p-7 sm:p-9 lg:row-span-2">
+        <dt class="order-2 max-w-sm">
+          <span class="block text-xl font-semibold text-ink"><%= t("landing.numbers.questions.label") %></span>
+          <span class="mt-2 block leading-relaxed text-ink-muted"><%= t("landing.numbers.questions.body") %></span>
+        </dt>
+        <dd class="order-1 text-6xl font-semibold tracking-tight text-accent tabular-nums sm:text-8xl">
+          <%= bank_count(stats.questions) %>
+        </dd>
+      </div>
+
+      <% [[:cases, stats.cases], [:guidelines, stats.guidelines]].each do |key, count| %>
+        <div class="card flex flex-col gap-4 p-5 sm:gap-6 sm:p-7">
+          <dt class="order-2">
+            <span class="block font-semibold text-ink"><%= t("landing.numbers.#{key}.label") %></span>
+            <span class="mt-1 block text-sm leading-relaxed text-ink-muted"><%= t("landing.numbers.#{key}.body") %></span>
+          </dt>
+          <dd class="order-1 text-3xl font-semibold tracking-tight text-ink tabular-nums sm:text-5xl"><%= bank_count(count) %></dd>
+        </div>
+      <% end %>
+
+      <div class="card col-span-2 flex flex-col gap-4 p-5 sm:gap-6 sm:p-7">
+        <dt class="order-2">
+          <span class="block font-semibold text-ink"><%= t("landing.numbers.mock.label") %></span>
+          <span class="mt-1 block text-sm leading-relaxed text-ink-muted"><%= t("landing.numbers.mock.body") %></span>
+        </dt>
+        <dd class="order-1 text-3xl font-semibold tracking-tight text-ink tabular-nums sm:text-5xl"><%= stats.mock_questions %></dd>
+      </div>
+    </dl>
+  </section>
+<% end %>
