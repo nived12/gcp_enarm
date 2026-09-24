@@ -38,7 +38,7 @@ Only with providers that serve us and act on our behalf (processors), which does
 - **[HOSTING PROVIDER, e.g. Railway]** — hosting of the application and database.
 - **Resend** — email delivery.
 - **Sentry** — technical error logging.
-- **PostHog** — usage measurement, only when enabled.
+- **PostHog** — usage measurement, only when enabled. It receives, from our server, activity milestones (for example, that you started or finished an exam and its score) tied to an internal account number; never your name, your email or anything you type.
 
 Some of these providers are outside Mexico. We do not sell your data.
 

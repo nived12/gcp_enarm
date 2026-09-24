@@ -64,6 +64,18 @@ RSpec.describe "Stripe webhooks", type: :request do
       expect(user.entitlements.sole).to be_refunded
     end
 
+    it "withholds the window while its charge is disputed, and gives it back when the dispute is won" do
+      deliver(payload)
+
+      deliver(dispute_created_json)
+      expect(response).to have_http_status(:ok)
+      expect(user).not_to be_paid_access
+
+      deliver(dispute_closed_json(status: "won"))
+      expect(response).to have_http_status(:ok)
+      expect(user).to be_paid_access
+    end
+
     it "needs no session, cookie or CSRF token" do
       deliver(payload)
 

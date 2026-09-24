@@ -752,6 +752,7 @@ es:
       invalid_signature: "La firma del webhook no es válida."
       unmatched: "El pago no corresponde a ningún usuario o periodo conocido."
       unmatched_refund: "El reembolso no corresponde a ninguna compra conocida."
+      unmatched_dispute: "La disputa no corresponde a ninguna compra conocida."
     account:
       eyebrow: "Cuenta"
       title: "Mi cuenta"
@@ -767,6 +768,10 @@ es:
         purchased_on: "Comprado el %{date}"
         refunded: "Reembolsado el %{date}. Este periodo ya no da acceso."
         partially_refunded: "Reembolso parcial de %{amount}."
+        dispute:
+          open: "Pago en disputa con el banco desde el %{date}. Mientras se resuelve, este periodo no da acceso."
+          won: "La disputa de este pago se cerró sin devolución. Este periodo vuelve a dar acceso."
+          lost: "El banco devolvió este pago tras una disputa. Este periodo ya no da acceso."
         empty:
           title: "Todavía no has comprado ningún periodo"
           body: "Cuando compres uno, aquí verás sus fechas y lo que pagaste."
@@ -963,6 +968,10 @@ es:
     eyebrow: "Plan de estudio"
     back_to_calendar: "‹ Calendario"
     done: "Hecho"
+    status:
+      done: "Hecho"
+      in_progress: "En curso"
+      missed: "Pendiente"
     date_formats:
       day: "%-d de %B"
       long: "%A %-d de %B de %Y"
@@ -1024,6 +1033,27 @@ es:
       previous_month: "Mes anterior"
       next_month: "Mes siguiente"
       empty_month: "Este mes no tiene días de tu plan."
+      views: "Vista del calendario"
+      view:
+        week: "Semana"
+        month: "Mes"
+      weeks: "Semanas del plan"
+      previous_week: "Semana anterior"
+      next_week: "Semana siguiente"
+      week_range:
+        same_month: "%{first_day} – %{last_day} de %{month}"
+        two_months: "%{from} – %{to}"
+      week_done: "Hechos: %{done} de %{total}"
+      empty_week: "Esta semana no tiene días de tu plan."
+      exam_day: "Examen ENARM"
+      outside_plan: "Fuera de tu plan"
+      reading: "Lectura: todavía sin casos para quiz"
+      quiz:
+        one: "Quiz de 1 pregunta"
+        other: "Quiz de %{count} preguntas"
+      questions:
+        one: "1 pregunta"
+        other: "%{count} preguntas"
     day:
       pass: "Vuelta %{number} de %{total}"
       rest: "Día de descanso"
@@ -1115,14 +1145,15 @@ es:
       home: "Volver al inicio"
 
   weak_spots:
-    none: "Todavía no hay temas por debajo de tu promedio."
+    none: "Todavía no hay temas ni contextos por debajo de tu promedio."
     preset:
       title: "Tus puntos débiles"
-      body: "Temas donde vas por debajo de tu propio promedio, con más peso a lo reciente y a los errores por no saber:"
+      body: "Temas y contextos donde vas por debajo de tu propio promedio, con más peso a lo reciente y a los errores por no saber. Un acierto con duda o adivinado cuenta menos que uno seguro:"
       start:
         one: "Practicar 1 pregunta"
         other: "Practicar %{count} preguntas"
-      none: "Ningún tema está por debajo de tu promedio. Sigue así."
+      none: "Ningún tema ni contexto está por debajo de tu promedio. Sigue así."
+      setting_overlap: "Un contexto (Urgencias, Medicina Familiar o Salud Pública) reúne las preguntas de los casos que ocurren ahí, así que comparte preguntas con los temas. En la práctica, cada caso sale una sola vez."
       not_enough: "Responde al menos %{minimum} preguntas para encontrar tus puntos débiles."
 
   remediation:

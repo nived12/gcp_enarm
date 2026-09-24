@@ -16,7 +16,7 @@
     <%= link_to t("sessions.new.forgot"), new_password_path, class: "text-ink-muted hover:text-accent" %>
     <p class="text-ink-muted">
       <%= t("sessions.new.no_account") %>
-      <%= link_to t("navigation.sign_up"), new_registration_path, class: "font-medium text-accent hover:underline" %>
+      <%= link_to t("navigation.sign_up"), new_registration_path(from: "sign_in"), class: "font-medium text-accent hover:underline" %>
     </p>
   </div>
 <% end %>

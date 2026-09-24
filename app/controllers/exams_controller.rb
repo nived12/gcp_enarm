@@ -44,6 +44,7 @@ class ExamsController < ApplicationController
     end
 
     exam = result.payload[:exam]
+    Analytics.capture(Current.user, "exam_started", exam.usage_properties.merge(from_study_plan: false))
     redirect_to exam.feedback_at_end? ? exam_path(exam) : exam_question_path(exam, 1)
   end
 

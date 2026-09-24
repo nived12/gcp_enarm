@@ -13,9 +13,9 @@ RSpec.describe EmailVerificationsMailer do
     expect(mail.text_part.body.to_s).to include(I18n.t("email_verifications_mailer.verify.greeting", name: "Gabriela"))
   end
 
-  it "sends from the no-reply address and takes replies at support" do
+  it "sends from the no-reply address with no reply-to" do
     expect(mail.from).to eq(["no-responder@gpcenarm.com"])
-    expect(mail.reply_to).to eq(["soporte@gpcenarm.com"])
+    expect(mail.reply_to).to be_nil
   end
 
   it "carries a link that verifies this account in both parts" do

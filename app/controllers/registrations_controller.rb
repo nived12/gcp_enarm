@@ -1,4 +1,6 @@
 class RegistrationsController < ApplicationController
+  include SignUpTracking
+
   allow_unauthenticated_access
   allow_unverified_email
 
@@ -8,6 +10,7 @@ class RegistrationsController < ApplicationController
 
   def new
     remember_return_to
+    remember_sign_up_source
     @user = User.new
   end
 
@@ -17,6 +20,7 @@ class RegistrationsController < ApplicationController
     if @user.save(context: :sign_up)
       EmailVerificationsMailer.verify(@user).deliver_later
       start_new_session_for(@user)
+      track_sign_up(@user, "password")
       redirect_to email_verification_path
     else
       render :new, status: :unprocessable_content

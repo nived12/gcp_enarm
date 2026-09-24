@@ -15,6 +15,10 @@ RSpec.describe "Study plans", type: :request do
                        .payload[:plan]
   end
 
+  def current_view
+    Nokogiri::HTML(response.body).at_css("[aria-current='page']").text
+  end
+
   it "turns away anyone not signed in" do
     delete session_path
 
@@ -93,11 +97,11 @@ RSpec.describe "Study plans", type: :request do
     end
   end
 
-  describe "the calendar" do
+  describe "the calendar's month" do
     it "names each day's topics for the month, today first" do
       create_plan
 
-      get study_plan_path
+      get study_plan_path(month: "2026-10")
 
       expect(response.body).to include(
         "Cirugía General A 1 · Cirugía General A 2", "octubre 2026",
@@ -134,12 +138,124 @@ RSpec.describe "Study plans", type: :request do
       plan.days.first.update!(completed_at: Time.current)
       travel 2.days
 
-      get study_plan_path
+      get study_plan_path(month: "2026-10")
 
       expect(response.body).to include(
         I18n.t("study_plans.show.behind", count: 1), I18n.t("study_plans.show.catch_up"),
-        I18n.t("study_plans.done")
+        I18n.t("study_plans.done"), I18n.t("study_plans.status.missed")
       )
+    end
+  end
+
+  describe "the calendar's week" do
+    def week_rows
+      Nokogiri::HTML(response.body).css("[data-testid='week'] > li").map { |row| row.text.squish }
+    end
+
+    it "opens on this week, Monday to Sunday, each day with its topics and its quiz or reading" do
+      create(
+        :published_case, topic: syllabus["cirugia-general"].first,
+        specialty: syllabus["cirugia-general"].first.specialty
+      )
+      create_plan
+
+      get study_plan_path
+
+      expect(response.body).to include("5 – 11 de octubre")
+      expect(current_view).to eq(I18n.t("study_plans.show.view.week"))
+      expect(week_rows.size).to eq(7)
+      expect(week_rows.first).to start_with("lun 5 Cirugía General A 1 · Cirugía General A 2")
+      expect(week_rows.first).to include(I18n.t("study_plans.show.quiz", count: 10))
+      expect(week_rows.second).to include(I18n.t("study_plans.show.reading"))
+      expect(week_rows.last).to start_with("dom 11")
+      expect(response.body).to include(
+        %(href="#{study_plan_path(week: "2026-10-12")}"), %(href="#{study_plan_path(month: "2026-10")}"),
+        I18n.t("study_plans.show.week_done", done: 0, total: 7)
+      )
+      expect(response.body).not_to include(%(href="#{study_plan_path(week: "2026-09-28")}"))
+    end
+
+    it "shows the week of any date it is given, across two months when it falls that way" do
+      create_plan
+
+      get study_plan_path(week: "2026-10-29")
+
+      expect(response.body).to include(
+        "26 de octubre – 1 de noviembre", %(href="#{study_plan_path(week: "2026-10-19")}"),
+        %(href="#{study_plan_path(month: "2026-10")}")
+      )
+    end
+
+    it "names rest days, and ends on the exam with nothing after it" do
+      create_plan(template: "six_days")
+
+      get study_plan_path(week: "2026-11-30")
+
+      expect(week_rows[3]).to include(
+        I18n.t("study_plans.kinds.assessment"),
+        I18n.t("study_plans.show.questions", count: 280)
+      )
+      expect(week_rows[4]).to include(I18n.t("study_plans.show.exam_day"))
+      expect(week_rows[5..]).to all(include(I18n.t("study_plans.show.outside_plan")))
+      expect(response.body).not_to include(%(href="#{study_plan_path(week: "2026-12-07")}"))
+
+      get study_plan_path(week: "2026-10-05")
+      expect(week_rows.last).to include(I18n.t("study_plans.day.rest"))
+    end
+
+    it "says a week outside the plan is empty, and ignores a week it cannot read" do
+      create_plan
+
+      get study_plan_path(week: "2027-01-04")
+      expect(response.body).to include(I18n.t("study_plans.show.empty_week"))
+
+      get study_plan_path(week: "someday")
+      expect(response.body).to include("5 – 11 de octubre")
+    end
+
+    it "says which days are done, under way, or missed" do
+      create(
+        :published_case, topic: syllabus["cirugia-general"][2],
+        specialty: syllabus["cirugia-general"].first.specialty
+      )
+      plan = create_plan
+      plan.days.first.update!(completed_at: Time.current)
+      travel 2.days
+      post quiz_study_plan_day_path(today + 2)
+
+      get study_plan_path
+
+      %i[done missed in_progress].each_with_index do |status, index|
+        expect(week_rows[index]).to end_with(I18n.t("study_plans.status.#{status}"))
+      end
+      expect(response.body).to include(I18n.t("study_plans.show.week_done", done: 1, total: 7))
+    end
+  end
+
+  describe "remembering the view" do
+    it "opens in whichever view was chosen last, and the day leads back to it" do
+      plan = create_plan
+
+      get study_plan_path(month: "2026-10")
+      get study_plan_path
+      expect(current_view).to eq(I18n.t("study_plans.show.view.month"))
+      get study_plan_day_path(plan.days.first.date)
+      expect(response.body).to include(%(href="#{study_plan_path(month: "2026-10")}"))
+
+      get study_plan_path(week: "2026-10-12")
+      get study_plan_path
+      expect(response.body).to include("5 – 11 de octubre")
+      get study_plan_day_path(plan.days.first.date)
+      expect(response.body).to include(%(href="#{study_plan_path(week: "2026-10-05")}"))
+    end
+
+    it "opens the week when what it remembers is not a view" do
+      create_plan
+      cookies[:calendar_view] = "fortnight"
+
+      get study_plan_path
+
+      expect(response.body).to include("5 – 11 de octubre")
     end
   end
 

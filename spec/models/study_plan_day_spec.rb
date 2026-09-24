@@ -45,6 +45,10 @@ RSpec.describe StudyPlanDay do
     expect(day("catch_up")).not_to be_quiz
   end
 
+  it "knows how long each kind of day's quiz is" do
+    expect(%w[topics case_workshop review assessment].map { |kind| day(kind).question_count }).to eq([10, 20, 20, 280])
+  end
+
   describe "a day of one of the three contexts" do
     let(:emergency) { create(:emergency_setting) }
     let(:emergency_topic) { create(:topic, branch: create(:branch, specialty: emergency)) }

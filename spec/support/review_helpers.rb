@@ -2,7 +2,7 @@
 # :wrong, [:wrong, reason] or nil for a question left blank. Pass `exam:` to add the case
 # to an exam already started; the review schedule follows through the models' callbacks.
 module ReviewHelpers
-  def sit(user, kase, outcomes, exam: nil, timing: "after_each", finish: false, option: nil)
+  def sit(user, kase, outcomes, exam: nil, timing: "after_each", finish: false, option: nil, confidence: nil)
     exam ||= create(:exam, user: user, feedback_timing: timing, question_count: outcomes.size)
     offset = exam.exam_questions.count
     kase.questions.zip(outcomes).each.with_index(1) do |(question, outcome), index|
@@ -13,7 +13,7 @@ module ReviewHelpers
       chosen = option || question.answer_options.find { |candidate| candidate.correct? == right }
       exam_question.create_answer!(
         answer_option: chosen, correct: right, answered_at: Time.current,
-        error_reason: reason
+        error_reason: reason, confidence: confidence
       )
     end
     exam.update!(question_count: exam.exam_questions.count)

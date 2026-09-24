@@ -56,6 +56,12 @@ class StudyPlanDay < ApplicationRecord
     true
   end
 
+  # How long the day's quiz is, for a day that has one (see #quiz?).
+  def question_count
+    { "topics" => TOPIC_QUIZ_QUESTIONS, "case_workshop" => WORKSHOP_QUESTIONS, "review" => REVIEW_QUESTIONS }
+      .fetch(kind) { Exam::QUESTION_COUNTS.fetch("full_exam") }
+  end
+
   # What Exams::Builder is asked for. The review and the simulacro draw from the whole
   # bank, interleaved, as the exam does.
   def exam_request

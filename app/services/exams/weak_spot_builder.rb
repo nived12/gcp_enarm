@@ -1,9 +1,11 @@
 # A quiz drawn from the student's weak spots (Stats::WeakSpotCalculator): published cases
-# from the topics where they do worse than their own average.
+# from the topics and settings where they do worse than their own average. A setting
+# draws its whole area (`ClinicalCase.in_area`).
 #
-# The weaker the topic, the more of the quiz it gets — seats are dealt by the D'Hondt
-# method on how far each topic sits below the student's mean, so the weakest topic leads
-# without shutting the others out. Within a topic, cases the student has never met come
+# The weaker the spot, the more of the quiz it gets — seats are dealt by the D'Hondt
+# method on how far each spot sits below the student's mean, so the weakest spot leads
+# without shutting the others out. A case in a weak topic and a weak setting is dealt
+# once, by the weaker of the two. Within a spot, cases the student has never met come
 # first (can they use it on a new patient?), then the ones they missed, and last the
 # ones they already got right.
 module Exams
@@ -21,29 +23,43 @@ module Exams
     end
 
     def filters
-      @filters ||= { "interleave" => true, "topic_ids" => spots.map { |spot| spot.topic.id } }
+      @filters ||= {
+        "interleave" => true,
+        "topic_ids" => spots.filter_map { |spot| spot.topic&.id },
+        "setting_ids" => spots.filter_map { |spot| spot.setting&.id }
+      }.compact_blank
     end
 
     def candidates
-      ClinicalCase.status_published.where(topic_id: filters["topic_ids"]).joins(:questions)
-                  .group(:id, :specialty_id, :topic_id).order(:id)
-                  .pluck(:id, :specialty_id, Arel.sql("COUNT(questions.id)"), :topic_id)
+      topic_ids, setting_ids = filters.values_at("topic_ids", "setting_ids").map { |ids| Array(ids) }
+      cases = ClinicalCase.status_published
+      cases.where(topic_id: topic_ids).or(cases.in_area(setting_ids)).joins(:questions)
+           .group(:id, :specialty_id, :topic_id, :setting_id).order(:id)
+           .pluck(:id, :specialty_id, Arel.sql("COUNT(questions.id)"), :topic_id, :setting_id)
     end
 
     def ordered(rows)
       queues = rows.shuffle(random: random).each_with_index
                    .sort_by { |(id, *), index| [familiarity(id), index] }.map(&:first)
-                   .group_by(&:last)
-      excess = spots.to_h { |spot| [spot.topic.id, spot.excess] }
+                   .group_by { |row| weakest_spot(row) }
       seats = Hash.new(0)
       dealt = []
 
       until queues.values.all?(&:empty?)
-        topic_id = queues.keys.select { |id| queues[id].any? }.max_by { |id| [excess[id] / (seats[id] + 1), -id] }
-        seats[topic_id] += 1
-        dealt << queues[topic_id].shift.first(3)
+        spot = queues.keys.select { |key| queues[key].any? }
+                     .max_by { |key| [key.excess / (seats[key] + 1), -spots.index(key)] }
+        seats[spot] += 1
+        dealt << queues[spot].shift.first(3)
       end
       dealt
+    end
+
+    # Spots come weakest first, so the first one the case belongs to is the weakest.
+    def weakest_spot(row)
+      _id, specialty_id, _count, topic_id, setting_id = row
+      spots.find do |spot|
+        spot.topic ? spot.topic.id == topic_id : [specialty_id, setting_id].include?(spot.setting.id)
+      end
     end
 
     def familiarity(case_id)

@@ -750,6 +750,7 @@ en:
       invalid_signature: "The webhook signature is not valid."
       unmatched: "The payment matches no known user or access window."
       unmatched_refund: "The refund matches no known purchase."
+      unmatched_dispute: "The dispute matches no known purchase."
     account:
       eyebrow: "Account"
       title: "My account"
@@ -765,6 +766,10 @@ en:
         purchased_on: "Bought on %{date}"
         refunded: "Refunded on %{date}. This window no longer grants access."
         partially_refunded: "Partial refund of %{amount}."
+        dispute:
+          open: "Payment disputed with the bank since %{date}. This window grants no access while the dispute is open."
+          won: "The dispute over this payment closed without a refund. This window grants access again."
+          lost: "The bank returned this payment after a dispute. This window no longer grants access."
         empty:
           title: "You haven't bought an access window yet"
           body: "When you do, its dates and what you paid will show here."
@@ -961,6 +966,10 @@ en:
     eyebrow: "Study plan"
     back_to_calendar: "‹ Calendar"
     done: "Done"
+    status:
+      done: "Done"
+      in_progress: "In progress"
+      missed: "Missed"
     date_formats:
       day: "%B %-d"
       long: "%A, %B %-d, %Y"
@@ -1022,6 +1031,27 @@ en:
       previous_month: "Previous month"
       next_month: "Next month"
       empty_month: "This month has no days of your plan."
+      views: "Calendar view"
+      view:
+        week: "Week"
+        month: "Month"
+      weeks: "Weeks of the plan"
+      previous_week: "Previous week"
+      next_week: "Next week"
+      week_range:
+        same_month: "%{month} %{first_day} – %{last_day}"
+        two_months: "%{from} – %{to}"
+      week_done: "Done: %{done} of %{total}"
+      empty_week: "This week has no days of your plan."
+      exam_day: "ENARM exam"
+      outside_plan: "Outside your plan"
+      reading: "Reading: no cases to quiz yet"
+      quiz:
+        one: "1-question quiz"
+        other: "%{count}-question quiz"
+      questions:
+        one: "1 question"
+        other: "%{count} questions"
     day:
       pass: "Pass %{number} of %{total}"
       rest: "Rest day"
@@ -1113,14 +1143,15 @@ en:
       home: "Back home"
 
   weak_spots:
-    none: "No topic is below your average yet."
+    none: "No topic or setting is below your average yet."
     preset:
       title: "Your weak spots"
-      body: "Topics where you are below your own average, weighing recent answers and knowledge gaps more:"
+      body: "Topics and settings where you are below your own average, weighing recent answers and knowledge gaps more. A right answer you were unsure of or guessed counts for less than a sure one:"
       start:
         one: "Practise 1 question"
         other: "Practise %{count} questions"
-      none: "No topic is below your average. Keep it up."
+      none: "No topic or setting is below your average. Keep it up."
+      setting_overlap: "A setting (Emergency, Family Medicine or Public Health) gathers the questions of cases that happen there, so it shares questions with the topics. In the quiz, each case comes up once."
       not_enough: "Answer at least %{minimum} questions to find your weak spots."
 
   remediation:

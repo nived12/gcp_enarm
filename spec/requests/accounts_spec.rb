@@ -58,6 +58,21 @@ RSpec.describe "Account", type: :request do
     expect(response.body).to include(I18n.t("billing.account.see_plans"))
   end
 
+  it "marks a disputed payment in the history, and how the dispute closed" do
+    date = I18n.l(Date.current, format: :long)
+    %w[open won lost].each do |status|
+      create(:entitlement, user: student, dispute_id: "dp_#{status}", dispute_status: status, disputed_at: Time.current)
+    end
+
+    get account_path
+
+    expect(response.body).to include(
+      I18n.t("billing.account.history.dispute.open", date: date),
+      I18n.t("billing.account.history.dispute.won"),
+      I18n.t("billing.account.history.dispute.lost")
+    )
+  end
+
   it "says a payment is being confirmed when the student returns from checkout" do
     get account_path(checkout: "success")
 

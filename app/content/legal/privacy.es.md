@@ -38,7 +38,7 @@ Solo con proveedores que nos prestan servicios y actúan por nuestra cuenta (enc
 - **[PROVEEDOR DE HOSPEDAJE, p. ej. Railway]** — hospedaje de la aplicación y la base de datos.
 - **Resend** — envío de correos.
 - **Sentry** — registro de errores técnicos.
-- **PostHog** — medición de uso, solo si está activada.
+- **PostHog** — medición de uso, solo si está activada. Recibe, desde nuestro servidor, hitos de actividad (por ejemplo, que empezaste o terminaste un examen y su calificación) ligados a un número interno de cuenta; nunca tu nombre, tu correo ni lo que escribes.
 
 Algunos de estos proveedores están fuera de México. No vendemos tus datos.
 
