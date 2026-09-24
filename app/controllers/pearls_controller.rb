@@ -32,6 +32,8 @@ class PearlsController < ApplicationController
       return redirect_to(pearls_path(step: step), status: :see_other)
     end
 
+    # Sent on the tenth grade rather than from the done page, which a reload shows again.
+    Analytics.capture(Current.user, "pearls_session_finished") if step + 1 == SESSION_SIZE
     redirect_to pearls_path(step: step + 1), status: :see_other
   end
 end

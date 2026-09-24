@@ -12,6 +12,8 @@ class QuestionReportsController < ApplicationController
 
     report = Current.user.question_reports.status_open.find_or_initialize_by(question: exam_question.question)
     saved = report.persisted? || report.update(report_params)
+    # The reason only: the comment is free text a student typed and never leaves the app.
+    Analytics.capture(Current.user, "suggestion_submitted", reason: report.reason) if report.previously_new_record?
     render partial: "question_reports/panel", status: saved ? :ok : :unprocessable_content,
       locals: { exam: exam, exam_question: exam_question, report: report }
   end

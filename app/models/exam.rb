@@ -56,6 +56,11 @@ class Exam < ApplicationRecord
   # final, so every case in it goes back into the review schedule.
   after_commit :reschedule_reviews, on: :update, if: -> { saved_change_to_status?(to: "completed") }
 
+  # Every way an exam ends — the finish button, the clock running out on a page or on a
+  # late answer — goes through complete!, so the event is sent from here and only once.
+  # A review session and a weak-spot quiz are exams too, told apart by mode.
+  after_commit :report_finished, on: :update, if: -> { saved_change_to_status?(to: "completed") }
+
   def self.default_feedback_timing(mode)
     EXAM_LENGTH_MODES.include?(mode.to_s) ? "at_end" : "after_each"
   end
@@ -143,7 +148,21 @@ class Exam < ApplicationRecord
           .sort_by { |specialty, _correct, _asked| specialty.position }
   end
 
+  # What analytics reports about a sitting, at the start and again at the end.
+  def usage_properties
+    { mode: mode, question_count: question_count, feedback_timing: feedback_timing, timed: !time_limit_seconds.nil? }
+  end
+
   private
+
+  def report_finished
+    Analytics.capture(
+      user, "exam_finished",
+      usage_properties.merge(
+        answered: answers.count, score: score.to_f, minutes: elapsed_seconds / 60, ran_out_of_time: time_up?
+      )
+    )
+  end
 
   def reschedule_reviews
     Reviews::CaseScheduler.call(user, exam_questions.reorder(nil).distinct.pluck(:clinical_case_id))
