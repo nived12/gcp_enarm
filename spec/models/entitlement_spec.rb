@@ -36,4 +36,13 @@ RSpec.describe Entitlement do
     expect([ kept, partial, refunded ].map(&:refunded?)).to eq([ false, false, true ])
     expect([ kept, partial, refunded ].map(&:partially_refunded?)).to eq([ false, true, false ])
   end
+
+  it "stops counting a window as in force while its payment is disputed, and again once the dispute is won" do
+    open_dispute, won, lost = %w[open won lost].map do |status|
+      create(:entitlement, dispute_id: "dp_#{status}", dispute_status: status, disputed_at: 1.day.ago)
+    end
+
+    expect(described_class.in_force).to contain_exactly(won)
+    expect([ open_dispute, won, lost ].map(&:dispute_open?)).to eq([ true, false, false ])
+  end
 end

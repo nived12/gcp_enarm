@@ -13,14 +13,14 @@ if ENV["COVERAGE"]
     command_name "rspec#{ENV["TEST_ENV_NUMBER"]}"
     merge_timeout 3600
 
-    add_filter "/spec/"
-    add_filter "/config/"
-    add_filter "/db/"
+    skip "/spec/"
+    skip "/config/"
+    skip "/db/"
 
-    add_group "Services", "app/services"
-    add_group "Models", "app/models"
-    add_group "Controllers", "app/controllers"
-    add_group "Jobs", "app/jobs"
+    group "Services", "app/services"
+    group "Models", "app/models"
+    group "Controllers", "app/controllers"
+    group "Jobs", "app/jobs"
   end
 end
 

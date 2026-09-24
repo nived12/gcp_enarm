@@ -43,7 +43,25 @@ parser said on the day the file was written.
    and `APP_HOST` (the public host, which the links in emails point to). Without them
    nobody who signs up with a password can confirm their address, and so nobody can use
    the app; Google sign-ins are unaffected. Failed sends show in Sentry and retry.
-5. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
+5. Payments: set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. The secret is the
+   signing secret of a webhook endpoint pointing at `https://<APP_HOST>/webhooks/stripe`,
+   subscribed to exactly these events:
+
+   - `checkout.session.completed`: a card payment; grants the window.
+   - `checkout.session.async_payment_succeeded`: an OXXO payment clearing days later;
+     grants the window. Without it, cash buyers pay and never get access.
+   - `charge.refunded`: a full refund withdraws the window from now; a partial one is
+     only recorded.
+   - `charge.dispute.created`: a chargeback, or an inquiry from the card's bank; the
+     window grants no access while the dispute is open.
+   - `charge.dispute.closed`: a won dispute (or an inquiry that lapsed) gives the window
+     back; a lost one keeps it withdrawn.
+
+   An event left out is not an error anywhere: Stripe simply never sends it, and the
+   student keeps access they should have lost, or never receives access they paid for.
+   Disputes show on the purchase history of the student's account page and of the admin
+   user page.
+6. Confirm the taxonomy seeded: `railway run bin/rails runner 'puts Topic.count'` → 277.
 
 At this point the app runs and has its taxonomy, and no guidelines.
 
