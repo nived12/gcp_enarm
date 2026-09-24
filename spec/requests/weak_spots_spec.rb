@@ -36,12 +36,29 @@ RSpec.describe "Weak spots", type: :request do
 
     get new_exam_path(section: "custom")
     expect(response.body).to include("Otitis media", I18n.t("weak_spots.preset.start", count: 20))
-    expect(response.body).not_to include("Crisis hipertensiva, ")
+    expect(response.body).not_to include("Crisis hipertensiva, ", I18n.t("weak_spots.preset.setting_overlap"))
 
     post exams_path, params: { mode: "weak_spots" }
     exam = Exam.last
     expect(exam).to have_attributes(mode: "weak_spots", filters: { "interleave" => true, "topic_ids" => [shaky.id] })
     expect(response).to redirect_to(exam_question_path(exam, 1))
+  end
+
+  it "names a weak setting beside the topics, says they share questions, and quizzes its area" do
+    emergency = create(:emergency_setting)
+    3.times do
+      sit(
+        student, create(:published_case, topic: create(:topic), setting: emergency, questions_count: 1),
+        [[:wrong, "did_not_know"]]
+      )
+    end
+    8.times { answer(solid, :right) }
+
+    get new_exam_path(section: "custom")
+    expect(response.body).to include("Urgencias", I18n.t("weak_spots.preset.setting_overlap"))
+
+    post exams_path, params: { mode: "weak_spots" }
+    expect(Exam.last.filters).to eq("interleave" => true, "setting_ids" => [emergency.id])
   end
 
   it "sends the student back to the custom section when there is nothing to target" do
