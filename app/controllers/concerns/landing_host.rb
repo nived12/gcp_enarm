@@ -1,16 +1,22 @@
-# The marketing host (SiteHosts.landing) is for visitors who are not signed in. A student
-# who is signed in is sent to the same page on the app host, where the header, the checkout
-# buttons and every form belong: a form posted from the marketing host would carry that
-# host's CSRF token to the app host and be refused.
+# The marketing host (SiteHosts.landing) shows the landing page and the legal pages to
+# anyone, signed in or not; the owner wants to be able to read them from an account. A page
+# that holds a form is different: posted from the marketing host it would carry that host's
+# CSRF token to the app host and be refused. So a signed-in student asking for such a page
+# (the prices, with their checkout buttons) is sent to the same page on the app host.
 module LandingHost
   extend ActiveSupport::Concern
 
   included do
-    before_action :send_signed_in_to_app_host, if: :landing_host?
+    before_action :send_signed_in_to_app_host, if: :landing_host?, unless: :readable_signed_in?
     helper_method :landing_host?, :app_host_url, :landing_root_url
   end
 
   private
+
+  # Pages without a form, which a signed-in reader may see on the marketing host.
+  def readable_signed_in?
+    (controller_name == "home" || controller_name == "legal") && action_name == "show"
+  end
 
   def landing_host?
     SiteHosts.landing?(request)

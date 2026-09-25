@@ -3,8 +3,8 @@ Rails.application.routes.draw do
 
   # The marketing host serves the signed-out landing page, the prices and the legal pages,
   # and sends every other path to the app host. Assets, icons, robots.txt and the sitemap
-  # are files in public/ and never reach the router. A signed-in visitor is sent on by
-  # LandingHost before any of these pages render.
+  # are files in public/ and never reach the router. A signed-in visitor reads the landing
+  # and legal pages here and is sent on to the prices by LandingHost.
   constraints Constraints::LandingHostConstraint.new do
     get "/" => "home#show"
     get "pricing" => "pricing#show"

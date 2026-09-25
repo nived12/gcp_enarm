@@ -78,7 +78,7 @@
             <% else %>
               <p class="mt-5 text-sm leading-relaxed text-ink-muted"><%= t("landing.sample.finale") %></p>
               <div class="mt-4 flex flex-col gap-3 sm:flex-row">
-                <%= link_to t("landing.cta"), app_host_url(new_registration_path(from: "case")), class: "btn btn--primary" %>
+                <%= landing_cta(from: "case", class: "btn btn--primary") %>
                 <% if next_key %>
                   <%= link_to t("landing.sample.another"), root_path(caso: next_key, anchor: "caso"), class: "btn btn--ghost" %>
                 <% end %>

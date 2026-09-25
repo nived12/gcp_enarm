@@ -100,20 +100,31 @@ RSpec.describe "Marketing and app hosts", type: :request do
         )
       end
 
-      it "sends a signed-in student to the same page on the app host" do
+      it "shows a signed-in student the landing page, with every button leading into the app" do
+        create(:published_case)
         host! app_host
         sign_in
         host! landing
 
         get root_path
-        expect(response).to redirect_to("http://#{app_host}/")
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(I18n.t("landing.hero.headline"))
+        expect(response.body).not_to include(I18n.t("navigation.sign_in"), I18n.t("navigation.sign_out"), "<form")
+        expect(links.count("http://#{app_host}/")).to eq(5)
+        expect(links.grep(/registration/)).to be_empty
+
+        get legal_path("terms")
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "sends a signed-in student to the prices on the app host, where checkout works" do
+        host! app_host
+        sign_in
+        host! landing
 
         get pricing_path(plan: "one_month")
         expect(response).to redirect_to("http://#{app_host}/pricing?plan=one_month")
-
-        get legal_path("terms")
-        expect(response).to redirect_to("http://#{app_host}/legal/terms")
+        expect(response).to have_http_status(:found)
       end
     end
 

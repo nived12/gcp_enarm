@@ -33,7 +33,7 @@
     <p class="mt-5 text-sm font-medium text-ink"><%= t("landing.pricing.terms") %></p>
 
     <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-      <%= link_to t("landing.cta"), app_host_url(new_registration_path(from: "pricing")), class: "btn btn--primary px-7" %>
+      <%= landing_cta(from: "pricing", class: "btn btn--primary px-7") %>
       <%= link_to t("landing.pricing.see_plans"), pricing_path, class: "btn btn--ghost" %>
     </div>
 

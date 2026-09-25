@@ -14,7 +14,14 @@
     <div class="ml-auto flex items-center gap-1">
       <%= render "shared/theme_toggle" %>
 
-      <% if authenticated? %>
+      <% if authenticated? && landing_host? %>
+        <%# The marketing host shows its pages to anyone, and a signed-in reader needs only
+            the way back into the app: a sign-out form posted from here would be refused. %>
+        <%= link_to t("pricing.nav"), pricing_path,
+              class: "hidden min-h-11 items-center rounded-full px-4 text-sm font-medium text-ink-muted hover:bg-surface-sunk hover:text-ink sm:inline-flex" %>
+        <%= link_to t("navigation.open_app"), app_host_url(root_path),
+              class: "inline-flex min-h-11 items-center rounded-full bg-accent px-4 text-sm font-medium text-accent-ink hover:bg-accent-hover" %>
+      <% elsif authenticated? %>
         <% if Current.user.role_admin? || Current.user.role_reviewer? %>
           <%= link_to t("navigation.admin"), admin_root_path,
                 class: "hidden min-h-11 items-center rounded-full px-4 text-sm font-medium text-ink-muted hover:bg-surface-sunk hover:text-ink sm:inline-flex" %>

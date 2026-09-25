@@ -9,13 +9,15 @@
       <%= t("landing.hero.subhead") %>
     </p>
     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-      <%= link_to t("landing.cta"), app_host_url(new_registration_path(from: "hero")), class: "btn btn--primary px-7" %>
+      <%= landing_cta(from: "hero", class: "btn btn--primary px-7") %>
       <% if sample %>
         <a href="#caso" class="btn btn--ghost lg:hidden"><%= t("landing.hero.try_case") %></a>
       <% end %>
     </div>
     <%# The two doubts that stop a click on "free": for how long, and whether it wants a card. %>
-    <p class="mt-4 text-sm text-ink-faint"><%= t("landing.hero.reassurance", trial_days: SubscriptionAccess.trial_days) %></p>
+    <% unless authenticated? %>
+      <p class="mt-4 text-sm text-ink-faint"><%= t("landing.hero.reassurance", trial_days: SubscriptionAccess.trial_days) %></p>
+    <% end %>
   </div>
 
   <% if sample %>

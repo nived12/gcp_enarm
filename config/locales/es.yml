@@ -23,6 +23,7 @@ es:
     stats: "Estadísticas"
     account: "Mi cuenta"
     sign_in: "Iniciar sesión"
+    open_app: "Entrar a la app"
     sign_up: "Crear cuenta"
     sign_out: "Cerrar sesión"
 

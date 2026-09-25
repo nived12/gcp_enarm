@@ -1,4 +1,4 @@
-<% if authenticated? %>
+<% if authenticated? && !landing_host? %>
   <%= render "home/dashboard" %>
 <% else %>
   <%= render "home/landing" %>
