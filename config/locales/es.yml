@@ -905,7 +905,7 @@ es:
         one: "1 mes"
         other: "%{count} meses"
       per_day: "≈ %{amount} al día"
-      terms: "Un solo pago. No se renueva."
+      terms: "Un solo pago. No se renueva. Tarjeta u OXXO."
       free: "Sin pagar tienes %{limit} preguntas al día. Al crear tu cuenta, %{trial_days} días sin límite."
       see_plans: "Ver precios"
     doctor:
@@ -938,6 +938,9 @@ es:
         renewal:
           question: "¿Me van a cobrar cada mes?"
           answer: "No. Pagas una sola vez por el periodo que elijas y termina en su fecha. No guardamos tu tarjeta y no hay nada que cancelar."
+        oxxo:
+          question: "¿Puedo pagar en OXXO?"
+          answer: "Sí. Al pagar eliges OXXO y recibes una ficha con código de barras, también por correo, para pagar en efectivo en cualquier OXXO dentro de %{oxxo_days} días. Tu acceso se activa cuando el pago se acredita, normalmente al siguiente día hábil. También aceptamos tarjeta de crédito o débito y Apple Pay."
         different:
           question: "¿Qué lo hace diferente?"
           answer: "En cada pregunta ves la frase exacta de la GPC de donde sale la respuesta, con su grado de evidencia y el año de la guía, así que estudias la guía mientras practicas. Además te arma un plan de estudio hasta tu examen, y cuesta desde ≈ %{amount} al día."

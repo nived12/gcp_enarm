@@ -7,6 +7,8 @@
 module Billing
   class StripeAdapter
     CHECKOUT_LOCALES = { "es" => "es-419", "en" => "en" }.freeze
+    # Stripe's default life of an OXXO voucher; the landing FAQ quotes it.
+    OXXO_VOUCHER_DAYS = 5
 
     CHECKOUT_COMPLETED = "checkout.session.completed".freeze
     ASYNC_PAYMENT_SUCCEEDED = "checkout.session.async_payment_succeeded".freeze

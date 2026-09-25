@@ -903,7 +903,7 @@ en:
         one: "1 month"
         other: "%{count} months"
       per_day: "≈ %{amount} a day"
-      terms: "One payment. It never renews."
+      terms: "One payment. It never renews. Card or OXXO."
       free: "Without paying you get %{limit} questions a day. When you sign up, %{trial_days} days with no limit."
       see_plans: "See pricing"
     doctor:
@@ -936,6 +936,9 @@ en:
         renewal:
           question: "Will I be charged every month?"
           answer: "No. You pay once for the period you choose and it ends on its date. We do not store your card and there is nothing to cancel."
+        oxxo:
+          question: "Can I pay at OXXO?"
+          answer: "Yes. At checkout you choose OXXO and get a barcode voucher, also by email, to pay in cash at any OXXO within %{oxxo_days} days. Your access starts once the payment clears, usually the next business day. We also take credit or debit cards and Apple Pay."
         different:
           question: "What makes it different?"
           answer: "On every question you see the exact GPC sentence the answer comes from, with its evidence grade and the guideline's year, so you study the guideline while you practise. It also builds you a study plan up to your exam, and costs from ≈ %{amount} a day."

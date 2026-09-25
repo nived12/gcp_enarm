@@ -4,15 +4,17 @@
   </h2>
 
   <div class="divide-y divide-line border-y border-line">
-    <%# Ordered by what stops a purchase: the trial first, then being charged again. %>
+    <%# Ordered by what stops a purchase: the trial first, then being charged again, then
+        how to pay without a card. %>
     <% cheapest = Plan.all.map(&:daily_price).min %>
-    <% %w[trial renewal different currency mock phone].each do |item| %>
+    <% %w[trial renewal oxxo different currency mock phone].each do |item| %>
       <details class="group">
         <summary class="flex min-h-14 cursor-pointer list-none items-center gap-4 py-4 font-medium text-ink [&::-webkit-details-marker]:hidden">
           <span class="flex-1"><%= t("landing.faq.items.#{item}.question") %></span>
           <span class="text-xl leading-none text-ink-faint transition group-open:rotate-45" aria-hidden="true">+</span>
         </summary>
-        <p class="max-w-prose pb-5 leading-relaxed text-ink-muted"><%= t("landing.faq.items.#{item}.answer", trial_days: SubscriptionAccess.trial_days, limit: SubscriptionAccess.free_daily_questions, amount: money(cheapest), mock_questions: Exam::QUESTION_COUNTS.fetch("full_exam")) %></p>
+        <p class="max-w-prose pb-5 leading-relaxed text-ink-muted"><%= t("landing.faq.items.#{item}.answer", trial_days: SubscriptionAccess.trial_days, limit: SubscriptionAccess.free_daily_questions, amount: money(cheapest), mock_questions: Exam::QUESTION_COUNTS.fetch("full_exam"),
+              oxxo_days: Billing::StripeAdapter::OXXO_VOUCHER_DAYS) %></p>
       </details>
     <% end %>
   </div>
