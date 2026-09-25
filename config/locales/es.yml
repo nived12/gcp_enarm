@@ -575,6 +575,7 @@ es:
         verify: "Marcar como confirmado"
         done: "Correo marcado como confirmado. La prueba empieza hoy."
       access:
+        staff: "Acceso completo por su rol"
         granted: "Acceso completo otorgado"
         trial: "En periodo de prueba"
         free: "Gratuito: %{limit} preguntas al día"
@@ -738,6 +739,7 @@ es:
         product_name: "GPCEnarm · 12 meses de acceso"
     access:
       title: "Tu acceso"
+      staff: "Tu cuenta de equipo tiene acceso completo."
       granted: "Tienes acceso completo hasta el %{date}."
       paid: "Tienes acceso sin límite hasta el %{date}."
       stacking: "Si compras otro periodo, empieza cuando termine este."

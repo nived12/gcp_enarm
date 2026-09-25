@@ -79,6 +79,10 @@ RSpec.describe "Admin user lookup", type: :request do
       expect(response.body).to include(
         I18n.t("admin.users.access.free", limit: SubscriptionAccess.free_daily_questions)
       )
+
+      student.update!(role: :reviewer)
+      get admin_user_path(student)
+      expect(response.body).to include(I18n.t("admin.users.access.staff"))
     end
 
     it "does not offer an admin their own role" do

@@ -573,6 +573,7 @@ en:
         verify: "Mark as confirmed"
         done: "Email marked as confirmed. The trial starts today."
       access:
+        staff: "Full access through their role"
         granted: "Full access granted"
         trial: "In trial"
         free: "Free: %{limit} questions a day"
@@ -736,6 +737,7 @@ en:
         product_name: "GPCEnarm · 12 months of access"
     access:
       title: "Your access"
+      staff: "Your team account has full access."
       granted: "You have full access until %{date}."
       paid: "You have unlimited access until %{date}."
       stacking: "If you buy another window, it starts when this one ends."

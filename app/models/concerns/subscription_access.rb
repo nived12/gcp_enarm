@@ -51,9 +51,15 @@ module SubscriptionAccess
     granted_premium? || paid_access?
   end
 
+  # Admins and reviewers work inside the bank, so they are never capped and need no
+  # granted date of their own.
+  def staff_access?
+    role_admin? || role_reviewer?
+  end
+
   # No daily cap right now, for whatever reason.
   def unlimited?
-    active_paid_subscription? || active_trial?
+    staff_access? || active_paid_subscription? || active_trial?
   end
 
   # When the paid window ends. Windows are stacked end to end when bought, so the

@@ -1,6 +1,8 @@
 <%# What the student has right now, in one sentence. Granted premium outranks a paid
-    window, which outranks the trial. %>
-<% if user.granted_premium? %>
+    window, which outranks the trial; staff come first, since their access has no end. %>
+<% if user.staff_access? %>
+  <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.staff") %></p>
+<% elsif user.granted_premium? %>
   <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.granted", date: l(user.granted_premium_until.to_date, format: :long)) %></p>
 <% elsif user.paid_access? %>
   <p class="text-sm leading-relaxed text-ink"><%= t("billing.access.paid", date: l(user.paid_access_until.to_date, format: :long)) %></p>

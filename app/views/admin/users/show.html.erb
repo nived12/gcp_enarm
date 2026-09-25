@@ -14,7 +14,8 @@
     <div>
       <dt class="text-xs text-ink-faint"><%= t("admin.users.fields.access") %></dt>
       <dd class="mt-1 text-ink">
-        <%= if @user.granted_premium? then t("admin.users.access.granted")
+        <%= if @user.staff_access? then t("admin.users.access.staff")
+            elsif @user.granted_premium? then t("admin.users.access.granted")
             elsif @user.active_trial? then t("admin.users.access.trial")
             else t("admin.users.access.free", limit: SubscriptionAccess.free_daily_questions) end %>
       </dd>

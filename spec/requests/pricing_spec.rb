@@ -35,6 +35,14 @@ RSpec.describe "Pricing", type: :request do
   describe "the student's current access" do
     let(:long_date) { ->(time) { I18n.l(time.to_date, format: :long) } }
 
+    it "tells staff their access has no end" do
+      sign_in(create(:user, :admin, :trial_expired))
+
+      get pricing_path
+
+      expect(response.body).to include(I18n.t("billing.access.staff"))
+    end
+
     it "names a granted window first" do
       user = create(:user, :granted_premium)
       sign_in(user)

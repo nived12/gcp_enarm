@@ -125,6 +125,11 @@ RSpec.describe SubscriptionAccess do
       expect(create(:user, :granted_premium, :trial_expired).daily_questions_limit).to be_nil
     end
 
+    it "is nil for admins and reviewers, with no trial and no granted date" do
+      expect(create(:user, :admin, :trial_expired).daily_questions_limit).to be_nil
+      expect(create(:user, :trial_expired, role: :reviewer).daily_questions_limit).to be_nil
+    end
+
     it "is the free allowance once the trial lapses" do
       expect(create(:user, :trial_expired).daily_questions_limit).to eq(10)
     end
