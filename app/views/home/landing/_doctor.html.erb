@@ -2,7 +2,10 @@
     the four reasons to buy, so they follow the story as its proof. It sits just before
     the prices, where "accessible" is the next thing a visitor checks. No credential line
     under the quote yet: the owner adds her residency once she has it. The photo is a 4:5
-    crop of dra_guadarrama/gaby_2.JPG (her beside the IMSS podium logo), resized to 640x800. %>
+    crop of dra_guadarrama/gaby_2.JPG centred on her, the IMSS podium cropped out but for
+    its edge, resized to 640x800. Everything on the certificate but the Gobierno de México
+    and IMSS logos and "RECONOCIMIENTO" is blurred (her name, the hospital, signers, date),
+    and metadata is stripped; redo both by hand if the photo is ever re-cropped. %>
 <% cheapest = Plan.all.map(&:daily_price).min %>
 <section class="landing-reveal mt-24 sm:mt-36" aria-labelledby="founder-title">
   <%# Below 768px the title and a portrait to its right are one pair, centred, so a wider
@@ -23,8 +26,8 @@
       </div>
 
       <%# A deterrent, not protection: the overlay takes the right-click and the drag so the
-          browser offers no "save image", and the file is small enough that the certificate
-          text is unreadable. Anything the browser shows can still be screenshotted. %>
+          browser offers no "save image". Anything the browser shows can still be
+          screenshotted or pulled from the network panel. %>
       <div class="card relative w-[40%] max-w-44 shrink-0 select-none self-center overflow-hidden md:col-start-1 md:row-span-2 md:row-start-1 md:w-full md:max-w-none md:self-start">
         <%= image_tag "landing/dra-guadarrama.jpg", alt: t("landing.doctor.photo_alt"), loading: "lazy",
               width: 640, height: 800, draggable: false,
