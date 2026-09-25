@@ -1,38 +1,56 @@
 <%# Who made this and why, in her words: the four things she could not find together are
     the four reasons to buy, so they follow the story as its proof. It sits just before
     the prices, where "accessible" is the next thing a visitor checks. No credential line
-    under the quote yet: the owner adds her residency once she has it. The photo appears
-    once the owner adds app/assets/images/landing/dra-guadarrama.jpg. %>
-<% photo = Rails.root.join("app/assets/images/landing/dra-guadarrama.jpg").exist? %>
+    under the quote yet: the owner adds her residency once she has it. The photo is a 4:5
+    crop of dra_guadarrama/gaby_2.JPG (her beside the IMSS podium logo), resized to 640x800. %>
 <% cheapest = Plan.all.map(&:daily_price).min %>
 <section class="landing-reveal mt-24 sm:mt-36" aria-labelledby="founder-title">
-  <div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16">
-    <div>
-      <% if photo %>
+  <%# Below 768px the title and a portrait to its right are one pair, centred, so a wider
+      phone or small tablet does not push them to opposite edges; the story runs full width
+      underneath. From 768px the pair dissolves into the grid (md:contents): the photo moves
+      to the left, spanning the title and the story, its top level with the eyebrow. %>
+  <div class="flex flex-col gap-8 md:grid md:grid-cols-[14rem_minmax(0,1fr)] md:gap-x-12 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-x-16">
+    <div class="flex items-center justify-center gap-5 sm:gap-8 md:contents">
+      <div class="min-w-0 md:col-start-2 md:row-start-1">
+        <p class="eyebrow"><%= t("landing.doctor.eyebrow") %></p>
+        <%# One block per line below 768px, so "Guadarrama" stands alone beside the photo.
+            Wider, the lines run together, with a non-breaking space before the surname so the
+            name never splits. %>
+        <% lines = t("landing.doctor.title_lines").map { |line| tag.span(line, class: "block md:inline") } %>
+        <h2 id="founder-title" class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]">
+          <%= safe_join(lines[0..-2], " ") %><span class="hidden md:inline">&nbsp;</span><%= lines.last %>
+        </h2>
+      </div>
+
+      <%# A deterrent, not protection: the overlay takes the right-click and the drag so the
+          browser offers no "save image", and the file is small enough that the certificate
+          text is unreadable. Anything the browser shows can still be screenshotted. %>
+      <div class="card relative w-[40%] max-w-44 shrink-0 select-none self-center overflow-hidden md:col-start-1 md:row-span-2 md:row-start-1 md:w-full md:max-w-none md:self-start">
         <%= image_tag "landing/dra-guadarrama.jpg", alt: t("landing.doctor.photo_alt"), loading: "lazy",
-              class: "mb-6 size-20 rounded-full object-cover" %>
-      <% end %>
-      <p class="eyebrow"><%= t("landing.doctor.eyebrow") %></p>
-      <h2 id="founder-title" class="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-[2.75rem]"><%= t("landing.doctor.title") %></h2>
-      <blockquote class="mt-8 space-y-4 border-l-2 border-accent pl-5 text-lg leading-relaxed text-ink sm:pl-7 sm:text-xl sm:leading-relaxed">
-        <% t("landing.doctor.story").each do |paragraph| %>
-          <p><%= paragraph %></p>
-        <% end %>
-      </blockquote>
+              width: 640, height: 800, draggable: false,
+              class: "pointer-events-none aspect-[4/5] w-full object-cover object-top" %>
+        <div class="absolute inset-0" aria-hidden="true"></div>
+      </div>
     </div>
 
-    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:pt-12">
-      <% %w[price easy current cited].each do |reason| %>
-        <li class="card flex gap-4 p-6">
-          <svg class="mt-0.5 size-5 shrink-0 text-accent" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="m4.5 10.5 3.5 3.5 7.5-8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>
-            <span class="block font-semibold text-ink"><%= t("landing.doctor.reasons.#{reason}.title") %></span>
-            <span class="mt-1 block text-sm leading-relaxed text-ink-muted"><%= t("landing.doctor.reasons.#{reason}.body", amount: money(cheapest)) %></span>
-          </span>
-        </li>
+    <blockquote class="space-y-4 border-l-2 border-accent pl-5 text-lg leading-relaxed text-ink sm:pl-7 sm:text-xl sm:leading-relaxed md:col-start-2 md:row-start-2">
+      <% t("landing.doctor.story").each do |paragraph| %>
+        <p><%= paragraph %></p>
       <% end %>
-    </ul>
+    </blockquote>
   </div>
+
+  <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4">
+    <% %w[price easy current cited].each do |reason| %>
+      <li class="card flex gap-4 p-6">
+        <svg class="mt-0.5 size-5 shrink-0 text-accent" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="m4.5 10.5 3.5 3.5 7.5-8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>
+          <span class="block font-semibold text-ink"><%= t("landing.doctor.reasons.#{reason}.title") %></span>
+          <span class="mt-1 block text-sm leading-relaxed text-ink-muted"><%= t("landing.doctor.reasons.#{reason}.body", amount: money(cheapest)) %></span>
+        </span>
+      </li>
+    <% end %>
+  </ul>
 </section>

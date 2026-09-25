@@ -910,11 +910,11 @@ es:
       see_plans: "Ver precios"
     doctor:
       eyebrow: "Quién está detrás"
-      title: "Creado por la Dra. Guadarrama"
+      title_lines: ["Creado por la", "Dra.", "Guadarrama"]
       story:
         - "Probé los simuladores que hay para el ENARM y a todos les faltaba algo. Unos cuestan demasiado. Otros son difíciles de usar, o no están al día. Y casi ninguno te enseña de qué parte de la GPC sale la respuesta."
         - "Hice GPCEnarm para tener las cuatro cosas en un solo lugar: lo que yo buscaba y no encontré."
-        - "Lo construí con mi esposo, que es ingeniero de software: yo me encargo de la medicina y él de que todo funcione bien, en la computadora o en el celular."
+        - "Lo construí con mi esposo, que es ingeniero de software: yo me encargo de la medicina y él de que todo funcione bien en la plataforma."
       photo_alt: "La Dra. Guadarrama"
       reasons:
         price:

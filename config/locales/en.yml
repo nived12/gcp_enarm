@@ -908,11 +908,11 @@ en:
       see_plans: "See pricing"
     doctor:
       eyebrow: "Who is behind it"
-      title: "Made by Dra. Guadarrama"
+      title_lines: ["Made by", "Dra.", "Guadarrama"]
       story:
         - "I tried the simulators there are for the ENARM and every one was missing something. Some cost too much. Others are hard to use, or out of date. And almost none shows you which part of the GPC the answer comes from."
         - "I made GPCEnarm to have all four in one place: what I was looking for and could not find."
-        - "I built it with my husband, a software engineer: I take care of the medicine, and he makes sure everything works well, on the computer or on the phone."
+        - "I built it with my husband, a software engineer: I take care of the medicine, and he makes sure everything works well on the platform."
       photo_alt: "Dra. Guadarrama"
       reasons:
         price:
