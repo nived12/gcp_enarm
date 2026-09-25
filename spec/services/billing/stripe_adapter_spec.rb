@@ -37,6 +37,7 @@ RSpec.describe Billing::StripeAdapter do
                                          "product_data" => { "name" => "GPCEnarm · 6 meses de acceso" } } }
             } &&
             body["client_reference_id"] == user.id.to_s && body["customer_email"] == user.email &&
+            body["locale"] == "es-419" &&
             body["metadata"] == { "user_id" => user.id.to_s, "plan_code" => "six_months" } &&
             body["payment_intent_data"] == { "metadata" => { "user_id" => user.id.to_s,
 "plan_code" => "six_months" } } &&

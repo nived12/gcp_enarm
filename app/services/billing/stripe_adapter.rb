@@ -6,6 +6,8 @@
 # Stripe keys at all, and it does — checkout reports itself unavailable.
 module Billing
   class StripeAdapter
+    CHECKOUT_LOCALES = { "es" => "es-419", "en" => "en" }.freeze
+
     CHECKOUT_COMPLETED = "checkout.session.completed".freeze
     ASYNC_PAYMENT_SUCCEEDED = "checkout.session.async_payment_succeeded".freeze
     CHARGE_REFUNDED = "charge.refunded".freeze
@@ -28,9 +30,9 @@ module Billing
     # charged is the one Plan shows on the pricing page and there is nothing to keep in
     # sync. No payment_method_types: the dashboard decides, which is where OXXO is enabled.
     #
-    # No `locale` either, so Checkout follows the browser. stripe 19.6.2 (API
-    # 2026-08-26.dahlia) types it as a free String and lists no accepted values, so
-    # "es-419" could not be confirmed from the bundle; confirm it in Stripe's docs first.
+    # Checkout and the OXXO voucher speak the student's language, not the browser's: a
+    # student reading the app in Spanish on an English browser got an English checkout.
+    # "es-419" (Latin American Spanish) is in the API reference's list of locales.
     def create_checkout_session(user:, plan:, success_url:, cancel_url:)
       metadata = { user_id: user.id.to_s, plan_code: plan.code }
       session = client.v1.checkout.sessions.create(
@@ -38,6 +40,7 @@ module Billing
         line_items: [ { quantity: 1, price_data: price_data(plan) } ],
         client_reference_id: user.id.to_s,
         customer_email: user.email,
+        locale: CHECKOUT_LOCALES.fetch(user.locale.to_s, "es-419"),
         metadata: metadata,
         payment_intent_data: { metadata: metadata },
         success_url: success_url,
