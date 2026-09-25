@@ -33,7 +33,7 @@ RSpec.describe "Pearls", type: :request do
     prompt = body.index("Se recomienda iniciar amoxicilina durante ")
     expect(prompt).to be < body.index(I18n.t("pearls.card.blank_label"))
     expect(body).to include(">10 días</strong>", kase.guideline.catalog_key, "2022", ">A<")
-    expect(body).not_to include("<mark>", "<img")
+    expect(body).not_to include("<mark>", "<figure")
   end
 
   it "says when the pearl's guideline is past its validity" do

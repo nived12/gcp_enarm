@@ -4,8 +4,11 @@
         trading colours on hover. The spans touch, so the link's text stays "GPCEnarm". %>
     <%# Signed out, the wordmark leads to the landing page, which with the hosts split is not
         on this host: the app's root sends a signed-out visitor to sign in. %>
-    <%= link_to authenticated? ? root_path : landing_root_url, class: "group text-lg font-semibold tracking-tight" do %>
-      <span class="text-ink transition-colors group-hover:text-accent">GPC</span><span class="text-accent transition-colors group-hover:text-ink">Enarm</span>
+    <%# The icon keeps its brand colours in both themes, like an app icon; it is decorative,
+        so the link's accessible name stays the wordmark. %>
+    <%= link_to authenticated? ? root_path : landing_root_url, class: "group flex items-center gap-2 text-lg font-semibold tracking-tight" do %>
+      <%= image_tag "brand/gpcenarm-icon.svg", alt: "", width: 28, height: 28, class: "size-7 shrink-0" %>
+      <span><span class="text-ink transition-colors group-hover:text-accent">GPC</span><span class="text-accent transition-colors group-hover:text-ink">Enarm</span></span>
     <% end %>
 
     <div class="ml-auto flex items-center gap-1">

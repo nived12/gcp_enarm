@@ -4,6 +4,7 @@
       always shown beside "Reanima tu racha", so it reads as something to fix, not a verdict;
     - none yet: a faint empty heart, nothing to revive.
 
+    The pulse is the app icon's trace, a beat that ends in a check mark.
     The flat line is the pulse line squashed flat, so the moment a streak is lost can be
     shown as the pulse flattening. streak_heart_controller plays that once, and a double
     beat once on the day's first view after it counts; `moment` is what it remembers. %>
@@ -20,6 +21,6 @@
         fill="<%= state == :active ? "currentColor" : "none" %>" fill-opacity="0.15"/>
   <% unless state == :none %>
     <path class="streak-heart__pulse <%= "streak-heart__pulse--flat" if state == :lost %>"
-          d="M5 12h3l1.5-2.5 2 5 1.5-2.5h6" pathLength="1"/>
+          d="M5 12.5h3.2l1.4-2.8 1.6 5.4 1.4-2.6 1.6 1.6 4.4-4.8" pathLength="1"/>
   <% end %>
 </svg>
