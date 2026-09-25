@@ -37,8 +37,10 @@ RSpec.describe "Landing page", type: :request do
   it "tells who made it and answers the doubts that stop a sign-up" do
     get root_path
 
-    expect(response.body).to include(*I18n.t("landing.doctor.title_lines"), I18n.t("landing.faq.items.trial.question"),
-                                         I18n.t("landing.faq.items.oxxo.question"))
+    expect(response.body).to include(
+      *I18n.t("landing.doctor.title_lines"), I18n.t("landing.faq.items.trial.question"),
+      I18n.t("landing.faq.items.oxxo.question")
+    )
     expect(response.body).to include(I18n.t("landing.hero.reassurance", trial_days: SubscriptionAccess.trial_days))
   end
 
