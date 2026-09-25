@@ -75,7 +75,9 @@ for (const [device, { viewport, questionOffset }] of Object.entries(DEVICES)) {
   }
 }
 
-// The preview card: the product's claim as the page shows it, one highlighted citation.
+// The preview card: the logo, the product's claim as the page shows it, one highlighted
+// citation. The logo sits centred at the top because a small link preview (WhatsApp on a
+// computer) crops the image to its middle square.
 const og = await browser.newPage({ viewport: { width: 1200, height: 630 }, colorScheme: "light" })
 await og.goto(`${BASE}/`)
 await og.evaluate(() => {
@@ -85,7 +87,11 @@ await og.evaluate(() => {
   document.body.style.cssText = "margin:0;display:grid;place-items:center;height:630px;padding:0 72px;box-sizing:border-box"
   const wrap = document.createElement("div")
   wrap.style.cssText = "width:100%"
-  wrap.innerHTML = `<p style="font:600 40px/1.15 'Alan Sans',sans-serif;letter-spacing:-0.02em;margin:0 0 28px;color:var(--ink)">Simulador ENARM con la GPC detrás de cada respuesta.</p>`
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 22px;font:700 34px/1 'Alan Sans',sans-serif;letter-spacing:-0.02em">
+      <img src="/icon.svg" width="52" height="52" alt=""><span><span style="color:var(--ink)">GPC</span><span style="color:var(--accent)">Enarm</span></span>
+    </div>
+    <p style="font:600 36px/1.15 'Alan Sans',sans-serif;letter-spacing:-0.02em;margin:0 0 24px;color:var(--ink);text-align:center">Simulador ENARM con la GPC detrás de cada respuesta.</p>`
   figure.style.cssText = "margin:0"
   wrap.append(figure)
   document.body.append(wrap)
