@@ -99,6 +99,9 @@ RSpec.describe SubscriptionAccess do
             .create_answer!(answered_at: time)
       end
       zone = Time.find_zone("America/Tijuana")
+      # Ended well before the dates travelled to; the trait's "a day ago" is relative to
+      # the real clock and put these dates back inside the trial once it passed them.
+      user.update_column(:trial_ends_at, zone.local(2026, 9, 1))
       answer_at.call(0, zone.local(2026, 9, 22, 23, 59))
       answer_at.call(1, zone.local(2026, 9, 23, 8))
       answer_at.call(2, zone.local(2026, 9, 23, 22))
