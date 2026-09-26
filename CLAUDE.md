@@ -10,6 +10,18 @@ The full build plan lives outside the repo at `../initial_plan.md`
 
 ## Non-negotiables
 
+**Nothing reaches production without the owner's yes, asked for each time.** Railway
+deploys `main` automatically, so a `git push` to `main` is a production deploy. The same
+goes for anything else that changes the live site: setting or removing Railway
+variables (which redeploys), redeploying or restarting a service, and writing to the
+production database or running tasks in its console. Commit locally, say what would go
+out, and wait for the owner to agree. One approval covers that one action, not the
+next.
+
+**Merging needs the owner's yes too.** Work on a branch or worktree stays there until
+the owner agrees to merge it into `main`, even locally, and no branch is pushed to
+GitHub without asking.
+
 **Code is English. The UI is Spanish.** Every identifier — class, table, column, enum
 value, route, partial, i18n key, comment — is English. Spanish exists only as *values* in
 `config/locales/es.yml`. Domain terms get translated, not transliterated: `pass_number`
