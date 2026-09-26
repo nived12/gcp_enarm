@@ -110,6 +110,32 @@ namespace :questions do
     puts "\n#{tally.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")} tokens=#{run.total_tokens}"
   end
 
+  desc "Judge again the supported or flawed cases verified before a time, then publish: " \
+       "rake questions:recheck[count,2026-09-26T02:00:00Z]"
+  task :recheck, %i[count before] => :environment do |_task, args|
+    abort("Uso: rake questions:recheck[count,before]") if args[:before].blank?
+    before = Time.zone.parse(args[:before]) || abort("No entiendo la fecha #{args[:before]}")
+    provider = Llm::Provider.for(:verifier)
+    abort("Falta la clave del verificador. Revisa .env") unless provider.configured?
+
+    run = GenerationRun.create!(
+      purpose: "verification", provider: provider.name, model: provider.model,
+      started_at: Time.current, notes: "recheck"
+    )
+    tally = Hash.new(0)
+    ClinicalCase.recheckable_before(before).order(:id).limit((args[:count] || 10).to_i).each do |kase|
+      result = Questions::Verifier.call(kase, run: run)
+      state = result.success? ? result.payload[:verdict] : result.errors.full_messages.first
+      tally[state] += 1
+      puts "caso #{kase.id}: #{state}"
+    end
+
+    run.update!(status: "completed", finished_at: Time.current)
+    payload = Questions::Publisher.call.payload
+    puts "\n#{tally.map { |verdict, n| "#{verdict}=#{n}" }.join(" ")} costo=$#{format("%.4f", run.cost_usd)} " \
+         "en_el_banco=#{payload[:live]}"
+  end
+
   desc "Publish every verifier-supported case nobody has withdrawn, and pull back any that no longer qualify"
   task publish: :environment do
     payload = Questions::Publisher.call.payload

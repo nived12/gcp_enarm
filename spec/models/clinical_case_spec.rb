@@ -1,6 +1,20 @@
 require "rails_helper"
 
 RSpec.describe ClinicalCase do
+  describe ".recheckable_before" do
+    it "reads supported and flawed cases verified before the time, never retired ones or later ones" do
+      cutoff = Time.zone.parse("2026-09-26 02:00")
+      before = cutoff - 1.hour
+      supported = create(:clinical_case, verification_verdict: "supported", verified_at: before)
+      flawed = create(:clinical_case, verification_verdict: "flawed", verified_at: before)
+      create(:clinical_case, verification_verdict: "unsupported", verified_at: before)
+      create(:clinical_case, verification_verdict: "supported", verified_at: before, status: "retired")
+      create(:clinical_case, verification_verdict: "supported", verified_at: cutoff + 1.minute)
+
+      expect(described_class.recheckable_before(cutoff)).to contain_exactly(supported, flawed)
+    end
+  end
+
   describe "#publishable?" do
     it "is true only once a verifier has called it supported" do
       expect(build(:clinical_case, verification_verdict: "supported")).to be_publishable

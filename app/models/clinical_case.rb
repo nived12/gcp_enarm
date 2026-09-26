@@ -50,6 +50,13 @@ class ClinicalCase < ApplicationRecord
   WITHDRAWN = %w[flagged retired].freeze
 
   scope :publishable, -> { verdict_supported.where.not(status: WITHDRAWN) }
+  # Cases a second opinion passed, or found only item-writing defects in, before `time`:
+  # what questions:recheck reads again after the verifier learns to see something new.
+  # Passing the same time twice continues rather than repeats, since a recheck moves
+  # verified_at past it.
+  scope :recheckable_before, lambda { |time|
+    where(verification_verdict: %w[supported flawed]).where(verified_at: ...time).where.not(status: "retired")
+  }
 
   # The cases an area holds: those about it, and those that happen in it. The owner's
   # decision of 2026-09-23 — a case of pneumonia seen in urgencias counts for Medicina
