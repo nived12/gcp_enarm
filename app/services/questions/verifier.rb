@@ -19,7 +19,9 @@ module Questions
 
     # Item-writing defects that make a question easier than the real exam, found reading
     # the validation batch (2026-09-25). None needs the marked answer, so asking for them
-    # leaves the blind answering intact. A code the model invents is ignored: only these
+    # leaves the blind answering intact. The second pilot showed the verifier calling a
+    # correct option that echoes the recommendation a giveaway; the student never sees the
+    # recommendation, so the prompt says that is expected. A code the model invents is ignored: only these
     # hold a case back, and each has a label a reviewer reads (review.flaws).
     FLAWS = %w[answer_in_stem other_patient repeats_question implausible_distractor giveaway_wording].freeze
 
@@ -86,9 +88,12 @@ module Questions
         - repeats_question: pregunta lo mismo que otra pregunta del caso, con otras palabras.
         - implausible_distractor: alguna opción es absurda o nadie con formación médica la
           elegiría.
-        - giveaway_wording: el enunciado contiene palabras que delatan la respuesta, o una
-          opción destaca de las demás por su forma o su longitud.
-        Marca solo defectos claros; en "note" di cuál es, en una oración.
+        - giveaway_wording: la viñeta o el enunciado de la pregunta contienen palabras que
+          delatan la respuesta, o una opción destaca claramente de las demás por su forma.
+        El alumno no ve la recomendación: que la opción respaldada repita su texto es lo
+        esperado y no es un defecto. Tampoco lo es que la recomendación no alcance para
+        decidir; eso ya lo dice "decidable". Marca solo defectos claros; en "note" di cuál
+        es, en una oración.
 
         Devuelve SOLO JSON, sin markdown:
         {"questions":[{"question":1,"option":"B","decidable":true,"flaws":[],"note":"..."}]}
