@@ -45,8 +45,29 @@ RSpec.describe Questions::Prompt do
       expect(text).to include("paciente COMPLETO", "Signos vitales COMPLETOS", "3 preguntas")
     end
 
-    it "asks for a short vignette and two questions when focused" do
-      expect(prompt(detail: :focused)).to include("breve y centrada", "2 preguntas")
+    it "asks for a short vignette and two questions when focused, still with vitals and an exam" do
+      expect(prompt(detail: :focused)).to include(
+        "breve y centrada", "2 preguntas", "signos vitales con unidades", "exploración física dirigida"
+      )
+    end
+
+    it "writes two full workups for every focused case" do
+      expect(Array.new(6) { |index| described_class.detail_for(index) })
+        .to eq(%i[full_workup full_workup focused] * 2)
+    end
+  end
+
+  # Each of these made a validation-batch item easier than the real exam.
+  describe "what a question may not do" do
+    it "forbids asking for what the vignette says, other patients, repeats and giveaways" do
+      expect(prompt).to include(
+        "Nunca pregunta por un dato", "Trata sobre ESTE paciente", "no repitas la misma pregunta",
+        "no contiene palabras que delaten"
+      )
+    end
+
+    it "asks for distractors of one kind and length that a physician would consider" do
+      expect(prompt).to include("la correcta no es la más larga", "algo que un médico consideraría")
     end
 
     it "falls back to focused rather than trusting an unknown detail level" do

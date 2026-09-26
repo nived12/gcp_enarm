@@ -1,6 +1,15 @@
 require "rails_helper"
 
 RSpec.describe Questions::CaseGenerator do
+  # Long enough to pass CaseBuilder's length floor, the way a real vignette is.
+  STEM = "Paciente masculino de 54 años con diabetes mellitus tipo 2 de 10 años en manejo con " \
+         "metformina e hipertensión arterial de 6 años con losartán, que acude a urgencias por " \
+         "dolor torácico opresivo de 40 minutos de evolución, irradiado a brazo izquierdo y " \
+         "acompañado de diaforesis. Signos vitales: TA 150/90 mmHg, FC 104 lpm, FR 22 rpm, " \
+         "SatO2 94% al aire ambiente, temperatura 36.7 °C. A la exploración, ruidos cardiacos " \
+         "rítmicos sin soplos, campos pulmonares bien ventilados, abdomen blando sin dolor, " \
+         "pulsos periféricos presentes y simétricos, sin edema de miembros inferiores."
+
   let(:guideline) { create(:guideline, year: Date.current.year) }
   let(:section) { create(:guideline_section, guideline: guideline, kind: "recommendation") }
   let!(:recommendation) do
@@ -30,7 +39,7 @@ RSpec.describe Questions::CaseGenerator do
   end
 
   def one_case(*questions)
-    { "cases" => [{ "stem" => "Paciente de 54 años con dolor torácico.", "questions" => questions }] }
+    { "cases" => [{ "stem" => STEM, "questions" => questions }] }
   end
 
   it "refuses a guideline with no actionable recommendations" do
@@ -63,14 +72,14 @@ RSpec.describe Questions::CaseGenerator do
   end
 
   it "builds a case with its questions and options" do
-    stub_model(one_case(question))
+    stub_model(one_case(question, question))
 
     result = described_class.call(guideline)
     kase = result.payload[:cases].first
 
     expect(result).to be_success
     expect(kase.stem).to include("dolor torácico")
-    expect(kase.questions.size).to eq(1)
+    expect(kase.questions.size).to eq(2)
     expect(kase.questions.first.answer_options.size).to eq(4)
     expect(kase.questions.first.recommendation).to eq(recommendation)
   end
@@ -78,7 +87,7 @@ RSpec.describe Questions::CaseGenerator do
   describe "the generation run" do
     it "records tokens, cases and rejections" do
       run = create(:generation_run)
-      stub_model(one_case(question, question(quote: "inventado")))
+      stub_model(one_case(question, question, question(quote: "inventado")))
 
       described_class.call(guideline, run: run)
 
@@ -110,7 +119,7 @@ RSpec.describe Questions::CaseGenerator do
     end
 
     it "works without a run at all" do
-      stub_model(one_case(question))
+      stub_model(one_case(question, question))
 
       expect(described_class.call(guideline)).to be_success
     end
@@ -118,7 +127,7 @@ RSpec.describe Questions::CaseGenerator do
 
   it "writes from the window of statements it is handed" do
     later = create(:recommendation, guideline_section: section, text: "Se recomienda iniciar aspirina 300 mg.")
-    stub_model(one_case(question(quote: "iniciar aspirina 300 mg")))
+    stub_model(one_case(question(quote: "iniciar aspirina 300 mg"), question(quote: "iniciar aspirina 300 mg")))
 
     result = described_class.call(guideline, recommendations: [later])
 
@@ -126,13 +135,13 @@ RSpec.describe Questions::CaseGenerator do
       expect(prompt).to include("1. Se recomienda iniciar aspirina 300 mg.")
       expect(prompt).not_to include("electrocardiograma")
     end
-    expect(result.payload[:cases].sole.questions.sole.recommendation).to eq(later)
+    expect(result.payload[:cases].sole.questions.map(&:recommendation)).to eq([later, later])
   end
 
   # The detail level and the language are the prompt's and the builder's business; this
   # only proves the generator hands them on.
   it "passes the rotation's choices through to the prompt and the saved case" do
-    stub_model(one_case(question))
+    stub_model(one_case(question, question))
 
     kase = described_class.call(guideline, detail: :full_workup, locale: "en").payload[:cases].sole
 
@@ -143,7 +152,7 @@ RSpec.describe Questions::CaseGenerator do
   end
 
   it "reads JSON the model wrapped in a markdown fence" do
-    stub_model("```json\n#{one_case(question).to_json}\n```")
+    stub_model("```json\n#{one_case(question, question).to_json}\n```")
 
     expect(described_class.call(guideline).payload[:cases].size).to eq(1)
   end

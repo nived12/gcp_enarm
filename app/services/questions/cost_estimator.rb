@@ -108,12 +108,12 @@ module Questions
       }
     end
 
-    # Alternating the two vignette lengths, as GenerationRunner's rotation does.
+    # Mixing the two vignette lengths as GenerationRunner's rotation does.
     def mean_prompt_chars
       return 0 if windows.empty?
 
       windows.each_with_index.sum do |(guideline, statements), index|
-        Prompt.new(guideline, statements, detail: index.even? ? :full_workup : :focused).to_s.length
+        Prompt.new(guideline, statements, detail: Prompt.detail_for(index)).to_s.length
       end.to_f / windows.size
     end
 

@@ -18,6 +18,13 @@ module Questions
     QUESTIONS_BY_DETAIL = { focused: 2, full_workup: 3 }.freeze
     DETAIL_LEVELS = QUESTIONS_BY_DETAIL.keys.freeze
 
+    # Two full workups for every focused case. Alternating one to one (until 2026-09-25)
+    # made half the bank 52–90 words long, and reading the validation batch found the
+    # short half was where the thin cases and the obvious distractors were.
+    def self.detail_for(index)
+      (index % 3) == 2 ? :focused : :full_workup
+    end
+
     # The convocatoria (§9.1) examines "competencias cognitivas contextualizadas en casos
     # clínicos enfocados en Salud Pública, Urgencias y Medicina Familiar" — the three
     # contexts are where a case happens, the four troncales are what it is about. The
@@ -64,6 +71,31 @@ module Questions
       o instrucción al alumno. Cada pregunta va únicamente en su propio campo "text".
     TEXT
 
+    # From reading the validation batch (2026-09-25): a question whose answer is a finding the
+    # vignette already names ("¿qué signo es característico?" over a stem listing it), a
+    # second question about a hypothetical other patient, two questions asking the same
+    # thing, and distractors nobody would choose. Each makes the item easier than the real
+    # exam, and the point is passing the real exam.
+    QUESTION_INSTRUCTIONS = <<~TEXT.strip
+      Cada pregunta:
+      - Evalúa una decisión clínica que el alumno debe razonar integrando los datos del caso
+        con la recomendación, con la dificultad del ENARM real. Nunca pregunta por un dato
+        que la viñeta ya dice: si la viñeta describe un signo, no preguntes cuál es el signo.
+      - Trata sobre ESTE paciente. No introduzcas otro paciente hipotético ni cambies de
+        caso a mitad de la pregunta.
+      - Las preguntas de un mismo caso evalúan decisiones distintas (diagnóstico, estudio,
+        tratamiento, seguimiento o prevención); no repitas la misma pregunta con otras
+        palabras.
+      - El enunciado no contiene palabras que delaten la opción correcta.
+      - Exactamente CUATRO opciones: una correcta y tres distractores. Las cuatro son del
+        mismo tipo (todas fármacos, todas estudios, todas conductas) y de longitud y forma
+        parecidas; la correcta no es la más larga ni la más detallada.
+      - Cada distractor es algo que un médico consideraría para este paciente: lo correcto
+        en otro momento o situación, una alternativa de segunda línea, o un error frecuente
+        de quien estudió el tema de forma incompleta. Nunca una opción absurda, peligrosa o
+        que nadie elegiría: un distractor evidente hace inútil el reactivo.
+    TEXT
+
     # An unknown detail level falls back to focused rather than failing the call.
     def initialize(guideline, recommendations, detail: :focused, locale: "es")
       @guideline = guideline
@@ -87,10 +119,9 @@ module Questions
 
         #{SETTING_INSTRUCTIONS}
 
-        Cada pregunta:
-        - Exactamente CUATRO opciones: una correcta y tres distractores plausibles, del tipo
-          que elegiría alguien que estudió el tema de forma incompleta. Un distractor
-          evidentemente absurdo hace inútil el reactivo.
+        #{QUESTION_INSTRUCTIONS}
+
+        Además, en cada pregunta:
         - Una explicación breve de por qué la correcta lo es.
         #{RATIONALE_INSTRUCTIONS}
         - El número de la recomendación en la que se basa, y una cita textual de esa
@@ -135,9 +166,10 @@ module Questions
     # different thing entirely.
     def vignette_instructions
       return <<~TEXT.strip if detail == :focused
-        La viñeta es breve y centrada (60 a 90 palabras): edad, sexo, antecedentes
-        relevantes, motivo de consulta y los hallazgos necesarios. No todo reactivo del
-        examen real es largo.
+        La viñeta es breve y centrada (100 a 130 palabras), pero trae al paciente: edad,
+        sexo, antecedentes relevantes con su duración, motivo de consulta con su evolución,
+        signos vitales con unidades y la exploración física dirigida, con algún hallazgo
+        normal. No todo reactivo del examen real es largo, pero ninguno omite al paciente.
       TEXT
 
       <<~TEXT.strip

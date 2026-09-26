@@ -93,7 +93,7 @@ module Questions
       scheduled = index.positive? && (index % english_every).zero?
 
       {
-        detail: index.even? ? :full_workup : :focused,
+        detail: Prompt.detail_for(index),
         locale: index == forced_english || scheduled ? "en" : "es"
       }
     end

@@ -1,6 +1,15 @@
 require "rails_helper"
 
 RSpec.describe Questions::CaseBuilder do
+  # Long enough to pass the length floor, the way a real vignette is.
+  STEM = "Paciente masculino de 54 años con diabetes mellitus tipo 2 de 10 años en manejo con " \
+         "metformina e hipertensión arterial de 6 años con losartán, que acude a urgencias por " \
+         "dolor torácico opresivo de 40 minutos de evolución, irradiado a brazo izquierdo y " \
+         "acompañado de diaforesis. Signos vitales: TA 150/90 mmHg, FC 104 lpm, FR 22 rpm, " \
+         "SatO2 94% al aire ambiente, temperatura 36.7 °C. A la exploración, ruidos cardiacos " \
+         "rítmicos sin soplos, campos pulmonares bien ventilados, abdomen blando sin dolor, " \
+         "pulsos periféricos presentes y simétricos, sin edema de miembros inferiores."
+
   let(:guideline) { create(:guideline) }
   let(:section) { create(:guideline_section, guideline: guideline, kind: "recommendation") }
   let(:recommendation) do
@@ -20,7 +29,7 @@ RSpec.describe Questions::CaseBuilder do
   end
 
   def one_case(*questions)
-    { "cases" => [{ "stem" => "Paciente de 54 años con dolor torácico.", "questions" => questions }] }
+    { "cases" => [{ "stem" => STEM, "questions" => questions }] }
   end
 
   def build_from(payload, recommendations: [recommendation], **options)
@@ -28,34 +37,32 @@ RSpec.describe Questions::CaseBuilder do
   end
 
   it "saves a case with its questions and options" do
-    kase = build_from(one_case(question))[:cases].sole
+    kase = build_from(one_case(question, question))[:cases].sole
 
     expect(kase).to be_persisted
-    expect(kase).to have_attributes(
-      stem: "Paciente de 54 años con dolor torácico.", locale: "es",
-      source: "gpc_generated", guideline: guideline
-    )
-    expect(kase.questions.sole.answer_options.size).to eq(4)
-    expect(kase.questions.sole.recommendation).to eq(recommendation)
+    expect(kase).to have_attributes(stem: STEM, locale: "es", source: "gpc_generated", guideline: guideline)
+    expect(kase.questions.size).to eq(2)
+    expect(kase.questions.first.answer_options.size).to eq(4)
+    expect(kase.questions.first.recommendation).to eq(recommendation)
   end
 
   it "keeps why each distractor is wrong, and nothing on the correct option" do
     opts = options.each_with_index.map { |option, i| option.merge("rationale" => "  Razón\n#{i}  ") }
 
-    kase = build_from(one_case(question(options: opts)))[:cases].sole
+    kase = build_from(one_case(question(options: opts), question))[:cases].sole
 
-    rationales = kase.questions.sole.answer_options.map(&:rationale)
+    rationales = kase.questions.first.answer_options.map(&:rationale)
     expect(rationales).to eq([nil, "Razón 1", "Razón 2", "Razón 3"])
   end
 
   it "records the language it was asked for" do
-    expect(build_from(one_case(question), locale: "en")[:cases].sole.locale).to eq("en")
+    expect(build_from(one_case(question, question), locale: "en")[:cases].sole.locale).to eq("en")
   end
 
   it "files the case under the guideline's main topic and its specialty" do
     topic = create(:guideline_topic, guideline: guideline).topic
 
-    kase = build_from(one_case(question))[:cases].sole
+    kase = build_from(one_case(question, question))[:cases].sole
 
     expect(kase).to have_attributes(topic: topic, specialty: topic.branch.specialty)
   end
@@ -63,7 +70,7 @@ RSpec.describe Questions::CaseBuilder do
   describe "the setting the model names" do
     def with_setting(code, count: 1)
       { "cases" => Array.new(count) do |i|
-        { "stem" => "Paciente #{i} con dolor torácico.", "setting" => code, "questions" => [question] }
+        { "stem" => "#{STEM} Caso #{i}.", "setting" => code, "questions" => [question, question] }
       end }
     end
 
@@ -91,7 +98,7 @@ RSpec.describe Questions::CaseBuilder do
     it "keeps the case with an unknown setting when the model names none" do
       create(:emergency_setting)
 
-      expect(build_from(one_case(question))[:cases].sole.setting).to be_nil
+      expect(build_from(one_case(question, question))[:cases].sole.setting).to be_nil
     end
   end
 
@@ -149,18 +156,35 @@ RSpec.describe Questions::CaseBuilder do
       end
 
       it "keeps a stem that only quotes a short question or asks mid-sentence" do
-        stem = "La madre pregunta: ¿es contagioso? Refiere fiebre de 38.5 °C."
+        stem = "#{STEM} La esposa pregunta: ¿es grave? Refiere que nunca había tenido dolor así."
         short = question(text: "¿Diagnóstico?")
 
-        expect(build_from(case_with_stem(stem, short))[:cases].size).to eq(1)
+        expect(build_from(case_with_stem(stem, short, short))[:cases].size).to eq(1)
       end
     end
 
     it "keeps the good questions in a case that also had a bad one" do
+      built = build_from(one_case(question, question(quote: "inventado"), question))
+
+      expect(built[:cases].sole.questions.size).to eq(2)
+      expect(built[:rejected]).to eq(1)
+    end
+
+    # The validation batch's short cases (52–90 words) were the thin ones; the real
+    # exam's are 150–200.
+    it "rejects the whole case when the vignette is shorter than the floor" do
+      stem = STEM.split.first(described_class::MIN_STEM_WORDS - 1).join(" ")
+      built = build_from({ "cases" => [{ "stem" => stem, "questions" => [question, question] }] })
+
+      expect(built).to eq(cases: [], rejected: 2, reasons: { "stem_too_short" => 2 })
+    end
+
+    it "drops a case left with one question, since the exam asks two or three per case" do
       built = build_from(one_case(question, question(quote: "inventado")))
 
-      expect(built[:cases].sole.questions.size).to eq(1)
-      expect(built[:rejected]).to eq(1)
+      expect(built).to eq(
+        cases: [], rejected: 2, reasons: { "quote_not_in_recommendation" => 1, "too_few_questions" => 1 }
+      )
     end
 
     it "skips a case with no vignette or no questions" do
@@ -184,7 +208,7 @@ RSpec.describe Questions::CaseBuilder do
   describe "difficulty" do
     def difficulty_for(grade)
       recommendation.update!(grade: grade)
-      build_from(one_case(question))[:cases].sole.difficulty
+      build_from(one_case(question, question))[:cases].sole.difficulty
     end
 
     it "calls a case from strong evidence an easier item and one from weak evidence a harder one" do

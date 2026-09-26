@@ -21,6 +21,14 @@ module Questions
     # Below this length a "question" is a word or two, which any vignette may contain.
     QUESTION_ECHO_MIN_LENGTH = 20
 
+    # The prompt asks for 100 words at the least; this is the floor under it. The first
+    # pilot's short cases (52–90 words) were the thin ones, with the obvious distractors.
+    MIN_STEM_WORDS = 80
+
+    # The convocatoria examines two or three questions per case. A case the rejections
+    # left with one is not the format the student will sit.
+    MIN_QUESTIONS = 2
+
     # `recommendations` must be in the order the prompt numbered them, since that number
     # is how the model says which one it used.
     def initialize(payload, guideline:, recommendations:, run: nil, locale: "es")
@@ -62,6 +70,7 @@ module Questions
       questions = Array(attributes["questions"])
       return if attributes["stem"].blank? || questions.empty?
       return reject(questions.size, :stem_asks_question) if stem_asks_question?(attributes["stem"], questions)
+      return reject(questions.size, :stem_too_short) if attributes["stem"].split.size < MIN_STEM_WORDS
 
       kase = ClinicalCase.new(
         stem: attributes["stem"], guideline: guideline, generation_run: run,
@@ -70,6 +79,7 @@ module Questions
       )
       built = questions.filter_map.with_index(1) { |question, position| build_question(kase, question, position) }
       return if built.empty?
+      return reject(built.size, :too_few_questions) if built.size < MIN_QUESTIONS
 
       # A rejected question must not leave a hole. Positions number what survived, not
       # what the model sent, or a case reads "Pregunta 1, Pregunta 3" to a student.
