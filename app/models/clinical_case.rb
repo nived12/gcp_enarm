@@ -34,7 +34,7 @@ class ClinicalCase < ApplicationRecord
     prefix: :source
 
   enum :verification_verdict,
-    { supported: "supported", unsupported: "unsupported", ambiguous: "ambiguous" },
+    { supported: "supported", unsupported: "unsupported", ambiguous: "ambiguous", flawed: "flawed" },
     prefix: :verdict
 
   validates :stem, presence: true
@@ -82,7 +82,7 @@ class ClinicalCase < ApplicationRecord
   # already taken, so it leaves the queue.
   scope :in_review_queue, lambda {
     where.not(status: "retired").and(
-      status_flagged.or(where(verification_verdict: [nil, "unsupported", "ambiguous"])).or(with_open_reports)
+      status_flagged.or(where(verification_verdict: [nil, "unsupported", "ambiguous", "flawed"])).or(with_open_reports)
     )
   }
 

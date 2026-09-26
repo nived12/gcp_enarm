@@ -52,7 +52,7 @@ module Admin
       case name
       when "reported" then ClinicalCase.in_review_queue.with_open_reports
       when "flagged" then ClinicalCase.status_flagged
-      when "disputed" then ClinicalCase.in_review_queue.where(verification_verdict: %w[unsupported ambiguous])
+      when "disputed" then ClinicalCase.in_review_queue.where(verification_verdict: %w[unsupported ambiguous flawed])
       when "unverified" then ClinicalCase.in_review_queue.where(verification_verdict: nil)
       when "retired" then ClinicalCase.status_retired
       else ClinicalCase.in_review_queue

@@ -335,7 +335,14 @@ es:
       supported: "Respaldado"
       ambiguous: "Ambiguo"
       unsupported: "No respaldado"
+      flawed: "Con defectos"
       unverified: "Sin verificar"
+    flaws:
+      answer_in_stem: "la respuesta ya está en la viñeta"
+      other_patient: "habla de otro paciente"
+      repeats_question: "repite otra pregunta del caso"
+      implausible_distractor: "un distractor que nadie elegiría"
+      giveaway_wording: "el enunciado o la forma de una opción delata la respuesta"
     question_count:
       one: "1 pregunta"
       other: "%{count} preguntas"
@@ -385,6 +392,7 @@ es:
         supported: "Otro modelo respondió cada pregunta usando solo la recomendación citada y eligió la misma opción."
         ambiguous: "Otro modelo no pudo decidir al menos una pregunta con la recomendación citada. Revisa si la pregunta pide más de lo que la recomendación dice."
         unsupported: "Otro modelo eligió una opción distinta en al menos una pregunta. Revisa la respuesta marcada como correcta."
+        flawed: "Otro modelo eligió la misma respuesta, pero encontró en al menos una pregunta un defecto que la hace más fácil que el examen real. Corrígela o retira el caso."
         unverified: "Este caso todavía no pasa por la segunda opinión."
   question_reports:
     reasons:

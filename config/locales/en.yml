@@ -333,7 +333,14 @@ en:
       supported: "Supported"
       ambiguous: "Ambiguous"
       unsupported: "Not supported"
+      flawed: "Flawed"
       unverified: "Not verified"
+    flaws:
+      answer_in_stem: "the answer is already in the vignette"
+      other_patient: "it is about another patient"
+      repeats_question: "it repeats another question in the case"
+      implausible_distractor: "a distractor nobody would choose"
+      giveaway_wording: "the wording or an option's shape gives the answer away"
     question_count:
       one: "1 question"
       other: "%{count} questions"
@@ -383,6 +390,7 @@ en:
         supported: "Another model answered every question from the cited recommendation alone and chose the same option."
         ambiguous: "Another model could not decide at least one question from the cited recommendation. Check whether the question asks more than the recommendation says."
         unsupported: "Another model chose a different option on at least one question. Check the answer marked correct."
+        flawed: "Another model chose the same answer, but found a defect in at least one question that makes it easier than the real exam. Fix it or retire the case."
         unverified: "This case has not been through the second opinion yet."
   question_reports:
     reasons:

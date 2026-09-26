@@ -15,7 +15,13 @@ module Questions
 
     # Worst wins. A case is a unit — exams select whole cases — so one question whose
     # answer another family disputes holds the whole case back.
-    SEVERITY = %w[unsupported ambiguous supported].freeze
+    SEVERITY = %w[unsupported ambiguous flawed supported].freeze
+
+    # Item-writing defects that make a question easier than the real exam, found reading
+    # the validation batch (2026-09-25). None needs the marked answer, so asking for them
+    # leaves the blind answering intact. A code the model invents is ignored: only these
+    # hold a case back, and each has a label a reviewer reads (review.flaws).
+    FLAWS = %w[answer_in_stem other_patient repeats_question implausible_distractor giveaway_wording].freeze
 
     # Options go out lettered, as on the real exam. Numbered options were answered
     # zero-based often enough to record a verifier that agreed as one that disputed.
@@ -71,8 +77,21 @@ module Questions
         Para cada pregunta devuelve la letra de la opción que la recomendación respalda, y
         si la recomendación alcanza para decidirla.
 
+        Revisa además cada pregunta como revisor del ENARM real, y anota en "flaws" los
+        defectos claros que tenga, con estos códigos (lista vacía si no tiene ninguno):
+        - answer_in_stem: la respuesta ya está escrita en la viñeta; basta con localizarla,
+          no hay que razonar.
+        - other_patient: la pregunta trata de otro paciente o de una situación hipotética
+          ajena al caso.
+        - repeats_question: pregunta lo mismo que otra pregunta del caso, con otras palabras.
+        - implausible_distractor: alguna opción es absurda o nadie con formación médica la
+          elegiría.
+        - giveaway_wording: el enunciado contiene palabras que delatan la respuesta, o una
+          opción destaca de las demás por su forma o su longitud.
+        Marca solo defectos claros; en "note" di cuál es, en una oración.
+
         Devuelve SOLO JSON, sin markdown:
-        {"questions":[{"question":1,"option":"B","decidable":true,"note":"..."}]}
+        {"questions":[{"question":1,"option":"B","decidable":true,"flaws":[],"note":"..."}]}
       TEXT
     end
 
@@ -135,7 +154,11 @@ module Questions
       return ["ambiguous", note] if !judgement["decidable"] || chosen.nil?
       return ["unsupported", note] unless chosen.correct?
 
-      ["supported", nil]
+      flaws = FLAWS & Array(judgement["flaws"]).map(&:to_s)
+      return ["supported", nil] if flaws.empty?
+
+      labels = flaws.map { |flaw| I18n.t("review.flaws.#{flaw}") }.join(", ")
+      ["flawed", ["#{question.position}.", "#{labels}.", judgement["note"]].compact_blank.join(" ")]
     end
 
     def option_at(question, letter)

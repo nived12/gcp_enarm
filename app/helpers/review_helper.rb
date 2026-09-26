@@ -27,6 +27,7 @@ module ReviewHelper
   VERDICT_CLASSES = {
     "supported" => "border-correct text-correct",
     "ambiguous" => "border-line-strong text-ink",
+    "flawed" => "border-line-strong text-ink",
     "unsupported" => "border-incorrect bg-incorrect-soft text-incorrect",
     "unverified" => "border-line text-ink-faint"
   }.freeze

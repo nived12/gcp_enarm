@@ -100,6 +100,52 @@ RSpec.describe Questions::Verifier do
     expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
   end
 
+  describe "item-writing defects" do
+    it "holds back a case whose answer it agrees with but whose question gives it away, and says why" do
+      clinical_case.update!(verification_verdict: "supported", status: "published")
+      build_question
+      flawed = judgement(note: "La viñeta ya nombra el signo.").merge("flaws" => ["answer_in_stem"])
+      stub_verifier("questions" => [flawed])
+
+      described_class.call(clinical_case)
+
+      expect(clinical_case.reload).to have_attributes(verification_verdict: "flawed", status: "draft")
+      expect(clinical_case.verification_notes)
+        .to eq("1. #{I18n.t("review.flaws.answer_in_stem")}. La viñeta ya nombra el signo.")
+    end
+
+    it "ranks a wrong answer above a defect, since the answer is what a student learns" do
+      build_question(position: 1)
+      build_question(position: 2)
+      stub_verifier(
+        "questions" => [
+                judgement.merge("flaws" => ["implausible_distractor"]), judgement(question: 2, option: "B")
+              ]
+      )
+
+      expect(described_class.call(clinical_case).payload[:verdict]).to eq("unsupported")
+    end
+
+    it "ignores a defect code it did not ask for" do
+      build_question
+      stub_verifier("questions" => [judgement.merge("flaws" => ["too_hard"])])
+
+      expect(described_class.call(clinical_case).payload[:verdict]).to eq("supported")
+    end
+
+    it "asks for the defects without showing which answer is marked" do
+      build_question
+      stub_verifier("questions" => [judgement])
+
+      described_class.call(clinical_case)
+
+      expect(Llm::Completion).to have_received(:call) do |prompt:, **|
+        expect(prompt).to include(*described_class::FLAWS)
+        expect(prompt).not_to include("correcta)")
+      end
+    end
+  end
+
   # Numbered options were answered zero-based: on the pilot the verifier agreed in its
   # own note and was recorded as disputing the answer.
   it "reads an answer it cannot place as ambiguous, not as a dispute" do
