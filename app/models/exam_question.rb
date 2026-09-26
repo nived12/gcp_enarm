@@ -21,6 +21,14 @@ class ExamQuestion < ApplicationRecord
     exam.status_completed? || (exam.feedback_after_each? && answer.present?)
   end
 
+  # The options in the order this exam shows them. The model writes the correct answer
+  # first, so the stored order would make it always A. Seeded by this row's id, the order
+  # is new in every exam and stays put across reloads and in the review, so the letter a
+  # student picked is the letter they read back.
+  def answer_options
+    question.answer_options.to_a.shuffle(random: Random.new(id))
+  end
+
   def next_in_exam
     exam.exam_questions.find_by(position: position + 1)
   end

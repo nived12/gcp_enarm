@@ -31,7 +31,7 @@
         </h2>
 
         <div class="mt-4 space-y-2.5">
-          <% question.answer_options.each_with_index do |option, option_index| %>
+          <% question.answer_options.shuffle.each_with_index do |option, option_index| %>
             <button type="button" data-action="landing-case#answer" data-correct="<%= option.correct? %>"
                     class="landing-option group flex min-h-12 w-full items-start gap-3.5 rounded-control border border-line px-4 py-3 text-left text-sm leading-relaxed text-ink transition hover:border-accent enabled:active:scale-[0.99] disabled:cursor-default disabled:hover:border-line">
               <span class="numeric mt-px w-4 shrink-0 font-medium text-ink-faint group-data-[state=correct]:hidden group-data-[state=incorrect]:hidden"><%= option_letter(option_index) %></span>

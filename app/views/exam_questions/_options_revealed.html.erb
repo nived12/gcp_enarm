@@ -1,7 +1,7 @@
 <%# Correct and incorrect never rely on hue alone: the mark and the words carry the
     meaning, colour only agrees with them. %>
 <ul class="mt-6 space-y-3" lang="<%= exam_question.clinical_case.locale %>">
-  <% exam_question.question.answer_options.each_with_index do |option, index| %>
+  <% exam_question.answer_options.each_with_index do |option, index| %>
     <% chosen = answer&.answer_option_id == option.id %>
     <li class="flex items-start gap-4 rounded-card border px-5 py-4 text-sm leading-relaxed <%=
           if option.correct? then "border-correct bg-correct-soft"
