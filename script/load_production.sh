@@ -3,13 +3,15 @@
 # DEPLOY.md requires. Run from gpc_enarm/ on the machine that holds the corpus.
 #
 #   script/load_production.sh            # corpus + figures + bank (first load)
-#   script/load_production.sh --bank     # only the cases production does not have yet
+#   script/load_production.sh --bank     # the cases production lacks, and newer verdicts on the rest
 #   script/load_production.sh --resume   # corpus already uploaded: redo the Railway steps and the bank
 #
 # Every step is idempotent: the corpus keys on catalog_key and the bank on export_key,
 # so a rerun updates rather than duplicates. Review happens in production after launch,
-# so --bank runs questions:import_new: a case production already holds keeps its status
-# and edits, and only the cases it lacks come in. The first load and --resume still run
+# so --bank runs questions:import_new: a case production already holds keeps its text,
+# status and edits, and only the cases it lacks come in. The second opinion's verdicts do
+# move on to the cases it holds (questions:recheck can change them), which may take a case
+# off the bank but never put one on. The first load and --resume still run
 # questions:import, which overwrites the cases it finds (see DEPLOY.md).
 set -euo pipefail
 

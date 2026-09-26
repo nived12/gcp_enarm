@@ -64,8 +64,9 @@ module Questions
       figure = attributes.delete("image")
       references = attributes.extract!("run_key", "catalog_key", "topic_slug", "specialty_slug", "setting_slug")
 
-      if only_new && ClinicalCase.exists?(export_key: attributes["export_key"])
+      if only_new && (existing = ClinicalCase.find_by(export_key: attributes["export_key"]))
         counts[:cases_skipped] += 1
+        counts[:second_opinions_synced] += 1 if sync_second_opinion(existing, attributes, questions)
         return
       end
 
@@ -86,6 +87,38 @@ module Questions
         counts,
         "El caso #{attributes["export_key"]} no se pudo guardar: #{e.record.errors.full_messages.to_sentence}"
       )
+    end
+
+    # A case production already holds keeps its text, its status and whatever a person
+    # decided there. The second opinion is a model's, rerun here as the verifier learns
+    # (questions:recheck), so it moves on: the case's verdict and notes, and each
+    # rationale's verdict — only while production's rationale is the text that was judged.
+    # It may take a live case off the bank, never put one on; publishing stays with
+    # Questions::Publisher. True when anything changed.
+    def sync_second_opinion(kase, attributes, questions)
+      verdict = attributes.slice("verification_verdict", "verification_notes", "verified_at")
+      live = kase.status_published? && verdict["verification_verdict"] == "supported"
+      kase.assign_attributes(verdict.merge(status: kase.status_published? && !live ? "draft" : kase.status))
+      options = rationale_verdicts(kase, questions)
+      return false unless kase.changed? || options.any?(&:changed?)
+
+      ClinicalCase.transaction do
+        kase.save!
+        options.each(&:save!)
+      end
+      true
+    end
+
+    def rationale_verdicts(kase, questions)
+      Array(questions).flat_map do |question_attributes|
+        question = kase.questions.find { |candidate| candidate.position == question_attributes["position"] }
+        Array(question_attributes["options"]).filter_map do |attributes|
+          option = question&.answer_options&.find { |candidate| candidate.position == attributes["position"] }
+          next if option.nil? || option.rationale != attributes["rationale"]
+
+          option.tap { |judged| judged.assign_attributes(attributes.slice("rationale_verdict", "rationale_note")) }
+        end
+      end
     end
 
     def refuse(counts, message)

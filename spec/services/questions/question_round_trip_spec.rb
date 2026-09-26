@@ -288,6 +288,64 @@ RSpec.describe "question bank export and import" do
       expect(kase.questions.sole.answer_options.first.text).to eq("ECG de 12 derivaciones")
     end
 
+    describe "a newer second opinion on a case the database already has" do
+      let(:judged_at) { Time.zone.parse("2026-09-26 02:00") }
+
+      def rejudge(kase)
+        kase.update!(
+          verification_verdict: "flawed", verified_at: judged_at,
+          verification_notes: "1. repite otra pregunta del caso."
+        )
+        kase.questions.sole.answer_options.second.update!(rationale_verdict: "sound", rationale_note: nil)
+      end
+
+      it "takes a live case off the bank, says why, and brings the rationale verdicts along" do
+        kase = build_bank
+        rejudge(kase)
+        export
+        kase.update!(verification_verdict: "supported", verification_notes: nil, status: "published")
+        kase.questions.sole.answer_options.second.update!(rationale_verdict: "overstated")
+
+        result = import_new
+
+        expect(result.payload).to include(cases_skipped: 1, second_opinions_synced: 1)
+        expect(kase.reload).to have_attributes(
+          verification_verdict: "flawed", status: "draft", verified_at: judged_at,
+          verification_notes: "1. repite otra pregunta del caso."
+        )
+        expect(kase.questions.sole.answer_options.second.rationale_verdict).to eq("sound")
+      end
+
+      it "never puts a case on the bank, nor moves one a person withdrew" do
+        drafted = build_bank
+        drafted.update!(verification_verdict: "supported")
+        export
+        drafted.update!(verification_verdict: "flawed")
+
+        import_new
+        expect(drafted.reload).to have_attributes(verification_verdict: "supported", status: "draft")
+
+        rejudge(drafted)
+        export
+        drafted.update!(verification_verdict: "supported", status: "retired")
+
+        import_new
+        expect(drafted.reload).to have_attributes(verification_verdict: "flawed", status: "retired")
+      end
+
+      it "leaves a rationale's verdict alone when production has rewritten that rationale" do
+        kase = build_bank
+        rejudge(kase)
+        export
+        option = kase.questions.sole.answer_options.second
+        option.update!(rationale: "Corregida en producción.", rationale_verdict: "overstated")
+
+        import_new
+
+        expect(option.reload).to have_attributes(rationale: "Corregida en producción.", rationale_verdict: "overstated")
+      end
+    end
+
     it "imports the cases the database lacks exactly as a full import would" do
       build_bank
       export

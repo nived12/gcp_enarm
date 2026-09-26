@@ -61,8 +61,9 @@ namespace :questions do
   end
 
   # Once review happens in production, a case there has a status and edits the file
-  # knows nothing about; only the cases production lacks may come in.
-  desc "Load only the cases this database does not have yet, leaving existing ones untouched [path]"
+  # knows nothing about; only the cases production lacks may come in. The second opinion's
+  # verdicts still move on to the cases it has, and may only take one off the bank.
+  desc "Load the cases this database does not have yet, and newer verdicts on the ones it has [path]"
   task :import_new, [:path] => :environment do |_task, args|
     import_bank.call(args[:path], only_new: true)
   end
